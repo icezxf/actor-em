@@ -19,6 +19,8 @@ func main() {
 	var (
 		refresh    string
 		refreshAll bool
+		scanNFO    bool
+		noXlsx     bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -29,20 +31,49 @@ func main() {
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "actors.json 路径")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
+	flag.StringVar(&cfg.Source, "source", cfg.Source, "演员清单来源：txt（默认）或 emby")
+	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
+	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
+	flag.BoolVar(&noXlsx, "no-xlsx", false, "不导出 Excel")
+	flag.BoolVar(&scanNFO, "scan-nfo", false, "只扫描 alist 里的 nfo 生成演员清单，不刮削")
+	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
+	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 	start := time.Now()
 
-	if cfg.EmbyURL == "" {
-		logger.Fatal("缺少 Emby 地址：设置 EMBY_URL 或在 config.local.go 里填 EmbyURL")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Hour)
+	defer cancel()
+
+	cfg.Source = strings.ToLower(strings.TrimSpace(cfg.Source))
+	if cfg.Source == "" {
+		cfg.Source = "txt"
 	}
+
+	// 只扫描 nfo 生成清单，不抓数据
+	if scanNFO {
+		if err := runScanNFO(ctx, cfg, logger); err != nil {
+			logger.Fatalf("扫描 nfo 失败: %v", err)
+		}
+		return
+	}
+
 	if cfg.TPDBAPIKey == "" && cfg.JavStashAPIKey == "" && cfg.StashDBAPIKey == "" {
 		logger.Fatal("至少要配一个数据源 Key（TPDB / JavStash / StashDB），否则所有演员都会被判成 no_source")
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Hour)
-	defer cancel()
+	switch cfg.Source {
+	case "txt":
+		if _, err := os.Stat(cfg.NamesFile); err != nil {
+			logger.Fatalf("读不到演员清单 %s：%v（用 --names 指定，或先跑 --scan-nfo 生成）", cfg.NamesFile, err)
+		}
+	case "emby":
+		if cfg.EmbyURL == "" {
+			logger.Fatal("source=emby 但缺少 Emby 地址：设置 EMBY_URL")
+		}
+	default:
+		logger.Fatalf("未知的清单来源 %q，只支持 txt / emby", cfg.Source)
+	}
 
 	// ---------- 1. 读本地库 ----------
 	db, err := actorsync.LoadDb(cfg.DataFile)
@@ -51,16 +82,25 @@ func main() {
 	}
 	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
 
-	// ---------- 2. 拉 Emby 人物清单 ----------
-	emby := actorsync.NewEmbyClient(cfg.EmbyURL, cfg.EmbyUser, cfg.EmbyPass, cfg.EmbyAPIKey)
-	if err := emby.Login(ctx); err != nil {
-		logger.Fatalf("Emby 登录失败: %v", err)
+	// ---------- 2. 读待抓清单（txt 或 Emby） ----------
+	var persons []actorsync.EmbyPerson
+	if cfg.Source == "txt" {
+		persons, err = actorsync.LoadNamesFile(cfg.NamesFile)
+		if err != nil {
+			logger.Fatalf("读取演员清单失败: %v", err)
+		}
+		logger.Printf("演员清单：%d 个（%s）", len(persons), cfg.NamesFile)
+	} else {
+		emby := actorsync.NewEmbyClient(cfg.EmbyURL, cfg.EmbyUser, cfg.EmbyPass, cfg.EmbyAPIKey)
+		if err := emby.Login(ctx); err != nil {
+			logger.Fatalf("Emby 登录失败: %v", err)
+		}
+		persons, err = emby.ListPersons(ctx)
+		if err != nil {
+			logger.Fatalf("拉取 Emby 人物清单失败: %v", err)
+		}
+		logger.Printf("Emby 人物：%d 个", len(persons))
 	}
-	persons, err := emby.ListPersons(ctx)
-	if err != nil {
-		logger.Fatalf("拉取 Emby 人物清单失败: %v", err)
-	}
-	logger.Printf("Emby 人物：%d 个", len(persons))
 
 	// ---------- 3. 算本轮待抓名单 ----------
 	var refreshNames []string
@@ -74,7 +114,8 @@ func main() {
 	stats := actorsync.RunStats{
 		StartedAt:   start.UTC().Format(time.RFC3339),
 		Picked:      len(plan),
-		EmbyPersons: len(persons),
+		Source:      cfg.Source,
+		SourceCount: len(persons),
 	}
 
 	if cfg.Limit > 0 && len(plan) > cfg.Limit {
@@ -231,8 +272,59 @@ func main() {
 		logger.Fatalf("保存 actors.json 失败: %v", err)
 	}
 	writeManifest(logger, cfg, db, stats, srcStats, start)
+	if !noXlsx {
+		if err := actorsync.ExportXLSX(cfg.XlsxFile, db); err != nil {
+			logger.Printf("⚠️  导出 Excel 失败: %v", err)
+		} else {
+			logger.Printf("Excel 已导出：%s", cfg.XlsxFile)
+		}
+	}
 	logger.Printf("完成：库内 %d 条，新增 %d，更新 %d，失败 %d，用时 %s",
 		len(db.Actors), added, updated, failed, time.Since(start).Round(time.Second))
+}
+
+// runScanNFO 递归读 alist 目录下的 nfo，把演员名写成待抓清单。
+func runScanNFO(ctx context.Context, cfg *Config, logger *log.Logger) error {
+	if cfg.AlistURL == "" || cfg.AlistUser == "" {
+		return fmt.Errorf("扫描 nfo 需要配置 ALIST_URL / ALIST_USER / ALIST_PASS")
+	}
+	if cfg.NFODir == "" {
+		return fmt.Errorf("缺少 nfo 目录：设置 ALIST_NFO_DIR 或传 --nfo-dir")
+	}
+
+	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistPublicBase, cfg.AlistUser, cfg.AlistPass)
+	if err := alist.Login(ctx); err != nil {
+		return fmt.Errorf("alist 登录失败: %w", err)
+	}
+	logger.Printf("开始扫描：%s（最多 %d 个 nfo，0 = 不限）", cfg.NFODir, cfg.NFOMaxFiles)
+
+	names, st, err := actorsync.ScanNFODirectory(ctx, alist, cfg.NFODir, cfg.NFOMaxFiles, func(s actorsync.ScanStats) {
+		logger.Printf("  已读 %d 个目录 / %d 个 nfo", s.Dirs, s.NFOCount)
+	})
+	if err != nil {
+		return err
+	}
+	logger.Printf("扫描完成：目录 %d，nfo %d，读取失败 %d，演员 %d", st.Dirs, st.NFOCount, st.ParseFail, len(names))
+
+	if cfg.DryRun {
+		logger.Printf("dry-run：不写 %s，前 5 个：%v", cfg.NamesFile, firstN(names, 5))
+		return nil
+	}
+	if len(names) == 0 {
+		return fmt.Errorf("一个演员都没解析到，检查目录是否正确、nfo 里是否有 <actor><name>")
+	}
+	if err := actorsync.SaveNamesFile(cfg.NamesFile, names); err != nil {
+		return fmt.Errorf("写入 %s 失败: %w", cfg.NamesFile, err)
+	}
+	logger.Printf("已写入 %s（%d 个演员）", cfg.NamesFile, len(names))
+	return nil
+}
+
+func firstN(s []string, n int) []string {
+	if len(s) < n {
+		return s
+	}
+	return s[:n]
 }
 
 func writeManifest(logger *log.Logger, cfg *Config, db *actorsync.Db, stats actorsync.RunStats, srcStats map[string]map[string]int, start time.Time) {

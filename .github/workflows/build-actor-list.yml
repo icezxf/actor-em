@@ -1,0 +1,64 @@
+name: build-actor-list
+
+# 从 alist 里指定目录的 nfo 提取演员名，生成 actors.txt。
+# 和 actor-sync 解耦：这个只负责"该抓谁"，那边只负责"怎么抓"。
+
+on:
+  schedule:
+    # 每周一 20:00 UTC = 北京时间周二 04:00
+    - cron: "0 20 * * 0"
+  workflow_dispatch:
+    inputs:
+      nfo_dir:
+        description: "alist 里 nfo 所在目录（留空用 ALIST_NFO_DIR）"
+        default: ""
+      nfo_max:
+        description: "最多读多少个 nfo（0 = 不限）"
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-actor-list
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build -o /tmp/actorsync ./cmd/actorsync
+
+      - name: Scan nfo
+        env:
+          ALIST_URL: ${{ secrets.ALIST_URL }}
+          ALIST_USER: ${{ secrets.ALIST_USER }}
+          ALIST_PASS: ${{ secrets.ALIST_PASS }}
+          ALIST_NFO_DIR: ${{ github.event.inputs.nfo_dir || secrets.ALIST_NFO_DIR }}
+          ALIST_NFO_MAX: ${{ github.event.inputs.nfo_max || '0' }}
+          ACTORS_TXT: actors.txt
+          ACTORS_VERBOSE: "1"
+        run: /tmp/actorsync --scan-nfo
+
+      - name: Commit actors.txt
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add actors.txt
+          if git diff --cached --quiet; then
+            echo "演员清单无变化"
+            exit 0
+          fi
+          git commit -m "chore(actors): 从 nfo 更新待抓清单 $(date -u +%F)"
+          git pull --rebase --autostash origin main
+          git push

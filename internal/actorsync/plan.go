@@ -118,7 +118,7 @@ func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
 		Name:             displayName,
 		NameOriginal:     StrPtr(origName),
 		Aliases:          res.Aliases,
-		EmbyIDs:          []string{embyID},
+		EmbyIDs:          mergeStrings(nil, []string{embyID}),
 		Gender:           StrPtr(res.Gender),
 		BirthDate:        StrPtr(res.BirthDate),
 		BirthPlace:       StrPtr(res.BirthPlace),
@@ -170,6 +170,11 @@ func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
 	default:
 		a.FailCount = 0
 		a.RetryAfter = nil
+	}
+
+	// 清单来自 txt 时没有 Emby Id，保留记录里原有的
+	if embyID == "" && existing != nil {
+		a.EmbyIDs = existing.EmbyIDs
 	}
 
 	// 没抓到图时，保留旧头像字段，不要把已有图擦掉

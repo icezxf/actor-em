@@ -82,5 +82,6 @@ type RunStats struct {
 	Added       int    `json:"added"`
 	Updated     int    `json:"updated"`
 	Failed      int    `json:"failed"`
-	EmbyPersons int    `json:"emby_persons"`
+	Source      string `json:"source"`       // txt / emby
+	SourceCount int    `json:"source_count"` // 待抓清单里的演员总数
 }

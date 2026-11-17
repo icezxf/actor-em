@@ -1,20 +1,35 @@
 # actor-em
 
-从 Emby 拉演员清单，只给**库里还没有的新演员**补元数据，头像转存到 alist，结果写成根目录的 `actors.json`。
-任何程序读这一个文件就能拿到全部演员信息，不需要连 Emby、也不需要数据库。
+读 `actors.txt` 里的待抓清单（也可以从 alist 的 nfo 自动生成），只给**库里还没有的演员**补元数据，
+头像转存到 alist，结果写成根目录的 `actors.json`，同时导出 `actors.xlsx` 方便手工查询。
+任何程序读这一个 JSON 就能拿到全部演员信息，不需要连 Emby、也不需要数据库。
 
 ```
-Emby /Persons ──> 对比 actors.json ──> 只抓新增 ──> 四源聚合 ──> alist 头像
-                                                              │
-                                                       actors.json + manifest
+actors.txt（手工 / nfo 扫描）
+      │
+      ▼
+对比 actors.json ──> 只抓新增 ──> 四源聚合 ──> alist 头像
+                                              │
+                                    actors.json + manifest + actors.xlsx
 ```
+
+## 两个工作流
+
+| 工作流 | 职责 | 触发 |
+|---|---|---|
+| `build-actor-list.yml` | 扫 alist 目录里的 `.nfo`，把 `<actor><name>` 收集成 `actors.txt` | 每周一 + 手动 |
+| `actor-sync.yml` | 按 `actors.txt` 增量刮削，产出 json/manifest/xlsx | 每天 04:00 UTC + 手动 |
+
+两者解耦：清单从哪来不影响抓取逻辑。不想用 nfo 扫描就手工往 `actors.txt` 里加名字。
 
 ## 产物
 
 | 文件 | 说明 |
 |---|---|
+| `actors.txt` | 待抓清单，一行一个名字；`#` 开头是注释 |
 | `actors.json` | 唯一真源。单文件对象，`{schema_version, generated_at, count, actors[]}` |
 | `actors.manifest.json` | 健康度快照：各状态数量、各源命中率、上轮耗时 |
+| `actors.xlsx` | 由 json 导出的只读表格，带筛选和冻结首行，**改它不会回流** |
 
 单条记录的完整示例见 [`actors.example.json`](actors.example.json)。字段说明见下方[数据结构](#数据结构)。
 
@@ -23,7 +38,11 @@ Emby /Persons ──> 对比 actors.json ──> 只抓新增 ──> 四源聚�
 ```bash
 # 1. 准备配置
 cp cmd/actorsync/config.local.go.example cmd/actorsync/config.local.go
-#    打开 config.local.go，填 Emby 和 alist 的地址、账号
+#    打开 config.local.go，填 alist 的地址、账号和数据源 key
+
+# 1.5 生成待抓清单（从 alist 的 nfo）
+make run ARGS="--scan-nfo --nfo-dir /media"
+#    或者手工往 actors.txt 里写名字，一行一个
 
 # 2. 先空跑看看会抓谁
 make run ARGS="--limit 3 --dry-run"
@@ -44,8 +63,12 @@ make run
 
 | 环境变量 | 对应配置 | 必填 | 说明 |
 |---|---|---|---|
-| `EMBY_URL` | EmbyURL | ✅ | 例 `https://emby.example.com` |
-| `EMBY_USER` / `EMBY_PASS` | EmbyUser / EmbyPass | ✅ | 建议新建**只读**账号，别用管理员 |
+| `ACTORS_SOURCE` | Source | ✅ | `txt`（默认）/ `emby` |
+| `ACTORS_TXT` | NamesFile | ✅ | 待抓清单，默认 `actors.txt` |
+| `ACTORS_XLSX` | XlsxFile | 可选 | 导出的 Excel，默认 `actors.xlsx` |
+| `ALIST_NFO_DIR` | NFODir | 扫 nfo 时必填 | alist 里 nfo 所在目录 |
+| `EMBY_URL` | EmbyURL | 仅 emby 模式 | 例 `https://emby.example.com` |
+| `EMBY_USER` / `EMBY_PASS` | EmbyUser / EmbyPass | 仅 emby 模式 | 建议新建**只读**账号，别用管理员 |
 | `EMBY_API_KEY` | EmbyAPIKey | 可选 | 账号开了 2FA 时用这个兜底 |
 | `TPDB_API_KEY` | TPDBAPIKey | 建议 | 生日、三围、体重、图的主要来源 |
 | `JAVSTASH_API_KEY` | JavStashAPIKey | ✅ | 日系演员主力源 |
@@ -78,14 +101,32 @@ gh secret list                       # 核对
 ```bash
 actorsync [flags]
 
+  --source txt|emby    清单来源，默认 txt
+  --names actors.txt   清单文件（--source txt 时用）
   --limit N            本轮最多处理多少个（0 = 不限）
   --dry-run            只打印，不写文件
   --refresh 名字,名字   重抓指定演员
   --refresh-all        重抓库里所有演员（最慢）
   --force-avatar       头像已存在也重新上传
+  --xlsx actors.xlsx   导出 Excel 的路径
+  --no-xlsx            不导出 Excel
   --verbose            打印每个源的命中情况
   --data / --manifest  自定义文件路径
+
+  # 只扫描 nfo，生成 actors.txt，不抓数据
+  --scan-nfo --nfo-dir /media [--nfo-max 500]
 ```
+
+### 清单从哪来
+
+默认读 `actors.txt`，一行一个名字，`#` 开头是注释。三种来源都行：
+
+1. 手工写（最直接，100 个演员也就几分钟）
+2. `--scan-nfo --nfo-dir /media`：递归读 alist 目录里所有 `.nfo` 的 `<actor><name>`，去重后写回
+3. `--source emby`：退回老逻辑，走 Emby `/Persons`
+
+nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<actor>` 下的 `<name>`，
+不会把 `<movie><name>` 的片名当成演员。
 
 ## 数据结构
 
@@ -94,7 +135,7 @@ actorsync [flags]
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `key` | string | 主键。`javstash:` → `stashdb:` → `tpdb:` → `name:<sha1>` 降级 |
-| `name` | string | **Emby 里的名字**，也是头像文件名 |
+| `name` | string | 清单里的名字，也是头像文件名 |
 | `name_original` | string? | 数据源返回的原始名（多为日文原名） |
 | `aliases` | string[] | 别名 |
 | `emby_ids` | string[] | Emby Person Id，多服务器时追加 |

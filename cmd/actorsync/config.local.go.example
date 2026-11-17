@@ -34,10 +34,20 @@ func applyLocalFile(c *Config) {
 	c.AlistDir = "/actors"
 	c.AlistPublicBase = "" // 有独立直链域名时填，例如 https://cdn.example.com
 
+	// ===== 演员清单 =====
+	// txt：读 actors.txt（推荐，不依赖 Emby）
+	// emby：走 Emby /Persons 接口
+	c.Source = "txt"
+	c.NamesFile = "actors.txt"
+
+	// nfo 扫描（--scan-nfo 用）：从 alist 的这个目录递归读 nfo 里的演员名
+	c.NFODir = "/media"
+
 	// ===== 其他 =====
 	// 中文名 → 日文名字典，决定中文名能不能搜到日系数据源
 	c.DictFile = "data/actor_dict.csv"
 	c.DataFile = "actors.json"
 	c.ManifestFile = "actors.manifest.json"
+	c.XlsxFile = "actors.xlsx"
 	c.Verbose = true
 }

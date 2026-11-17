@@ -239,3 +239,89 @@ func TestDictMissingFile(t *testing.T) {
 		t.Fatalf("应为空字典，实际 %d", d.Size())
 	}
 }
+
+func TestLoadNamesFile(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "actors.txt")
+	content := "# 注释行\n小凑四叶\n\n  三上悠亚  \n小湊よつ葉\n小凑四叶\n"
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := LoadNamesFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 空行/注释跳过，重复（规范化后）只留一次
+	if len(got) != 3 {
+		t.Fatalf("期望 3 条，实际 %d: %+v", len(got), got)
+	}
+	if got[1].Name != "三上悠亚" {
+		t.Fatalf("应去掉首尾空格，实际 %q", got[1].Name)
+	}
+	if got[0].ID != "" {
+		t.Fatalf("txt 来源不应有 Emby Id")
+	}
+}
+
+func TestSaveNamesFileRoundTrip(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "actors.txt")
+	if err := SaveNamesFile(p, []string{"b", "a", "a", " "}); err != nil {
+		t.Fatal(err)
+	}
+	got, err := LoadNamesFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0].Name != "a" || got[1].Name != "b" {
+		t.Fatalf("应去重并排序，实际 %+v", got)
+	}
+}
+
+func TestParseNFOActors(t *testing.T) {
+	nfo := []byte(`<?xml version="1.0" encoding="utf-8"?>
+<movie>
+  <title>某部作品</title>
+  <name>片名不应被当成演员</name>
+  <actor>
+    <name>小湊よつ葉</name>
+    <role>主演</role>
+  </actor>
+  <actor><name> 三上悠亜 </name></actor>
+  <actor><name></name></actor>
+</movie>`)
+	got := ParseNFOActors(nfo)
+	if len(got) != 2 {
+		t.Fatalf("期望 2 个演员，实际 %d: %v", len(got), got)
+	}
+	if got[0] != "小湊よつ葉" || got[1] != "三上悠亜" {
+		t.Fatalf("解析结果不对: %v", got)
+	}
+}
+
+func TestParseNFOInvalid(t *testing.T) {
+	if got := ParseNFOActors([]byte("not xml at all")); got != nil {
+		t.Fatalf("非 xml 应返回空，实际 %v", got)
+	}
+}
+
+func TestExportXLSX(t *testing.T) {
+	db := &Db{SchemaVersion: 1}
+	db.Actors = []*Actor{
+		{
+			Key: "javstash:abc", Name: "小凑四叶", NameOriginal: StrPtr("小湊よつ葉"),
+			Aliases: []string{"こみなとよつば"}, Status: StatusOK, BirthDate: StrPtr("1996-05-10"),
+			HeightCm: IntPtr(160), ProviderIDs: map[string]string{"JavStash": "abc"},
+			Sources:   map[string]bool{"javstash": true, "tpdb": false},
+			Avatar:    StrPtr("https://alist.example.com/d/actors/x.jpg"),
+			ScrapedAt: "2026-01-01T00:00:00Z",
+		},
+	}
+	out := filepath.Join(t.TempDir(), "actors.xlsx")
+	if err := ExportXLSX(out, db); err != nil {
+		t.Fatalf("导出失败: %v", err)
+	}
+	fi, err := os.Stat(out)
+	if err != nil || fi.Size() < 2000 {
+		t.Fatalf("导出文件异常: %v size=%v", err, fi)
+	}
+}

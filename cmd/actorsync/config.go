@@ -32,11 +32,20 @@ type Config struct {
 	AlistDir        string // /actors
 	AlistPublicBase string // 直链前缀，留空 = AlistURL
 
+	// 演员清单来源
+	Source    string // txt（默认）/ emby
+	NamesFile string // 一行一个演员名的 txt
+
 	// 本地文件
 	DataFile      string
 	ManifestFile  string
 	DictFile      string
 	DictLocalFile string // 手工补充字典，覆盖主字典
+	XlsxFile      string // 导出的 Excel（派生产物）
+
+	// NFO 扫描（--scan-nfo）
+	NFODir      string
+	NFOMaxFiles int
 
 	// 行为
 	Limit       int
@@ -55,6 +64,9 @@ func DefaultConfig() *Config {
 		ManifestFile:     "actors.manifest.json",
 		DictFile:         "data/actor_dict.csv",
 		DictLocalFile:    "data/actor_dict.local.csv",
+		Source:           "txt",
+		NamesFile:        "actors.txt",
+		XlsxFile:         "actors.xlsx",
 		Limit:            0,
 	}
 }
@@ -97,6 +109,15 @@ func applyEnv(c *Config) {
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
 	set(&c.DictFile, "ACTOR_DICT")
 	set(&c.DictLocalFile, "ACTOR_DICT_LOCAL")
+	set(&c.XlsxFile, "ACTORS_XLSX")
+	set(&c.Source, "ACTORS_SOURCE")
+	set(&c.NamesFile, "ACTORS_TXT")
+	set(&c.NFODir, "ALIST_NFO_DIR")
+	if v := os.Getenv("ALIST_NFO_MAX"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			c.NFOMaxFiles = n
+		}
+	}
 
 	if v := os.Getenv("ACTORS_LIMIT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
