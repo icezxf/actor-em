@@ -71,6 +71,19 @@ func (d *Dict) Lookup(name string) string {
 	return d.m[NormalizeName(name)]
 }
 
+// Merge 用另一份字典覆盖当前字典，用于手工补充条目。
+// 主字典从 amane 自动生成、会被覆盖，手工维护请写在补充字典里。
+func (d *Dict) Merge(other *Dict) {
+	if d == nil || other == nil {
+		return
+	}
+	for k, v := range other.m {
+		if v != "" {
+			d.m[k] = v
+		}
+	}
+}
+
 // Size 用于启动日志。
 func (d *Dict) Size() int {
 	if d == nil {

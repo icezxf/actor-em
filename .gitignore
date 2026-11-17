@@ -9,3 +9,6 @@ bin/
 *.tmp
 *.log
 .DS_Store
+
+# 本地填写的 Secrets 清单，永不入库
+secrets.env

@@ -33,9 +33,10 @@ type Config struct {
 	AlistPublicBase string // 直链前缀，留空 = AlistURL
 
 	// 本地文件
-	DataFile     string
-	ManifestFile string
-	DictFile     string
+	DataFile      string
+	ManifestFile  string
+	DictFile      string
+	DictLocalFile string // 手工补充字典，覆盖主字典
 
 	// 行为
 	Limit       int
@@ -53,6 +54,7 @@ func DefaultConfig() *Config {
 		DataFile:         "actors.json",
 		ManifestFile:     "actors.manifest.json",
 		DictFile:         "data/actor_dict.csv",
+		DictLocalFile:    "data/actor_dict.local.csv",
 		Limit:            0,
 	}
 }
@@ -94,6 +96,7 @@ func applyEnv(c *Config) {
 	set(&c.DataFile, "ACTORS_FILE")
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
 	set(&c.DictFile, "ACTOR_DICT")
+	set(&c.DictLocalFile, "ACTOR_DICT_LOCAL")
 
 	if v := os.Getenv("ACTORS_LIMIT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {

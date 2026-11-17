@@ -57,9 +57,21 @@ make run
 | `ALIST_DIR` | AlistDir | ✅ | 头像根目录，默认 `/actors` |
 | `ALIST_PUBLIC_BASE` | AlistPublicBase | 可选 | 独立直链域名，默认同 `ALIST_URL` |
 | `ACTOR_DICT` | DictFile | 建议 | 中文→日文名字典，默认 `data/actor_dict.csv` |
+| `ACTOR_DICT_LOCAL` | DictLocalFile | 可选 | 手工补充字典，默认 `data/actor_dict.local.csv` |
 | `TPDB_ENDPOINT` / `JAVSTASH_ENDPOINT` / `STASHDB_ENDPOINT` | Endpoint | 可选 | 换镜像/代理时用，默认官方地址 |
 | `ACTORS_LIMIT` | Limit | 可选 | 本轮最多处理多少个，0 = 不限 |
 | `ACTORS_DRY_RUN` | DryRun | 可选 | `1` = 只打印不写盘 |
+
+### Secrets 一次性配置
+
+Actions 里没有 `config.local.go`，只能走 Secrets。逐个在网页点太啰嗦，用脚本：
+
+```bash
+cp secrets.env.example secrets.env   # 填好值，文件已被 .gitignore 排除
+gh auth login                        # 只需一次
+./scripts/setup-secrets.sh           # 批量写入，空值会跳过
+gh secret list                       # 核对
+```
 
 ## 命令行
 
@@ -124,7 +136,18 @@ actorsync [flags]
 Emby 里的演员名通常是中文（`小凑四叶`），而 JavStash / TPDB 只认日文或罗马字（`小湊よつ葉`）。
 **没有这层映射，日系演员几乎一条都搜不到。**
 
-字典是一个两列 CSV：
+字典分两份，两列 CSV：
+
+| 文件 | 来源 | 能不能手改 |
+|---|---|---|
+| `data/actor_dict.csv` | `scripts/gen_dict.py` 从 [amane 映射表](https://github.com/sqzw-x/amane) 生成，约 1 万条 | ❌ 会被重新生成覆盖 |
+| `data/actor_dict.local.csv` | 你自己补的，覆盖主字典同名条目 | ✅ 随便改 |
+
+```bash
+python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷）
+```
+
+手工补充写进 `data/actor_dict.local.csv`：
 
 ```csv
 中文名,日文名
@@ -132,12 +155,9 @@ Emby 里的演员名通常是中文（`小凑四叶`），而 JavStash / TPDB �
 三上悠亚,三上悠亜
 ```
 
-从你现有的 QMS 字典库导出（表名以 `.tables` 实际输出为准）：
-
-```bash
-sqlite3 /path/to/actor_dict.db ".tables"
-sqlite3 -csv /path/to/actor_dict.db "select zh_name, jp_name from actor_mappings;" > data/actor_dict.csv
-```
+主字典来自 QMS 同一份数据源（`mapping_actor.xml`），但它并不覆盖所有译名——
+比如它只有 `小凑よつ叶`，没有 `小凑四叶`。这种缺口就靠 `.local.csv` 补，
+两者在加载时合并，不冲突。
 
 查找顺序是：字典 → Ouxiang 站点 → 维基跨语言重定向 → 直接用原名搜。
 所以字典不是唯一途径，但它最稳、最快，也最省请求。

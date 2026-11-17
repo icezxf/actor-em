@@ -125,6 +125,13 @@ func main() {
 	} else {
 		logger.Printf("提示：未找到中文名字典 %s，中文名可能搜不到日系数据源", cfg.DictFile)
 	}
+	// 补充字典：手工维护，覆盖主字典里的同名条目
+	if local, err := actorsync.LoadDict(cfg.DictLocalFile); err != nil {
+		logger.Printf("⚠️  读取补充字典失败: %v", err)
+	} else if local.Size() > 0 {
+		dict.Merge(local)
+		logger.Printf("补充字典：%d 条（%s），合计 %d 条", local.Size(), cfg.DictLocalFile, dict.Size())
+	}
 	fetcher.Dict = dict
 
 	var alist *actorsync.AlistClient

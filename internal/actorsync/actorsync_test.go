@@ -189,3 +189,53 @@ func TestNormalizeDate(t *testing.T) {
 		}
 	}
 }
+
+func TestDictMergeOverride(t *testing.T) {
+	dir := t.TempDir()
+	mainPath := filepath.Join(dir, "main.csv")
+	localPath := filepath.Join(dir, "local.csv")
+
+	if err := os.WriteFile(mainPath, []byte("中文名,日文名\n小凑よつ叶,小湊よつ葉\n三上悠亚,三上悠亜\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(localPath, []byte("中文名,日文名\n三上悠亚,三上悠亜改\n小凑四叶,小湊よつ葉\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	d, err := LoadDict(mainPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := d.Lookup("三上悠亚"); got != "三上悠亜" {
+		t.Fatalf("主字典应命中三上悠亜，实际 %q", got)
+	}
+	if got := d.Lookup("小凑四叶"); got != "" {
+		t.Fatalf("主字典不应命中 小凑四叶，实际 %q", got)
+	}
+
+	l, err := LoadDict(localPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d.Merge(l)
+
+	if got := d.Lookup("三上悠亚"); got != "三上悠亜改" {
+		t.Fatalf("补充字典应覆盖同名条目，实际 %q", got)
+	}
+	if got := d.Lookup("小凑四叶"); got != "小湊よつ葉" {
+		t.Fatalf("补充字典应新增条目，实际 %q", got)
+	}
+	if got := d.Lookup("小凑よつ叶"); got != "小湊よつ葉" {
+		t.Fatalf("原有条目不应丢失，实际 %q", got)
+	}
+}
+
+func TestDictMissingFile(t *testing.T) {
+	d, err := LoadDict(filepath.Join(t.TempDir(), "nope.csv"))
+	if err != nil {
+		t.Fatalf("文件不存在不应报错: %v", err)
+	}
+	if d.Size() != 0 {
+		t.Fatalf("应为空字典，实际 %d", d.Size())
+	}
+}
