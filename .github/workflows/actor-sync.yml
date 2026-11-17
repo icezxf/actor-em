@@ -1,0 +1,84 @@
+name: actor-sync
+
+on:
+  schedule:
+    # 每天 04:00 UTC = 北京时间 12:00
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "本轮最多处理多少个演员（0 = 不限）"
+        default: "150"
+      dry_run:
+        description: "只打印结果，不写文件"
+        type: boolean
+        default: false
+      refresh:
+        description: "重抓指定演员，逗号分隔（留空则只抓新增）"
+        default: ""
+
+permissions:
+  contents: write
+
+# 同一时间只允许一轮在跑，避免两轮同时写 actors.json
+concurrency:
+  group: actor-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+          cache: true
+
+      - name: Build
+        run: go build -o /tmp/actorsync ./cmd/actorsync
+
+      - name: Sync actors
+        env:
+          EMBY_URL: ${{ secrets.EMBY_URL }}
+          EMBY_USER: ${{ secrets.EMBY_USER }}
+          EMBY_PASS: ${{ secrets.EMBY_PASS }}
+          EMBY_API_KEY: ${{ secrets.EMBY_API_KEY }}
+          TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+          WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+          ALIST_URL: ${{ secrets.ALIST_URL }}
+          ALIST_USER: ${{ secrets.ALIST_USER }}
+          ALIST_PASS: ${{ secrets.ALIST_PASS }}
+          ALIST_DIR: ${{ secrets.ALIST_DIR }}
+          ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
+          ACTORS_LIMIT: ${{ github.event.inputs.limit || '150' }}
+          ACTORS_VERBOSE: "1"
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.refresh }}" ]; then
+            ARGS="--refresh ${{ github.event.inputs.refresh }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          /tmp/actorsync $ARGS
+
+      - name: Commit
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add actors.json actors.manifest.json
+          if git diff --cached --quiet; then
+            echo "本轮无变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "chore(actors): sync $(date -u +%F)"
+          git pull --rebase --autostash origin main
+          git push

@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-17T04:12:33Z",
+  "count": 2,
+  "actors": [
+    {
+      "key": "javstash:8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",
+      "name": "小凑四叶",
+      "name_original": "小湊よつ葉",
+      "aliases": ["こみなとよつば", "小湊よつ葉"],
+      "emby_ids": ["local-1234"],
+
+      "gender": "female",
+      "birth_date": "1996-05-10",
+      "death_date": null,
+      "birth_place": "日本",
+      "country": "JP",
+
+      "height_cm": 160,
+      "weight_kg": 45,
+      "cup_size": "D",
+      "waist_cm": 58,
+      "hip_cm": 85,
+
+      "career_start": 2019,
+
+      "bio": "小湊よつ葉，日本女演员，1996年5月10日出生于日本。2019年出道，所属事务所……（此处为中文简介，长度通常 100~800 字）",
+      "bio_lang": "zh",
+
+      "avatar": "https://alist.example.com/d/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg",
+      "avatar_path": "/actors/小/小凑四叶.jpg",
+      "avatar_dir": "/actors/小",
+      "avatar_source": "https://cdndata.javstash.com/media/performers/8f2c1e0a/original.jpg",
+      "avatar_source_site": "javstash",
+      "avatar_sha256": "3f8a9c1e5b7d2a4f6c8e0b1d3f5a7c9e2b4d6f8a0c1e3b5d7f9a2c4e6b8d0f1a",
+      "avatar_bytes": 48213,
+      "avatar_w": 480,
+      "avatar_h": 640,
+
+      "provider_ids": {
+        "JavStash": "8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",
+        "StashDB": "7a1b2c3d-4e5f-6789-abcd-ef0123456789",
+        "TPDB": "performer-88213",
+        "Ouxiang": "https://www.ouxiangdanku.com/idol/xxxx",
+        "Wikipedia": "小湊よつ葉"
+      },
+
+      "status": "ok",
+      "sources": {
+        "javstash": true,
+        "tpdb": true,
+        "stashdb": true,
+        "wiki": true,
+        "ouxiang": true
+      },
+      "fail_count": 0,
+      "retry_after": null,
+
+      "created_at": "2026-11-16T04:10:11Z",
+      "scraped_at": "2026-11-17T04:10:52Z"
+    },
+    {
+      "key": "name:5e8d7c6b9a1f3e2d4c5b6a7988f7e6d5c4b3a291",
+      "name": "John Smith",
+      "name_original": "John Smith",
+      "aliases": [],
+      "emby_ids": ["local-8871"],
+
+      "gender": "male",
+      "birth_date": null,
+      "death_date": null,
+      "birth_place": null,
+      "country": null,
+
+      "height_cm": null,
+      "weight_kg": null,
+      "cup_size": null,
+      "waist_cm": null,
+      "hip_cm": null,
+
+      "career_start": null,
+
+      "bio": null,
+      "bio_lang": null,
+
+      "avatar": null,
+      "avatar_path": null,
+      "avatar_dir": null,
+      "avatar_source": null,
+      "avatar_source_site": null,
+      "avatar_sha256": null,
+      "avatar_bytes": null,
+      "avatar_w": null,
+      "avatar_h": null,
+
+      "provider_ids": {},
+
+      "status": "no_source",
+      "sources": {
+        "javstash": false,
+        "tpdb": false,
+        "stashdb": false,
+        "wiki": false,
+        "ouxiang": false
+      },
+      "fail_count": 0,
+      "retry_after": "2027-05-16T00:00:00Z",
+
+      "created_at": "2026-11-16T04:11:03Z",
+      "scraped_at": "2026-11-16T04:11:03Z"
+    }
+  ]
+}

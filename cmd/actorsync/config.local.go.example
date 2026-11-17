@@ -1,0 +1,43 @@
+//go:build local
+
+package main
+
+// 本地开发用的配置文件模板。
+//
+// 用法：
+//   cp cmd/actorsync/config.local.go.example cmd/actorsync/config.local.go
+//   # 按下面填好，然后
+//   go run -tags local ./cmd/actorsync --limit 5
+//
+// 这个文件本身叫 .example 不会参与编译；复制成 config.local.go 后
+// 被 .gitignore 忽略，密码不会进 git。
+//
+// 注意：这里的值会被环境变量覆盖，CI 上跑的时候不需要这个文件。
+func applyLocalFile(c *Config) {
+	// ===== Emby =====
+	c.EmbyURL = "https://emby.example.com"
+	c.EmbyUser = "actor-sync" // 建议专用只读账号
+	c.EmbyPass = "your-password"
+	c.EmbyAPIKey = "" // 可选，2FA 账号填这个
+
+	// ===== 数据源 =====
+	c.TPDBAPIKey = ""
+	c.JavStashAPIKey = ""
+	c.StashDBAPIKey = ""
+	c.DeepLAPIKey = "" // 留空则不翻译英文简介
+	c.WikiEmail = ""   // 维基 API 的 User-Agent 联系邮箱，可留空
+
+	// ===== alist =====
+	c.AlistURL = "https://alist.example.com"
+	c.AlistUser = "admin"
+	c.AlistPass = "your-password"
+	c.AlistDir = "/actors"
+	c.AlistPublicBase = "" // 有独立直链域名时填，例如 https://cdn.example.com
+
+	// ===== 其他 =====
+	// 中文名 → 日文名字典，决定中文名能不能搜到日系数据源
+	c.DictFile = "data/actor_dict.csv"
+	c.DataFile = "actors.json"
+	c.ManifestFile = "actors.manifest.json"
+	c.Verbose = true
+}

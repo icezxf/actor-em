@@ -1,0 +1,11 @@
+# 本地配置（含密码），永不入库
+cmd/actorsync/config.local.go
+
+# 构建产物
+bin/
+*.exe
+
+# 临时文件
+*.tmp
+*.log
+.DS_Store
