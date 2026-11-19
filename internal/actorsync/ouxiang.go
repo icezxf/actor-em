@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// OuxiangData 来自 ouxiangdanku.com，主要价值是中文简介和中文名。
+// OuxiangData 来自 ouxiangdanganku.com（偶像档案库），主要价值是中文简介和中文名。
 type OuxiangData struct {
 	JpName string
 	ZhName string
@@ -41,7 +41,7 @@ func FetchOuxiang(ctx context.Context, hc *http.Client, keyword string) (*Ouxian
 	}
 	normKeyword := NormalizeName(keyword)
 
-	searchURL := "https://www.ouxiangdanku.com/search/" + url.PathEscape(keyword)
+	searchURL := "https://www.ouxiangdanganku.com/search/" + url.PathEscape(keyword)
 	body, err := httpGet(ctx, hc, searchURL)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func FetchOuxiang(ctx context.Context, hc *http.Client, keyword string) (*Ouxian
 	}
 
 	for _, m := range matches {
-		detailURL := "https://www.ouxiangdanku.com" + m[1]
+		detailURL := "https://www.ouxiangdanganku.com" + m[1]
 		html, err := httpGet(ctx, hc, detailURL)
 		if err != nil {
 			continue
