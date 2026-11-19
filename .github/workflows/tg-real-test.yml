@@ -1,0 +1,37 @@
+name: actor-tg-real-test
+
+# 一次性真实刮削自检：用真实数据源 key 处理一个演员名，验证 key 生效。
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 要测试的演员名
+        required: true
+        default: 小凑四叶
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build
+        run: go build -o /tmp/actorsync ./cmd/actorsync
+      - name: Scrape one actor (no DB write, verbose)
+        env:
+          TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+          WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+          ACTORS_VERBOSE: "1"
+          TEST_NAME: ${{ inputs.name }}
+        run: |
+          # 直接跑 dry-run，把演员名写进临时清单，看数据源命中情况
+          printf '%s\n' "$TEST_NAME" > /tmp/test_actors.txt
+          /tmp/actorsync --dry-run --verbose --names /tmp/test_actors.txt \
+            --data /tmp/test_actors.json --no-xlsx 2>&1 | tail -80
