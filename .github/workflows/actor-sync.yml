@@ -62,14 +62,22 @@ jobs:
           ALIST_DIR: ${{ secrets.ALIST_DIR }}
           ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
 
+          # 人工选图：两个都配了才启用，留空则全自动取第一张
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ACTORS_REVIEW_MAX: "6"
+
           ACTORS_LIMIT: ${{ github.event.inputs.limit || '150' }}
           ACTORS_VERBOSE: "1"
+          # 通过环境变量传用户输入，不要直接拼进 shell（防命令注入）
+          REFRESH_INPUT: ${{ github.event.inputs.refresh }}
+          DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
         run: |
           ARGS=""
-          if [ -n "${{ github.event.inputs.refresh }}" ]; then
-            ARGS="--refresh ${{ github.event.inputs.refresh }}"
+          if [ -n "$REFRESH_INPUT" ]; then
+            ARGS="--refresh $REFRESH_INPUT"
           fi
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+          if [ "$DRY_RUN_INPUT" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
           /tmp/actorsync $ARGS
@@ -79,7 +87,8 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A actors.json actors.manifest.json data/actor_dict.csv
+          git add -A actors.json actors.manifest.json data/actor_dict.csv \
+            data/avatar_review.json data/avatar_choices.json
           [ -f actors.xlsx ] && git add actors.xlsx || true
           if git diff --cached --quiet; then
             echo "本轮无变化，跳过提交"

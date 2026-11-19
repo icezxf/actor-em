@@ -30,6 +30,8 @@ actors.txt（手工 / nfo 扫描）
 | `actors.json` | 唯一真源。单文件对象，`{schema_version, generated_at, count, actors[]}` |
 | `actors.manifest.json` | 健康度快照：各状态数量、各源命中率、上轮耗时 |
 | `actors.xlsx` | 由 json 导出的只读表格，带筛选和冻结首行，**改它不会回流** |
+| `data/avatar_choices.json` | 人工选图结果（key → 选中的图片 URL），优先于自动抓取 |
+| `data/avatar_review.json` | 选图交互状态（发过的消息 id、getUpdates 游标），丢了会重复发图 |
 
 单条记录的完整示例见 [`actors.example.json`](actors.example.json)。字段说明见下方[数据结构](#数据结构)。
 
@@ -80,6 +82,9 @@ make run
 | `TPDB_ENDPOINT` / `JAVSTASH_ENDPOINT` / `STASHDB_ENDPOINT` | Endpoint | 可选 | 换镜像/代理时用，默认官方地址 |
 | `ACTORS_LIMIT` | Limit | 可选 | 本轮最多处理多少个，0 = 不限 |
 | `ACTORS_DRY_RUN` | DryRun | 可选 | `1` = 只打印不写盘 |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | TelegramToken / TelegramChatID | 可选 | 两个都填才启用人工选图 |
+| `ACTORS_REVIEW_MAX` | ReviewMax | 可选 | 每轮最多发几个人等选择，默认 6，`0` = 关闭 |
+| `ACTORS_REVIEW_STATE` / `ACTORS_CHOICES` | ReviewStateFile / ChoicesFile | 可选 | 默认 `data/avatar_review.json`、`data/avatar_choices.json` |
 
 ### Secrets 一次性配置
 
@@ -103,6 +108,7 @@ actorsync [flags]
   --refresh 名字,名字   重抓指定演员
   --refresh-all        重抓库里所有演员（最慢）
   --force-avatar       头像已存在也重新上传
+  --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
   --verbose            打印每个源的命中情况
@@ -214,6 +220,35 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 
 > 注意：`avatar_source` 是数据源的 CDN 地址，带防盗链/签名，几个月后可能 403。
 > 运行时请一律用 `avatar`（alist 副本）。
+
+取图顺序：JavStash → StashDB → TPDB，且每个源都只取 `images[0]`——上游给的顺序，
+不一定是最好看的那张。要人工挑，见下一节。
+
+## 人工选图（Telegram）
+
+配上 bot 后，**新演员**和**抓完仍没有头像的人**会把候选图发给你选。
+
+| Secret | 说明 |
+| --- | --- |
+| `TELEGRAM_BOT_TOKEN` | @BotFather 申请 |
+| `TELEGRAM_CHAT_ID` | 你与 bot 的会话 id（或群 id） |
+
+**工作方式：两阶段，不需要常驻服务**
+
+1. 本轮收尾：候选图以相册发到你会话里，下面一排 `1 2 3 4 5` 按钮
+2. 你点一个。此时 bot 不在线，按钮会转圈到超时——但**点击已经进了 Telegram 的
+   updates 队列（保留 24 小时）**，不会丢
+3. 下一轮启动：`getUpdates` 把点击取回来，写进 `data/avatar_choices.json`，并回一条汇总
+4. 之后这个人一律用你选的图，且会**强制覆盖** alist 上的旧文件（换图必须重传，
+   否则直链不变、看着像没生效）
+
+几点约束：
+
+- 每轮最多发 `ACTORS_REVIEW_MAX` 个（默认 6）。同一会话约 20 条/分钟，别调太大
+- 候选少于 2 张不发——没得选
+- 想改主意：把 `data/avatar_choices.json` 里对应的 key 删掉，下一轮会重新问
+- 只用 `getUpdates`、不设 webhook，所以 bot 不需要公网入口，也不用额外挂 Worker
+- 两个文件都要提交进仓库（workflow 已包含），否则每轮都会重复发图、重复丢点击
 
 ## GitHub Actions
 

@@ -37,6 +37,7 @@ func main() {
 	flag.BoolVar(&scanNFO, "scan-nfo", false, "只扫描 alist 里的 nfo 生成演员清单，不刮削")
 	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
 	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
+	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
@@ -73,6 +74,52 @@ func main() {
 		logger.Fatalf("读取演员清单失败: %v", err)
 	}
 	logger.Printf("演员清单：%d 个（%s）", len(names), cfg.NamesFile)
+
+	// ---------- 2.5 Telegram 人工选图：先把上一轮攒下的点击收回来 ----------
+	reviewOn := cfg.TelegramToken != "" && cfg.TelegramChatID != "" && cfg.ReviewMax > 0
+	var (
+		tg          *actorsync.TelegramClient
+		reviewState *actorsync.ReviewState
+		choices     *actorsync.Choices
+	)
+	if reviewOn {
+		tg = actorsync.NewTelegramClient(cfg.TelegramToken, cfg.TelegramChatID)
+		reviewState, err = actorsync.LoadReviewState(cfg.ReviewStateFile)
+		if err != nil {
+			logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
+			reviewState = actorsync.NewReviewState(cfg.ReviewStateFile)
+		}
+		choices, err = actorsync.LoadChoices(cfg.ChoicesFile)
+		if err != nil {
+			logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
+			choices = actorsync.NewChoices(cfg.ChoicesFile)
+		}
+		if dropped := reviewState.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
+			logger.Printf("清理了 %d 条过期的待选记录", dropped)
+		}
+
+		applied, picked, perr := actorsync.CollectPicks(ctx, tg, reviewState, choices)
+		switch {
+		case perr != nil:
+			logger.Printf("⚠️  收取 Telegram 点击失败: %v", perr)
+		case applied > 0:
+			logger.Printf("收到 %d 个选图结果：%s", applied, strings.Join(picked, "、"))
+		}
+		if applied > 0 {
+			logger.Printf("人工选图库：%d 条（%s）", len(choices.Choices), cfg.ChoicesFile)
+		}
+		// offset 即使没收到点击也可能前进，必须落盘，否则同一批 update 会被反复拉取
+		if !cfg.DryRun {
+			if err := reviewState.Save(""); err != nil {
+				logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
+			}
+			if applied > 0 {
+				if err := choices.Save(""); err != nil {
+					logger.Printf("⚠️  保存 %s 失败: %v", cfg.ChoicesFile, err)
+				}
+			}
+		}
+	}
 
 	// ---------- 3. 算本轮待抓名单 ----------
 	var refreshNames []string
@@ -164,19 +211,52 @@ func main() {
 	srcStats := map[string]map[string]int{}
 	added, updated, failed := 0, 0, 0
 
+	// 需要人工挑图的人：新演员、或抓完仍然没有头像的
+	type reviewCand struct {
+		Key    string
+		Name   string
+		Images []string
+	}
+	var reviewQueue []reviewCand
+
 	for i, item := range plan {
 		prefix := fmt.Sprintf("[%d/%d] %s（%s）", i+1, len(plan), item.Name, item.Reason)
 
 		res := fetcher.Fetch(ctx, item.Name)
+
+		// 人工选过的图优先于任何自动抓取结果
+		key := actorsync.BuildKey(res.ProviderIDs, item.Name)
+		if item.Existing != nil {
+			key = item.Existing.Key
+		}
+		forceAvatar := cfg.ForceAvatar
+		manualPick := ""
+		if choices != nil {
+			if url, ok := choices.Get(key); ok {
+				manualPick = url
+				if res.ImageURL != url {
+					res.ImageURL = url
+					res.ImageSite = "manual"
+				}
+				// 换成新图必须重传，否则 alist 上还是旧文件、直链也不变
+				if item.Existing == nil || actorsync.StrVal(item.Existing.AvatarSource) != url {
+					forceAvatar = true
+				}
+			}
+		}
+
 		actor := actorsync.BuildActor(item.Name, res, item.Existing)
 
 		avatarNote := "无图"
+		if manualPick != "" {
+			avatarNote = "人工选图"
+		}
 		if res.ImageURL != "" && alist != nil {
 			imgData, err := actorsync.DownloadImage(ctx, hc, res.ImageURL)
 			if err != nil {
 				avatarNote = "图下载失败: " + err.Error()
 			} else {
-				av, err := alist.UploadAvatar(ctx, cfg.AlistDir, actor.Name, imgData, cfg.ForceAvatar)
+				av, err := alist.UploadAvatar(ctx, cfg.AlistDir, actor.Name, imgData, forceAvatar)
 				if err != nil {
 					avatarNote = "上传失败: " + err.Error()
 				} else {
@@ -198,6 +278,16 @@ func main() {
 			}
 		} else if res.ImageURL != "" {
 			avatarNote = "有图但未配置 alist"
+		}
+
+		// 只对「新演员」和「还没有头像的」发候选图；至少 2 张才值得问
+		candidates := actorsync.OrderCandidates(res.Images, res.ImageURL)
+		if reviewOn && !cfg.DryRun && manualPick == "" &&
+			len(reviewQueue) < cfg.ReviewMax &&
+			len(candidates) >= 2 &&
+			(item.Reason == "new" || actor.Avatar == nil) &&
+			!reviewState.HasKey(key) {
+			reviewQueue = append(reviewQueue, reviewCand{Key: key, Name: actor.Name, Images: candidates})
 		}
 
 		countSources(srcStats, res.Sources)
@@ -236,6 +326,34 @@ func main() {
 	stats.Added = added
 	stats.Updated = updated
 	stats.Failed = failed
+
+	// ---------- 5.5 把需要挑图的人发给 Telegram ----------
+	if reviewOn && !cfg.DryRun && len(reviewQueue) > 0 {
+		sent := 0
+		for _, cand := range reviewQueue {
+			id := reviewState.NextID()
+			msgs, err := tg.SendCandidates(ctx, id, cand.Name, cand.Images)
+			if err != nil {
+				logger.Printf("⚠️  候选图发送失败（%s）: %v", cand.Name, err)
+				continue
+			}
+			reviewState.Add(actorsync.ReviewPending{
+				ID:       id,
+				Key:      cand.Key,
+				Name:     cand.Name,
+				Messages: msgs,
+				Images:   cand.Images,
+			})
+			sent++
+			time.Sleep(3 * time.Second) // 同一会话约 20 条/分钟，留点余量
+		}
+		if err := reviewState.Save(""); err != nil {
+			logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
+		}
+		if sent > 0 {
+			logger.Printf("已发送 %d 个人的候选图，等你选择（下次运行时生效）", sent)
+		}
+	}
 
 	// ---------- 6. 收尾 ----------
 	if cfg.DryRun {
