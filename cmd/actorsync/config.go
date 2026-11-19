@@ -56,7 +56,7 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		TPDBEndpoint:     "https://api.theporndb.net/performers",
-		JavStashEndpoint: "https://javastash.org/graphql",
+		JavStashEndpoint: "https://javstash.org/graphql",
 		StashDBEndpoint:  "https://stashdb.org/graphql",
 		DataFile:         "actors.json",
 		ManifestFile:     "actors.manifest.json",

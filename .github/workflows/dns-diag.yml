@@ -1,4 +1,4 @@
-name: DNS 候选域名探测
+name: JavStash 域名验证
 
 on:
   workflow_dispatch:
@@ -7,28 +7,30 @@ jobs:
   diag:
     runs-on: ubuntu-latest
     steps:
-      - name: JavStash 候选拼写 DNS + HTTP
+      - name: 真实 GraphQL 查询 javstash.org
+        env:
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
         run: |
-          for d in javstash.org www.javstash.org api.javstash.com javastash.org www.javastash.org api.javastash.com; do
-            ip=$(getent ahostsv4 "$d" 2>/dev/null | head -1 | awk '{print $1}')
-            printf "%-24s 系统解析=%-16s " "$d" "${ip:-无}"
-            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/graphql" 2>/dev/null || echo "FAIL")
-            echo "graphql HTTP=$code"
-          done
+          echo "=== 1. schema 字段检查（现有字段串 weight/measurements 是否还在）==="
+          curl -sS --max-time 20 https://javstash.org/graphql \
+            -H "Authorization: Bearer $JAVSTASH_API_KEY" \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"{ __type(name: \"Performer\") { fields { name } } }"}' \
+            | head -c 2500
+          echo
 
-      - name: 偶像素库 候选拼写 DNS + HTTP
-        run: |
-          for d in ouxiangdanku.com www.ouxiangdanku.com ouxiangtuku.com www.ouxiangtuku.com ouxiangtuku.cc ouxiangdanku.cc ouxiangdanku.net ouxiangdanku.cn; do
-            ip=$(getent ahostsv4 "$d" 2>/dev/null | head -1 | awk '{print $1}')
-            printf "%-26s 系统解析=%-16s " "$d" "${ip:-无}"
-            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/" 2>/dev/null || echo "FAIL")
-            echo "首页 HTTP=$code"
-          done
+          echo "=== 2. ApiKey 头 + 项目现有字段串搜 桃乃木かな ==="
+          curl -sS --max-time 20 https://javstash.org/graphql \
+            -H "ApiKey: $JAVSTASH_API_KEY" \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"query Search($term: String!) { searchPerformer(term: $term) { id name aliases birth_date country ethnicity height weight gender career_start_year measurements { cup_size waist hip } images { url } urls { url } } }","variables":{"term":"桃乃木かな"}}' \
+            | head -c 2500
+          echo
 
-      - name: 权威 DoH 查 javstash.org
-        run: |
-          for d in javstash.org api.javstash.com; do
-            echo "=== $d ==="
-            curl -sS --max-time 12 -H 'accept: application/dns-json' "https://cloudflare-dns.com/dns-query?name=$d&type=A" || echo "查询失败"
-            echo
-          done
+          echo "=== 3. Bearer 头 + 精简字段对照 ==="
+          curl -sS --max-time 20 https://javstash.org/graphql \
+            -H "Authorization: Bearer $JAVSTASH_API_KEY" \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"query Search($term: String!) { searchPerformer(term: $term) { id name images { url } } }","variables":{"term":"桃乃木かな"}}' \
+            | head -c 1500
+          echo
