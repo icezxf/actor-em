@@ -24,6 +24,12 @@ type Bot struct {
 	MaxNames    int    // 一条消息最多处理几个名字
 	PollTimeout int    // 长轮询秒数
 
+	// DeriveChat 为 true 时（webhook/--tg-once 模式），从收到的 update 里
+	// 提取 chat id 作为回复目标。这样不必预先配置 TELEGRAM_CHAT_ID：
+	// webhook 还没注册时根本拿不到 chat id，属于先有鸡还是先有蛋。
+	// 限制来源由 CF Worker 的 ALLOWED_CHAT_ID 负责。
+	DeriveChat bool
+
 	Log func(format string, args ...any)
 }
 
@@ -108,8 +114,27 @@ func (b *Bot) HandleUpdate(ctx context.Context, raw []byte) error {
 	if err := json.Unmarshal(raw, &u); err != nil {
 		return fmt.Errorf("解析 Telegram update 失败: %w", err)
 	}
+	if b.DeriveChat && b.TG != nil {
+		if id := chatIDOf(&u); id != "" {
+			b.TG.ChatID = id
+		}
+	}
 	b.safeHandle(ctx, &u)
 	return nil
+}
+
+// chatIDOf 从一条 update 里取出来源会话 id。
+func chatIDOf(u *tgUpdate) string {
+	switch {
+	case u == nil:
+		return ""
+	case u.Message != nil && u.Message.Chat.ID != 0:
+		return strconv.FormatInt(u.Message.Chat.ID, 10)
+	case u.CallbackQuery != nil && u.CallbackQuery.Message != nil && u.CallbackQuery.Message.Chat.ID != 0:
+		return strconv.FormatInt(u.CallbackQuery.Message.Chat.ID, 10)
+	default:
+		return ""
+	}
 }
 
 // safeHandle 保证一条坏消息不会掀掉整个服务。

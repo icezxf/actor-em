@@ -330,9 +330,10 @@ curl -X POST https://actor-em-tg.<你的子域>.workers.dev/setup \
   -H "Authorization: Bearer $SETUP_KEY"
 ```
 
-最后给 bot 发 `/id`，把返回的会话 id 填进 `worker/wrangler.toml` 的
-`ALLOWED_CHAT_ID` 并重新 `npx wrangler deploy`——这样别人给 bot 发消息不会白耗
-Actions 额度。
+webhook 模式下**不需要配置 `TELEGRAM_CHAT_ID`**：回复目标自动从消息里取，
+所以给 bot 发名字就能直接收到候选图。给 bot 发 `/id` 会回你当前会话 id，
+把它填进 `worker/wrangler.toml` 的 `ALLOWED_CHAT_ID` 并重新
+`npx wrangler deploy`——这样别人给 bot 发消息不会白耗 Actions 额度。
 
 **注意**
 

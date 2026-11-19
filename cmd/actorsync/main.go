@@ -481,8 +481,10 @@ func runTelegramServe(ctx context.Context, cfg *Config, logger *log.Logger) erro
 // runTelegramOnce 处理 Cloudflare Worker 转发来的一条 update 后退出。
 // 没有长轮询、不碰 getUpdates，因此可以和 webhook 共存，适合 GitHub Actions。
 func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw string) error {
-	if cfg.TelegramToken == "" || cfg.TelegramChatID == "" {
-		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN 和 TELEGRAM_CHAT_ID")
+	// webhook 模式：回复目标从 update 里取，不必预置 TELEGRAM_CHAT_ID；
+	// 若显式配置了 chat id，则 Bot 会额外把它当作来源白名单。
+	if cfg.TelegramToken == "" {
+		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN")
 	}
 
 	db, err := actorsync.LoadDb(cfg.DataFile)
@@ -516,13 +518,14 @@ func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw s
 		Log:         logger.Printf,
 	}
 	bot := &actorsync.Bot{
-		TG:       newTelegram(cfg),
-		Engine:   engine,
-		State:    state,
-		Choices:  choices,
-		ChatID:   cfg.TelegramChatID,
-		MaxNames: 10,
-		Log:      logger.Printf,
+		TG:         newTelegram(cfg),
+		Engine:     engine,
+		State:      state,
+		Choices:    choices,
+		ChatID:     cfg.TelegramChatID,
+		DeriveChat: true,
+		MaxNames:   10,
+		Log:        logger.Printf,
 	}
 
 	if err := bot.HandleUpdate(ctx, []byte(raw)); err != nil {
