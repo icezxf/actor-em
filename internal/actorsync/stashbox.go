@@ -89,7 +89,7 @@ type stashPerformerJSON struct {
 	CupSize    string `json:"cup_size"`
 	WaistSize  int    `json:"waist_size"`
 	HipSize    int    `json:"hip_size"`
-	BandSize   string `json:"band_size"`
+	BandSize   int    `json:"band_size"` // StashDB: Int（不是字符串）
 	BreastType string `json:"breast_type"`
 	// JavStash 旧 schema 的嵌套字段
 	Measurements struct {
