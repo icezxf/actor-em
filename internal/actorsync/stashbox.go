@@ -51,16 +51,10 @@ func NewStashBoxClient(source, endpoint, apiKey string) *StashBoxClient {
 }
 
 // JavStash 沿用旧版 stash-box schema（带 weight / measurements）。
+// JavStash 和 StashDB 共用同一套 stash-box schema，都已移除 weight/measurements，
+// 改成扁平的 cup_size/band_size/waist_size/hip_size。
+// 查询里带上任何不存在的字段都会整体校验失败，所以只能用当前 schema 的字段。
 const stashGraphQLFields = `
-	id name aliases birth_date country ethnicity height weight gender career_start_year
-	measurements { cup_size waist hip }
-	images { url }
-	urls { url }
-`
-
-// StashDB 已从 schema 移除 weight 和 measurements，改成扁平字段。
-// 查询里带上任何不存在的字段都会整体 422，所以必须单独一套。
-const stashDBGraphQLFields = `
 	id name aliases birth_date country ethnicity height gender career_start_year
 	cup_size waist_size hip_size band_size breast_type
 	images { url }
@@ -68,9 +62,6 @@ const stashDBGraphQLFields = `
 `
 
 func fieldsFor(source string) string {
-	if source == "stashdb" {
-		return stashDBGraphQLFields
-	}
 	return stashGraphQLFields
 }
 
