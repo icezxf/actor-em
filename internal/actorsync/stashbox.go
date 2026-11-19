@@ -50,6 +50,7 @@ func NewStashBoxClient(source, endpoint, apiKey string) *StashBoxClient {
 	}
 }
 
+// JavStash 沿用旧版 stash-box schema（带 weight / measurements）。
 const stashGraphQLFields = `
 	id name aliases birth_date country ethnicity height weight gender career_start_year
 	measurements { cup_size waist hip }
@@ -57,17 +58,40 @@ const stashGraphQLFields = `
 	urls { url }
 `
 
+// StashDB 已从 schema 移除 weight 和 measurements，改成扁平字段。
+// 查询里带上任何不存在的字段都会整体 422，所以必须单独一套。
+const stashDBGraphQLFields = `
+	id name aliases birth_date country ethnicity height gender career_start_year
+	cup_size waist_size hip_size band_size breast_type
+	images { url }
+	urls { url }
+`
+
+func fieldsFor(source string) string {
+	if source == "stashdb" {
+		return stashDBGraphQLFields
+	}
+	return stashGraphQLFields
+}
+
 type stashPerformerJSON struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Aliases      []string `json:"aliases"`
-	BirthDate    string   `json:"birth_date"`
-	Country      string   `json:"country"`
-	Ethnicity    string   `json:"ethnicity"`
-	Height       int      `json:"height"`
-	Weight       int      `json:"weight"`
-	Gender       string   `json:"gender"`
-	CareerStart  int      `json:"career_start_year"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Aliases     []string `json:"aliases"`
+	BirthDate   string   `json:"birth_date"`
+	Country     string   `json:"country"`
+	Ethnicity   string   `json:"ethnicity"`
+	Height      int      `json:"height"`
+	Weight      int      `json:"weight"`
+	Gender      string   `json:"gender"`
+	CareerStart int      `json:"career_start_year"`
+	// StashDB 新 schema 的扁平字段
+	CupSize    string `json:"cup_size"`
+	WaistSize  int    `json:"waist_size"`
+	HipSize    int    `json:"hip_size"`
+	BandSize   string `json:"band_size"`
+	BreastType string `json:"breast_type"`
+	// JavStash 旧 schema 的嵌套字段
 	Measurements struct {
 		CupSize string `json:"cup_size"`
 		Waist   int    `json:"waist"`
@@ -95,11 +119,12 @@ func (c *StashBoxClient) Search(ctx context.Context, term string) (*Performer, e
 	var query string
 	vars := map[string]any{}
 
+	fields := fieldsFor(c.Source)
 	if isUUID {
-		query = fmt.Sprintf(`query Find($id: ID!) { findPerformer(id: $id) { %s } }`, stashGraphQLFields)
+		query = fmt.Sprintf(`query Find($id: ID!) { findPerformer(id: $id) { %s } }`, fields)
 		vars["id"] = term
 	} else {
-		query = fmt.Sprintf(`query Search($term: String!) { searchPerformer(term: $term) { %s } }`, stashGraphQLFields)
+		query = fmt.Sprintf(`query Search($term: String!) { searchPerformer(term: $term) { %s } }`, fields)
 		vars["term"] = term
 	}
 
@@ -207,6 +232,16 @@ func toPerformer(source string, p *stashPerformerJSON) *Performer {
 		Waist:       p.Measurements.Waist,
 		Hip:         p.Measurements.Hip,
 		CareerStart: p.CareerStart,
+	}
+	// StashDB 新 schema：扁平字段兜底（旧 schema 下这些为空，不影响）
+	if out.CupSize == "" {
+		out.CupSize = p.CupSize
+	}
+	if out.Waist == 0 {
+		out.Waist = p.WaistSize
+	}
+	if out.Hip == 0 {
+		out.Hip = p.HipSize
 	}
 	for _, img := range p.Images {
 		out.Images = append(out.Images, img.URL)
