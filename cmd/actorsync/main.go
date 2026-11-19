@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/icezxf/actor-em/internal/actorsync"
@@ -21,6 +23,7 @@ func main() {
 		refreshAll bool
 		scanNFO    bool
 		noXlsx     bool
+		serveBot   bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -38,12 +41,22 @@ func main() {
 	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
 	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
+	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 	start := time.Now()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Hour)
+	// 交互服务要一直挂着，5 小时超时只适合一次批量同步
+	var (
+		ctx    context.Context
+		cancel context.CancelFunc
+	)
+	if serveBot {
+		ctx, cancel = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	} else {
+		ctx, cancel = context.WithTimeout(context.Background(), 5*time.Hour)
+	}
 	defer cancel()
 
 	// 只扫描 nfo 生成清单，不抓数据
@@ -57,6 +70,15 @@ func main() {
 	if cfg.TPDBAPIKey == "" && cfg.JavStashAPIKey == "" && cfg.StashDBAPIKey == "" {
 		logger.Fatal("至少要配一个数据源 Key（TPDB / JavStash / StashDB），否则所有演员都会被判成 no_source")
 	}
+
+	// 交互服务不读 actors.txt，名字由消息给
+	if serveBot {
+		if err := runTelegramServe(ctx, cfg, logger); err != nil {
+			logger.Fatalf("交互服务退出: %v", err)
+		}
+		return
+	}
+
 	if _, err := os.Stat(cfg.NamesFile); err != nil {
 		logger.Fatalf("读不到演员清单 %s：%v（用 --names 指定，或先跑 --scan-nfo 生成）", cfg.NamesFile, err)
 	}
@@ -83,7 +105,7 @@ func main() {
 		choices     *actorsync.Choices
 	)
 	if reviewOn {
-		tg = actorsync.NewTelegramClient(cfg.TelegramToken, cfg.TelegramChatID)
+		tg = newTelegram(cfg)
 		reviewState, err = actorsync.LoadReviewState(cfg.ReviewStateFile)
 		if err != nil {
 			logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
@@ -164,47 +186,21 @@ func main() {
 
 	// ---------- 4. 准备抓取器和 alist ----------
 	hc := &http.Client{Timeout: 30 * time.Second}
-	fetcher := actorsync.NewFetcher(hc)
-	fetcher.WikiEmail = cfg.WikiEmail
-	fetcher.Verbose = cfg.Verbose
-	if cfg.TPDBAPIKey != "" {
-		fetcher.TPDB = actorsync.NewTPDBClient(cfg.TPDBEndpoint, cfg.TPDBAPIKey)
-	}
-	if cfg.JavStashAPIKey != "" {
-		fetcher.JavStash = actorsync.NewStashBoxClient("javstash", cfg.JavStashEndpoint, cfg.JavStashAPIKey)
-	}
-	if cfg.StashDBAPIKey != "" {
-		fetcher.StashDB = actorsync.NewStashBoxClient("stashdb", cfg.StashDBEndpoint, cfg.StashDBAPIKey)
-	}
-	fetcher.Translator = actorsync.NewTranslator(cfg.DeepLAPIKey, hc)
-	dict, err := actorsync.LoadDict(cfg.DictFile)
-	if err != nil {
-		logger.Printf("⚠️  读取字典失败（不影响主流程）: %v", err)
-	} else if dict.Size() > 0 {
-		logger.Printf("中文名字典：%d 条（%s）", dict.Size(), cfg.DictFile)
-	} else {
-		logger.Printf("提示：未找到中文名字典 %s，中文名可能搜不到日系数据源", cfg.DictFile)
-	}
-	// 补充字典：手工维护，覆盖主字典里的同名条目
-	if local, err := actorsync.LoadDict(cfg.DictLocalFile); err != nil {
-		logger.Printf("⚠️  读取补充字典失败: %v", err)
-	} else if local.Size() > 0 {
-		dict.Merge(local)
-		logger.Printf("补充字典：%d 条（%s），合计 %d 条", local.Size(), cfg.DictLocalFile, dict.Size())
-	}
-	fetcher.Dict = dict
+	fetcher := buildFetcher(cfg, hc, logger)
+	alist := connectAlist(ctx, cfg, logger)
 
-	var alist *actorsync.AlistClient
-	if cfg.AlistURL != "" && cfg.AlistUser != "" {
-		alist = actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistPublicBase, cfg.AlistUser, cfg.AlistPass)
-		if err := alist.Login(ctx); err != nil {
-			logger.Printf("⚠️  alist 登录失败，本轮跳过头像上传: %v", err)
-			alist = nil
-		} else {
-			logger.Printf("alist 已连接：%s%s", cfg.AlistURL, cfg.AlistDir)
-		}
-	} else {
-		logger.Printf("⚠️  未配置 alist，跳过头像上传")
+	// 抓取 → 生成记录 → 传头像 这条链路统一走 Engine，
+	// 和 --tg-serve 交互服务共用，避免两边行为漂移。
+	engine := &actorsync.Engine{
+		DB:          db,
+		Fetcher:     fetcher,
+		Alist:       alist,
+		Choices:     choices,
+		HTTP:        hc,
+		DataFile:    cfg.DataFile,
+		AlistDir:    cfg.AlistDir,
+		ForceAvatar: cfg.ForceAvatar,
+		Log:         logger.Printf,
 	}
 
 	// ---------- 5. 逐个抓 ----------
@@ -222,96 +218,40 @@ func main() {
 	for i, item := range plan {
 		prefix := fmt.Sprintf("[%d/%d] %s（%s）", i+1, len(plan), item.Name, item.Reason)
 
-		res := fetcher.Fetch(ctx, item.Name)
-
-		// 人工选过的图优先于任何自动抓取结果
-		key := actorsync.BuildKey(res.ProviderIDs, item.Name)
-		if item.Existing != nil {
-			key = item.Existing.Key
+		res, perr := engine.Process(ctx, item.Name, actorsync.ProcessOptions{NoDBWrite: cfg.DryRun})
+		if perr != nil {
+			logger.Printf("%s → 处理失败: %v", prefix, perr)
+			failed++
+			continue
 		}
-		forceAvatar := cfg.ForceAvatar
-		manualPick := ""
-		if choices != nil {
-			if url, ok := choices.Get(key); ok {
-				manualPick = url
-				if res.ImageURL != url {
-					res.ImageURL = url
-					res.ImageSite = "manual"
-				}
-				// 换成新图必须重传，否则 alist 上还是旧文件、直链也不变
-				if item.Existing == nil || actorsync.StrVal(item.Existing.AvatarSource) != url {
-					forceAvatar = true
-				}
-			}
-		}
-
-		actor := actorsync.BuildActor(item.Name, res, item.Existing)
-
-		avatarNote := "无图"
-		if manualPick != "" {
-			avatarNote = "人工选图"
-		}
-		if res.ImageURL != "" && alist != nil {
-			imgData, err := actorsync.DownloadImage(ctx, hc, res.ImageURL)
-			if err != nil {
-				avatarNote = "图下载失败: " + err.Error()
-			} else {
-				av, err := alist.UploadAvatar(ctx, cfg.AlistDir, actor.Name, imgData, forceAvatar)
-				if err != nil {
-					avatarNote = "上传失败: " + err.Error()
-				} else {
-					actor.Avatar = actorsync.StrPtr(av.URL)
-					actor.AvatarPath = actorsync.StrPtr(av.Path)
-					actor.AvatarDir = actorsync.StrPtr(av.Dir)
-					actor.AvatarSource = actorsync.StrPtr(res.ImageURL)
-					actor.AvatarSourceSite = actorsync.StrPtr(res.ImageSite)
-					actor.AvatarSHA256 = actorsync.StrPtr(av.SHA256)
-					actor.AvatarBytes = &av.Bytes
-					actor.AvatarW = actorsync.IntPtr(av.Width)
-					actor.AvatarH = actorsync.IntPtr(av.Height)
-					if av.Skipped {
-						avatarNote = "头像已存在"
-					} else {
-						avatarNote = "头像已上传"
-					}
-				}
-			}
-		} else if res.ImageURL != "" {
-			avatarNote = "有图但未配置 alist"
-		}
+		actor := res.Actor
 
 		// 只对「新演员」和「还没有头像的」发候选图；至少 2 张才值得问
-		candidates := actorsync.OrderCandidates(res.Images, res.ImageURL)
-		if reviewOn && !cfg.DryRun && manualPick == "" &&
+		if reviewOn && !cfg.DryRun && !res.Manual &&
 			len(reviewQueue) < cfg.ReviewMax &&
-			len(candidates) >= 2 &&
+			len(res.Candidates) >= 2 &&
 			(item.Reason == "new" || actor.Avatar == nil) &&
-			!reviewState.HasKey(key) {
-			reviewQueue = append(reviewQueue, reviewCand{Key: key, Name: actor.Name, Images: candidates})
+			!reviewState.HasKey(res.Key) {
+			reviewQueue = append(reviewQueue, reviewCand{Key: res.Key, Name: actor.Name, Images: res.Candidates})
 		}
 
-		countSources(srcStats, res.Sources)
-
-		switch actor.Status {
-		case actorsync.StatusOK:
-		case actorsync.StatusPartial:
-		case actorsync.StatusNoSource:
-		case actorsync.StatusFailed:
-			failed++
-		}
+		countSources(srcStats, res.Res.Sources)
 
 		if cfg.DryRun {
-			logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Summary(), avatarNote)
+			logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Res.Summary(), res.AvatarNote)
 			continue
 		}
 
-		if db.Upsert(actor) {
+		if res.Added {
 			added++
 		} else {
 			updated++
 		}
+		if actor.Status == actorsync.StatusFailed {
+			failed++
+		}
 
-		logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Summary(), avatarNote)
+		logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Res.Summary(), res.AvatarNote)
 
 		// 每 20 个落盘一次，中途挂掉也不丢进度
 		if (i+1)%20 == 0 {
@@ -410,6 +350,122 @@ func runScanNFO(ctx context.Context, cfg *Config, logger *log.Logger) error {
 	}
 	logger.Printf("已写入 %s（%d 个演员）", cfg.NamesFile, len(names))
 	return nil
+}
+
+// newTelegram 组装客户端；配了 TELEGRAM_API_BASE 就走反代
+// （国内直连 api.telegram.org 基本不通，常驻服务尤其需要这一点）。
+func newTelegram(cfg *Config) *actorsync.TelegramClient {
+	tg := actorsync.NewTelegramClient(cfg.TelegramToken, cfg.TelegramChatID)
+	if base := strings.TrimSpace(cfg.TelegramAPIBase); base != "" {
+		tg.APIBase = base
+	}
+	return tg
+}
+
+// buildFetcher 组装所有数据源，没配 Key 的源直接不挂上，Fetch 会自动跳过。
+func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.Fetcher {
+	fetcher := actorsync.NewFetcher(hc)
+	fetcher.WikiEmail = cfg.WikiEmail
+	fetcher.Verbose = cfg.Verbose
+	if cfg.TPDBAPIKey != "" {
+		fetcher.TPDB = actorsync.NewTPDBClient(cfg.TPDBEndpoint, cfg.TPDBAPIKey)
+	}
+	if cfg.JavStashAPIKey != "" {
+		fetcher.JavStash = actorsync.NewStashBoxClient("javstash", cfg.JavStashEndpoint, cfg.JavStashAPIKey)
+	}
+	if cfg.StashDBAPIKey != "" {
+		fetcher.StashDB = actorsync.NewStashBoxClient("stashdb", cfg.StashDBEndpoint, cfg.StashDBAPIKey)
+	}
+	fetcher.Translator = actorsync.NewTranslator(cfg.DeepLAPIKey, hc)
+
+	dict, err := actorsync.LoadDict(cfg.DictFile)
+	if err != nil {
+		logger.Printf("⚠️  读取字典失败（不影响主流程）: %v", err)
+	} else if dict.Size() > 0 {
+		logger.Printf("中文名字典：%d 条（%s）", dict.Size(), cfg.DictFile)
+	} else {
+		logger.Printf("提示：未找到中文名字典 %s，中文名可能搜不到日系数据源", cfg.DictFile)
+	}
+	// 补充字典：手工维护，覆盖主字典里的同名条目
+	if local, err := actorsync.LoadDict(cfg.DictLocalFile); err != nil {
+		logger.Printf("⚠️  读取补充字典失败: %v", err)
+	} else if local.Size() > 0 {
+		dict.Merge(local)
+		logger.Printf("补充字典：%d 条（%s），合计 %d 条", local.Size(), cfg.DictLocalFile, dict.Size())
+	}
+	fetcher.Dict = dict
+	return fetcher
+}
+
+// connectAlist 登录 alist；失败只告警不中断，头像上传会自动跳过。
+func connectAlist(ctx context.Context, cfg *Config, logger *log.Logger) *actorsync.AlistClient {
+	if cfg.AlistURL == "" || cfg.AlistUser == "" {
+		logger.Printf("⚠️  未配置 alist，跳过头像上传")
+		return nil
+	}
+	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistPublicBase, cfg.AlistUser, cfg.AlistPass)
+	if err := alist.Login(ctx); err != nil {
+		logger.Printf("⚠️  alist 登录失败，跳过头像上传: %v", err)
+		return nil
+	}
+	logger.Printf("alist 已连接：%s%s", cfg.AlistURL, cfg.AlistDir)
+	return alist
+}
+
+// runTelegramServe 常驻运行交互服务：长轮询收消息，发名字即走完整刮削并回候选图。
+//
+// 注意：同一个 bot token 只能有一个 getUpdates 客户端。跑这个服务时，
+// 批量同步那边要把 ACTORS_REVIEW_MAX 设成 0，否则两边会抢 update（409 Conflict）。
+func runTelegramServe(ctx context.Context, cfg *Config, logger *log.Logger) error {
+	if cfg.TelegramToken == "" || cfg.TelegramChatID == "" {
+		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN 和 TELEGRAM_CHAT_ID")
+	}
+
+	db, err := actorsync.LoadDb(cfg.DataFile)
+	if err != nil {
+		return fmt.Errorf("读取本地库失败: %w", err)
+	}
+	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
+
+	hc := &http.Client{Timeout: 30 * time.Second}
+	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
+	if err != nil {
+		logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
+		choices = actorsync.NewChoices(cfg.ChoicesFile)
+	}
+	state, err := actorsync.LoadReviewState(cfg.ReviewStateFile)
+	if err != nil {
+		logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
+		state = actorsync.NewReviewState(cfg.ReviewStateFile)
+	}
+	if dropped := state.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
+		logger.Printf("清理了 %d 条过期的待选记录", dropped)
+	}
+
+	engine := &actorsync.Engine{
+		DB:          db,
+		Fetcher:     buildFetcher(cfg, hc, logger),
+		Alist:       connectAlist(ctx, cfg, logger),
+		Choices:     choices,
+		HTTP:        hc,
+		DataFile:    cfg.DataFile,
+		AlistDir:    cfg.AlistDir,
+		ForceAvatar: cfg.ForceAvatar,
+		Log:         logger.Printf,
+	}
+
+	logger.Printf("提示：同一个 bot token 只能有一个 getUpdates 客户端，批量同步那边请把 ACTORS_REVIEW_MAX 设为 0")
+
+	bot := &actorsync.Bot{
+		TG:       newTelegram(cfg),
+		Engine:   engine,
+		State:    state,
+		Choices:  choices,
+		ChatID:   cfg.TelegramChatID,
+		MaxNames: 10, // 一条消息最多处理 10 个：再多 Telegram 侧就该限流了
+		Log:      logger.Printf,
+	}
+	return bot.Run(ctx)
 }
 
 func firstN(s []string, n int) []string {

@@ -32,6 +32,7 @@ type Config struct {
 	// Telegram 人工选图（两个都配了才启用）
 	TelegramToken   string // TELEGRAM_BOT_TOKEN
 	TelegramChatID  string // TELEGRAM_CHAT_ID
+	TelegramAPIBase string // TELEGRAM_API_BASE，国内直连不通时填反代地址
 	ReviewStateFile string // 发图状态 + getUpdates 游标
 	ChoicesFile     string // 人工选中的结果
 	ReviewMax       int    // 每轮最多发几个人等选（限流保护）
@@ -111,6 +112,7 @@ func applyEnv(c *Config) {
 	set(&c.NamesFile, "ACTORS_TXT")
 	set(&c.TelegramToken, "TELEGRAM_BOT_TOKEN")
 	set(&c.TelegramChatID, "TELEGRAM_CHAT_ID")
+	set(&c.TelegramAPIBase, "TELEGRAM_API_BASE")
 	set(&c.ReviewStateFile, "ACTORS_REVIEW_STATE")
 	set(&c.ChoicesFile, "ACTORS_CHOICES")
 	if v := os.Getenv("ACTORS_REVIEW_MAX"); v != "" {

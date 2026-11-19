@@ -13,12 +13,15 @@ import (
 	"time"
 )
 
-// TelegramClient 只做三件事：发候选图、收按钮回调、回执。
+// TelegramClient 做四件事：发候选图、收按钮回调、回执、长轮询收消息。
 //
-// 设计前提：本工具跑在 GitHub Actions 里，进程活不过一轮同步，
-// 所以不开 webhook（与 getUpdates 互斥），改用「下次运行时拉一次队列」。
-// 用户点按钮时 bot 不在线，按钮会转圈到超时，但 callback_query 会留在
-// Telegram 的 updates 队列里（保留 24h），下一轮 getUpdates 能取回来。
+// 两种运行方式共用这套客户端：
+//   - 批量同步（GitHub Actions）：进程活不过一轮，用 timeout=0 的
+//     "拉一次就走"，点击会留在 Telegram updates 队列（24h），下轮取回。
+//   - 交互服务（--tg-serve）：跑在常驻进程里，用 25 秒长轮询实时收消息。
+//     长轮询是客户端主动出站 HTTPS，不需要公网 IP，也不需要证书。
+//
+// webhook 与 getUpdates 互斥，本项目一律走 getUpdates。
 type TelegramClient struct {
 	Token   string
 	ChatID  string
@@ -55,6 +58,14 @@ type tgResponse struct {
 
 // call 发一个 JSON 请求，返回 result 原文。
 func (c *TelegramClient) call(ctx context.Context, method string, payload any) (json.RawMessage, error) {
+	return c.callHTTP(ctx, c.HTTP, method, payload)
+}
+
+// callHTTP 允许指定 client：长轮询要等 25 秒以上，默认 30 秒超时会误判失败。
+func (c *TelegramClient) callHTTP(ctx context.Context, hc *http.Client, method string, payload any) (json.RawMessage, error) {
+	if hc == nil {
+		hc = c.HTTP
+	}
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
@@ -65,7 +76,7 @@ func (c *TelegramClient) call(ctx context.Context, method string, payload any) (
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := c.HTTP.Do(req)
+	resp, err := hc.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -254,29 +265,55 @@ func parsePickData(data string) (string, int, bool) {
 	return id, idx, true
 }
 
-type tgUpdate struct {
-	UpdateID      int64 `json:"update_id"`
-	CallbackQuery *struct {
-		ID      string `json:"id"`
-		Data    string `json:"data"`
-		Message *struct {
-			MessageID int `json:"message_id"`
-			Chat      struct {
-				ID int64 `json:"id"`
-			} `json:"chat"`
-		} `json:"message"`
-	} `json:"callback_query"`
+// ---------- 长轮询 ----------
+
+type tgChat struct {
+	ID int64 `json:"id"`
 }
 
-// PollPicks 拉取待处理的按钮点击，返回解析结果与新的 offset。
-// timeout=0 表示「没有就立刻返回」，适合 Action 这种短生命周期场景。
-func (c *TelegramClient) PollPicks(ctx context.Context, offset int64) ([]Pick, int64, error) {
+type tgFrom struct {
+	ID        int64  `json:"id"`
+	FirstName string `json:"first_name"`
+	Username  string `json:"username"`
+}
+
+type tgMessage struct {
+	MessageID int     `json:"message_id"`
+	Date      int64   `json:"date"`
+	Chat      tgChat  `json:"chat"`
+	From      *tgFrom `json:"from"`
+	Text      string  `json:"text"`
+}
+
+type tgCallback struct {
+	ID      string     `json:"id"`
+	Data    string     `json:"data"`
+	Message *tgMessage `json:"message"`
+}
+
+type tgUpdate struct {
+	UpdateID      int64       `json:"update_id"`
+	Message       *tgMessage  `json:"message"`
+	CallbackQuery *tgCallback `json:"callback_query"`
+}
+
+// PollUpdates 长轮询一次。timeoutSec=0 表示「没有就立刻返回」。
+// allowed 为空表示全部类型。
+func (c *TelegramClient) PollUpdates(ctx context.Context, offset int64, timeoutSec int, allowed ...string) ([]tgUpdate, int64, error) {
 	payload := map[string]any{
-		"offset":          offset,
-		"timeout":         0,
-		"allowed_updates": []string{"callback_query"},
+		"offset":  offset,
+		"timeout": timeoutSec,
 	}
-	raw, err := c.call(ctx, "getUpdates", payload)
+	if len(allowed) > 0 {
+		payload["allowed_updates"] = allowed
+	}
+
+	// HTTP 超时必须比 Telegram 侧的 timeout 更长，否则每轮都超时
+	hc := &http.Client{
+		Timeout:   c.HTTP.Timeout + time.Duration(timeoutSec)*time.Second + 15*time.Second,
+		Transport: c.HTTP.Transport,
+	}
+	raw, err := c.callHTTP(ctx, hc, "getUpdates", payload)
 	if err != nil {
 		return nil, offset, err
 	}
@@ -286,13 +323,25 @@ func (c *TelegramClient) PollPicks(ctx context.Context, offset int64) ([]Pick, i
 	}
 
 	newOffset := offset
+	for i := range updates {
+		if updates[i].UpdateID >= newOffset {
+			newOffset = updates[i].UpdateID + 1
+		}
+	}
+	return updates, newOffset, nil
+}
+
+// PollPicks 拉取待处理的按钮点击，返回解析结果与新的 offset。
+// timeout=0 表示「没有就立刻返回」，适合 Action 这种短生命周期场景。
+func (c *TelegramClient) PollPicks(ctx context.Context, offset int64) ([]Pick, int64, error) {
+	updates, newOffset, err := c.PollUpdates(ctx, offset, 0, "callback_query")
+	if err != nil {
+		return nil, offset, err
+	}
+
 	var picks []Pick
 	for i := range updates {
-		u := &updates[i]
-		if u.UpdateID >= newOffset {
-			newOffset = u.UpdateID + 1
-		}
-		cq := u.CallbackQuery
+		cq := updates[i].CallbackQuery
 		if cq == nil {
 			continue
 		}
@@ -300,8 +349,7 @@ func (c *TelegramClient) PollPicks(ctx context.Context, offset int64) ([]Pick, i
 		if cq.Message != nil {
 			messageID = cq.Message.MessageID
 		}
-		id, idx, ok := parsePickData(cq.Data)
-		if ok {
+		if id, idx, ok := parsePickData(cq.Data); ok {
 			picks = append(picks, Pick{ReviewID: id, Index: idx, MessageID: messageID})
 		}
 		// 无论能否解析都要回执，否则客户端按钮会一直转圈

@@ -5,13 +5,21 @@
 任何程序读这一个 JSON 就能拿到全部演员信息，不依赖媒体服务器，也不需要数据库。
 
 ```
-actors.txt（手工 / nfo 扫描）
-      │
-      ▼
+actors.txt（手工 / nfo 扫描）         Telegram 发名字（--tg-serve）
+      │                                      │
+      ▼                                      ▼
 对比 actors.json ──> 只抓新增 ──> 五源聚合 ──> alist 头像
                                               │
                                     actors.json + manifest + actors.xlsx
 ```
+
+三种用法，任选：
+
+| 方式 | 触发 | 延迟 | 适合 |
+|---|---|---|---|
+| GitHub Actions 定时 | 每天 04:00 UTC | 一天 | 无人值守地补全清单 |
+| `--tg-serve` 常驻服务 | 你在 Telegram 里发名字 | 秒级 | 临时想补谁、顺手挑图 |
+| 本地命令行 | `actorsync --refresh 名字` | 立即 | 调试、跑一次性任务 |
 
 ## 两个工作流
 
@@ -83,6 +91,7 @@ make run
 | `ACTORS_LIMIT` | Limit | 可选 | 本轮最多处理多少个，0 = 不限 |
 | `ACTORS_DRY_RUN` | DryRun | 可选 | `1` = 只打印不写盘 |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | TelegramToken / TelegramChatID | 可选 | 两个都填才启用人工选图 |
+| `TELEGRAM_API_BASE` | TelegramAPIBase | 可选 | 反代地址；境内直连 `api.telegram.org` 不通时必填 |
 | `ACTORS_REVIEW_MAX` | ReviewMax | 可选 | 每轮最多发几个人等选择，默认 6，`0` = 关闭 |
 | `ACTORS_REVIEW_STATE` / `ACTORS_CHOICES` | ReviewStateFile / ChoicesFile | 可选 | 默认 `data/avatar_review.json`、`data/avatar_choices.json` |
 
@@ -116,6 +125,9 @@ actorsync [flags]
 
   # 只扫描 nfo，生成 actors.txt，不抓数据
   --scan-nfo --nfo-dir /media [--nfo-max 500]
+
+  # 常驻交互服务：在 Telegram 里发名字即时刮削（Ctrl+C 退出）
+  --tg-serve
 ```
 
 ### 清单从哪来
@@ -226,29 +238,98 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 
 ## 人工选图（Telegram）
 
-配上 bot 后，**新演员**和**抓完仍没有头像的人**会把候选图发给你选。
+自动取图永远是 `images[0]`，经常不是最好看的那张。两种用法，选一个。
 
 | Secret | 说明 |
 | --- | --- |
 | `TELEGRAM_BOT_TOKEN` | @BotFather 申请 |
 | `TELEGRAM_CHAT_ID` | 你与 bot 的会话 id（或群 id） |
+| `TELEGRAM_API_BASE` | 可选。境内直连 `api.telegram.org` 不通时填反代地址 |
 
-**工作方式：两阶段，不需要常驻服务**
+### 方式 A：批量同步里顺带问（零部署）
 
-1. 本轮收尾：候选图以相册发到你会话里，下面一排 `1 2 3 4 5` 按钮
-2. 你点一个。此时 bot 不在线，按钮会转圈到超时——但**点击已经进了 Telegram 的
+**新演员**和**抓完仍没有头像的人**会把候选图发到你会话里。
+
+1. 本轮收尾：候选图以相册发出，下面一排 `1 2 3 4 5` 按钮
+2. 你点一个。此时进程已退出，按钮会转圈到超时——但**点击已经进了 Telegram 的
    updates 队列（保留 24 小时）**，不会丢
 3. 下一轮启动：`getUpdates` 把点击取回来，写进 `data/avatar_choices.json`，并回一条汇总
-4. 之后这个人一律用你选的图，且会**强制覆盖** alist 上的旧文件（换图必须重传，
+4. 之后这个人一律用你选的图，且**强制覆盖** alist 上的旧文件（换图必须重传，
    否则直链不变、看着像没生效）
 
-几点约束：
+约束：
 
 - 每轮最多发 `ACTORS_REVIEW_MAX` 个（默认 6）。同一会话约 20 条/分钟，别调太大
 - 候选少于 2 张不发——没得选
 - 想改主意：把 `data/avatar_choices.json` 里对应的 key 删掉，下一轮会重新问
 - 只用 `getUpdates`、不设 webhook，所以 bot 不需要公网入口，也不用额外挂 Worker
 - 两个文件都要提交进仓库（workflow 已包含），否则每轮都会重复发图、重复丢点击
+
+### 方式 B：常驻交互服务（实时）
+
+```bash
+actorsync --tg-serve
+```
+
+在 Telegram 里直接发名字（一行一个，或用逗号、顿号隔开），它立刻走完整刮削流程：
+
+- **在库的人**：刷新元数据并重传头像，候选第 1 张固定是当前正在用的那张
+- **不在库的人**：完整刮削补齐元数据（生日、身高、三围、简介、别名、来源 ID）后入库
+- 抓完把候选图以相册发给你，**点按钮立刻换图**——下载选中图 → 传 alist（强制）→
+  写 `actors.json` → 记进 `avatar_choices.json`
+- 抓取失败但库里已有记录时**保留旧数据**，不会把好好的 `ok` 改成 `no_source`
+
+命令：
+
+| 命令 | 作用 |
+| --- | --- |
+| 直接发名字 | 刮削 + 发候选图 |
+| `/repick 名字` | 重抓并重新发候选（换掉已选的） |
+| `/status 名字` | 只看库里现状，不联网 |
+| `/list [关键词]` | 列出库里的人 |
+| `/id` | 告诉你当前会话 id，首次配置用 |
+| `/help` | 用法说明 |
+
+**为什么不需要 Cloudflare Worker 或公网 IP**
+
+长轮询是**客户端主动出站 HTTPS**：每 25 秒挂起一次 `getUpdates`，有消息立刻返回。
+不需要入站端口、不需要证书、不需要域名，家里 NAS、软路由、树莓派、任意 VPS 都能跑。
+Worker 方案（webhook）只在你想把逻辑放在云端时才需要。
+
+> ⚠️ **同一个 bot token 只能有一个 `getUpdates` 客户端**。
+> 跑 `--tg-serve` 时，把批量那边的 `ACTORS_REVIEW_MAX` 设成 `0`（或停掉定时任务），
+> 否则两边抢 update 会返回 `409 Conflict`，点击可能被对方吃掉。
+
+常驻部署（systemd 示例）：
+
+```ini
+[Unit]
+Description=actor-em telegram bot
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/actor-em
+EnvironmentFile=/opt/actor-em/secrets.env
+ExecStart=/opt/actor-em/actorsync --tg-serve
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+或者用 Docker（NAS、服务器都行，`Dockerfile` 已带好）：
+
+```bash
+docker build -t actor-em .
+docker run -d --name actor-em --restart unless-stopped \
+  --env-file secrets.env \
+  -v "$PWD/actors.json:/app/actors.json" \
+  -v "$PWD/data:/app/data" \
+  actor-em
+```
+
+`actors.json` 和 `data/` 必须挂进去——bot 会写这两个地方。
 
 ## GitHub Actions
 
