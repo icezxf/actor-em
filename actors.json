@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-19T12:00:38Z",
-  "count": 1,
+  "generated_at": "2026-11-19T12:25:53Z",
+  "count": 2,
   "actors": [
     {
       "key": "name:653852a17e94cd23caea8191b5749b1a84179ba9",
@@ -43,6 +43,47 @@
       "retry_after": null,
       "created_at": "2026-11-19T11:57:25Z",
       "scraped_at": "2026-11-19T11:57:25Z"
+    },
+    {
+      "key": "name:903033675dbc5d50bd61a080f0ccbb25ac291068",
+      "name": "桃乃木香奈",
+      "name_original": null,
+      "aliases": [],
+      "gender": null,
+      "birth_date": null,
+      "death_date": null,
+      "birth_place": null,
+      "country": null,
+      "height_cm": null,
+      "weight_kg": null,
+      "cup_size": null,
+      "waist_cm": null,
+      "hip_cm": null,
+      "career_start": null,
+      "bio": "桃乃木香奈（日語：桃乃木 かな／もものぎ かな，羅馬化：Momonogi Kana，1996年12月24日—）是一名日本前AV女優。所属于LIFE PROMOTION旗下，女子團體惠比壽★麝香葡萄成員，東京都出道，于2025年9月28日在instagram个人账号中表示将在在出道10周年之际的10月7日引退。",
+      "bio_lang": "ja",
+      "avatar": null,
+      "avatar_path": null,
+      "avatar_dir": null,
+      "avatar_source": null,
+      "avatar_source_site": null,
+      "avatar_sha256": null,
+      "avatar_bytes": null,
+      "avatar_w": null,
+      "avatar_h": null,
+      "provider_ids": {},
+      "status": "ok",
+      "sources": {
+        "javstash": false,
+        "ouxiang": false,
+        "stashdb": false,
+        "tpdb": false,
+        "wiki": true
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-19T12:25:53Z",
+      "scraped_at": "2026-11-19T12:25:53Z"
     }
   ]
 }
