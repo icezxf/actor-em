@@ -12,16 +12,16 @@ jobs:
           for d in javstash.org www.javstash.org api.javstash.com javastash.org www.javastash.org api.javastash.com; do
             ip=$(getent ahostsv4 "$d" 2>/dev/null | head -1 | awk '{print $1}')
             printf "%-24s 系统解析=%-16s " "$d" "${ip:-无}"
-            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/graphql" 2>/dev/null)
+            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/graphql" 2>/dev/null || echo "FAIL")
             echo "graphql HTTP=$code"
           done
 
       - name: 偶像素库 候选拼写 DNS + HTTP
         run: |
-          for d in ouxiangdanku.com www.ouxiangdanku.com ouxiangdanku.cc www.ouxiangdanku.cc ouxiangdanku.net ouxiangdanku.cn ouxiangdanku.info; do
+          for d in ouxiangdanku.com www.ouxiangdanku.com ouxiangtuku.com www.ouxiangtuku.com ouxiangtuku.cc ouxiangdanku.cc ouxiangdanku.net ouxiangdanku.cn; do
             ip=$(getent ahostsv4 "$d" 2>/dev/null | head -1 | awk '{print $1}')
             printf "%-26s 系统解析=%-16s " "$d" "${ip:-无}"
-            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/" 2>/dev/null)
+            code=$(curl -sS --max-time 12 -o /dev/null -w '%{http_code}' "https://$d/" 2>/dev/null || echo "FAIL")
             echo "首页 HTTP=$code"
           done
 
