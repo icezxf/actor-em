@@ -1,14 +1,14 @@
 # actor-em
 
 读 `actors.txt` 里的待抓清单（也可以从 alist 的 nfo 自动生成），只给**库里还没有的演员**补元数据，
-头像转存到 alist，结果写成根目录的 `actors.json`，同时导出 `actors.xlsx` 方便手工查询。
+头像直接用数据源给的网络地址（不下载、不转存），结果写成根目录的 `actors.json`，同时导出 `actors.xlsx` 方便手工查询。
 任何程序读这一个 JSON 就能拿到全部演员信息，不依赖媒体服务器，也不需要数据库。
 
 ```
 actors.txt（手工 / nfo 扫描）         Telegram 发名字（--tg-serve）
       │                                      │
       ▼                                      ▼
-对比 actors.json ──> 只抓新增 ──> 五源聚合 ──> alist 头像
+对比 actors.json ──> 只抓新增 ──> 五源聚合 ──> 网络头像地址
                                               │
                                     actors.json + manifest + actors.xlsx
 ```
@@ -82,10 +82,6 @@ make run
 | `STASHDB_API_KEY` | StashDBAPIKey | 可选 | 欧美演员兜底 |
 | `DEEPL_API_KEY` | DeepLAPIKey | 可选 | 英文简介译成中文，留空不翻译 |
 | `WIKI_EMAIL` | WikiEmail | 可选 | 维基 API 的 User-Agent 联系邮箱 |
-| `ALIST_URL` | AlistURL | ✅ | 例 `https://alist.example.com` |
-| `ALIST_USER` / `ALIST_PASS` | AlistUser / AlistPass | ✅ | alist 账号 |
-| `ALIST_DIR` | AlistDir | ✅ | 头像根目录，默认 `/actors` |
-| `ALIST_PUBLIC_BASE` | AlistPublicBase | 可选 | 独立直链域名，默认同 `ALIST_URL` |
 | `ACTOR_DICT` | DictFile | 建议 | 中文→日文名字典，默认 `data/actor_dict.csv` |
 | `ACTOR_DICT_LOCAL` | DictLocalFile | 可选 | 手工补充字典，默认 `data/actor_dict.local.csv` |
 | `TPDB_ENDPOINT` / `JAVSTASH_ENDPOINT` / `STASHDB_ENDPOINT` | Endpoint | 可选 | 换镜像/代理时用，默认官方地址 |
@@ -117,7 +113,6 @@ actorsync [flags]
   --dry-run            只打印，不写本地文件
   --refresh 名字,名字   重抓指定演员
   --refresh-all        重抓库里所有演员（最慢）
-  --force-avatar       头像已存在也重新上传
   --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
@@ -165,13 +160,10 @@ nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<acto
 | `career_start` | int? | 出道年份 |
 | `bio` | string? | 简介，优先中文 |
 | `bio_lang` | string? | `zh` / `ja` / `en` |
-| `avatar` | string? | alist 直链，**已 percent-encode**，直接 GET |
-| `avatar_path` | string? | alist 内路径 `/actors/小/小凑四叶.jpg` |
-| `avatar_dir` | string? | alist 目录 `/actors/小` |
-| `avatar_source` | string? | **原始网络地址**，CDN 会过期，仅溯源用 |
-| `avatar_source_site` | string? | `javstash` / `tpdb` / `stashdb` |
-| `avatar_sha256` | string? | 校验、去重 |
-| `avatar_bytes` `avatar_w` `avatar_h` | int? | 文件大小与尺寸 |
+| `avatar` | string? | 头像的**网络地址**（数据源原图 URL），直接用 |
+| `avatar_source` | string? | 同 `avatar`，溯源用 |
+| `avatar_source_site` | string? | `javstash` / `tpdb` / `stashdb` / `manual` |
+| `avatar_path` `avatar_dir` `avatar_sha256` `avatar_bytes` `avatar_w` `avatar_h` | — | 旧版 alist 转存字段，现已不再写入，恒为 `null` |
 | `provider_ids` | object | `{JavStash, StashDB, TPDB, Tmdb, Imdb, Wikipedia, ...}` |
 | `status` | string | `ok` / `partial` / `no_source` / `failed` |
 | `sources` | object | 各源是否命中 |
@@ -221,24 +213,14 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 
 ## 头像
 
-路径规则：`{ALIST_DIR}/{名字首字符}/{清单里的名字}.jpg`
-
-```
-/actors/小/小凑四叶.jpg
-/actors/J/John Smith.jpg
-/actors/1/123.jpg
-```
-
-- 首字符是中日韩字符就原样（`小`、`あ`），拉丁字母转大写，数字原样，其余归 `_`
-- 只做必要 sanitize：`\ / : * ? " < > |` 换 `_`、去首尾空白与尾部点、按 rune 截断 80 字节
-- 上传前先查是否存在，**存在就跳过**（`--force-avatar` 可强制覆盖）
-- 演员改名会换文件名、可能换桶，旧的会成孤儿（规模大时再加清理任务）
-
-> 注意：`avatar_source` 是数据源的 CDN 地址，带防盗链/签名，几个月后可能 403。
-> 运行时请一律用 `avatar`（alist 副本）。
+头像不再下载转存，直接把数据源给的图片网络地址写进 `avatar`（`avatar_source` 同值）。
+所以无需 alist，也不用配 `ALIST_DIR` 等头像相关参数。
 
 取图顺序：JavStash → StashDB → TPDB，且每个源都只取 `images[0]`——上游给的顺序，
 不一定是最好看的那张。要人工挑，见下一节。
+
+> 注意：这些地址是数据源的 CDN 链接，部分带防盗链/签名，过一段时间可能 403。
+> 若发现头像失效，用下面的 Telegram 人工选图换一张即可。
 
 ## 人工选图（Telegram）
 
@@ -263,9 +245,9 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 
 交互行为（三种方式都一样）：
 
-- **在库的人**：刷新元数据并重传头像，候选第 1 张固定是当前正在用的那张
+- **在库的人**：刷新元数据并更新网络头像，候选第 1 张固定是当前正在用的那张
 - **不在库的人**：完整刮削补齐元数据（生日、身高、三围、简介、别名、来源 ID）后入库
-- **点按钮**：下载选中图 → 传 alist（强制覆盖）→ 写 `actors.json` → 记进
+- **点按钮**：把选中图的网络地址写进头像 → 写 `actors.json` → 记进
   `avatar_choices.json`，以后同步不会再被自动图覆盖
 - 抓取失败但库里已有记录时**保留旧数据**，不会把好好的 `ok` 改成 `no_source`
 
@@ -288,7 +270,7 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 2. 你点一个。此时进程已退出，按钮会转圈到超时——但**点击已经进了 Telegram 的
    updates 队列（保留 24 小时）**
 3. 下一轮启动：`getUpdates` 把点击取回来，写进 `data/avatar_choices.json`
-4. 之后这个人一律用你选的图，且**强制覆盖** alist 上的旧文件
+4. 之后这个人一律用你选的图的网络地址
 
 约束：每轮最多发 `ACTORS_REVIEW_MAX` 个（默认 6）；候选少于 2 张不发；
 想改主意就删掉 `data/avatar_choices.json` 里对应的 key。
@@ -303,7 +285,7 @@ Worker **只做两件事**：接 Telegram webhook、把 update 派发成 GitHub
 ```
 Telegram ──webhook──> CF Worker ──repository_dispatch──> Actions (--tg-once)
                                                           │
-                                        actors.json / choices / alist
+                                        actors.json / choices
 ```
 
 **一次性部署**

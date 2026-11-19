@@ -179,8 +179,11 @@ type AvatarResult struct {
 	Skipped bool // 已存在，跳过上传
 }
 
-// UploadAvatar 把图片存到 {AlistDir}/{首字符}/{演员名}.jpg，返回各种路径。
+// UploadAvatar 把图片存到 {baseDir}/{首字符}/{演员名}.jpg，返回各种路径。
 // force=false 时已存在就跳过（幂等，省流量）。
+//
+// Deprecated: 头像已改为直接用网络地址，主链路不再调用这里。
+// 保留仅为兼容可能仍在用它的外部工具；AlistClient 本身仍供 --scan-nfo 使用。
 func (c *AlistClient) UploadAvatar(ctx context.Context, baseDir, actorName string, data []byte, force bool) (*AvatarResult, error) {
 	baseDir = "/" + strings.Trim(baseDir, "/")
 	bucket := BucketOf(actorName)

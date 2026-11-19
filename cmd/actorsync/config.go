@@ -19,12 +19,11 @@ type Config struct {
 	DeepLAPIKey      string
 	WikiEmail        string
 
-	// alist
+	// alist（仅 --scan-nfo 用；头像直接用网络地址，不转存）
 	AlistURL        string
 	AlistUser       string
 	AlistPass       string
-	AlistDir        string // /actors
-	AlistPublicBase string // 直链前缀，留空 = AlistURL
+	AlistPublicBase string // nfo 直链前缀，留空 = AlistURL
 
 	// 演员清单（唯一来源，一行一个名字）
 	NamesFile string
@@ -49,15 +48,13 @@ type Config struct {
 	NFOMaxFiles int
 
 	// 行为
-	Limit       int
-	DryRun      bool
-	Verbose     bool
-	ForceAvatar bool
+	Limit   int
+	DryRun  bool
+	Verbose bool
 }
 
 func DefaultConfig() *Config {
 	return &Config{
-		AlistDir:         "/actors",
 		TPDBEndpoint:     "https://api.theporndb.net/performers",
 		JavStashEndpoint: "https://javastash.org/graphql",
 		StashDBEndpoint:  "https://stashdb.org/graphql",
@@ -102,7 +99,6 @@ func applyEnv(c *Config) {
 	set(&c.AlistURL, "ALIST_URL")
 	set(&c.AlistUser, "ALIST_USER")
 	set(&c.AlistPass, "ALIST_PASS")
-	set(&c.AlistDir, "ALIST_DIR")
 	set(&c.AlistPublicBase, "ALIST_PUBLIC_BASE")
 	set(&c.DataFile, "ACTORS_FILE")
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
@@ -136,5 +132,4 @@ func applyEnv(c *Config) {
 		c.DryRun = true
 	}
 	c.Verbose = c.Verbose || os.Getenv("ACTORS_VERBOSE") == "1"
-	c.ForceAvatar = os.Getenv("ACTORS_FORCE_AVATAR") == "1"
 }

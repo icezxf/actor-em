@@ -27,17 +27,7 @@ func TestBotEndToEnd(t *testing.T) {
 		switch {
 		case strings.HasPrefix(r.URL.Path, "/img/"):
 			w.Header().Set("Content-Type", "image/jpeg")
-			_, _ = w.Write([]byte(strings.Repeat("x", 600))) // DownloadImage 要求 ≥512 字节
-
-		// ---- 极简 alist：登录 / 建目录 / 判存在 / 上传 ----
-		case strings.HasSuffix(r.URL.Path, "/api/auth/login"):
-			_, _ = w.Write([]byte(`{"code":200,"data":{"token":"tk"}}`))
-		case strings.HasSuffix(r.URL.Path, "/api/fs/mkdir"):
-			_, _ = w.Write([]byte(`{"code":200}`))
-		case strings.HasSuffix(r.URL.Path, "/api/fs/get"):
-			_, _ = w.Write([]byte(`{"code":404,"message":"not found"}`))
-		case r.Method == http.MethodPut:
-			_, _ = w.Write([]byte(`{"code":200}`))
+			_, _ = w.Write([]byte(strings.Repeat("x", 600))) // 发相册时 DownloadImage 要求 ≥512 字节
 
 		// ---- Telegram ----
 		case strings.HasSuffix(r.URL.Path, "/getUpdates"):
@@ -101,14 +91,6 @@ func TestBotEndToEnd(t *testing.T) {
 	}})
 	engine.DataFile = dir + "/actors.json"
 	engine.HTTP = srv.Client()
-	// 真实走一遍上传：下载图 → mkdir → put → 拼直链
-	alist := NewAlistClient(srv.URL, srv.URL, "u", "p")
-	alist.HTTP = srv.Client()
-	if err := alist.Login(context.Background()); err != nil {
-		t.Fatal(err)
-	}
-	engine.Alist = alist
-	engine.AlistDir = "/actors"
 
 	choices := NewChoices(dir + "/choices.json")
 	state := NewReviewState(dir + "/review.json")
@@ -169,8 +151,14 @@ func TestBotEndToEnd(t *testing.T) {
 	}
 	wantURL := srv.URL + "/img/b.jpg"
 	actor := engine.DB.Actors[0]
+	if StrVal(actor.Avatar) != wantURL {
+		t.Fatalf("头像应是第 2 张的网络地址，实际 %q", StrVal(actor.Avatar))
+	}
 	if StrVal(actor.AvatarSource) != wantURL {
 		t.Fatalf("头像来源应为第 2 张，实际 %q", StrVal(actor.AvatarSource))
+	}
+	if actor.AvatarPath != nil {
+		t.Fatal("不该残留 alist 路径")
 	}
 
 	url, ok := choices.Get(actor.Key)

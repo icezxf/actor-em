@@ -41,12 +41,6 @@ jobs:
           DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
 
-          ALIST_URL: ${{ secrets.ALIST_URL }}
-          ALIST_USER: ${{ secrets.ALIST_USER }}
-          ALIST_PASS: ${{ secrets.ALIST_PASS }}
-          ALIST_DIR: ${{ secrets.ALIST_DIR }}
-          ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
-
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ACTORS_VERBOSE: "1"

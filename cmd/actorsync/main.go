@@ -30,7 +30,6 @@ func main() {
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
 	flag.BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "只打印结果，不写本地文件")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "打印每个数据源的命中情况")
-	flag.BoolVar(&cfg.ForceAvatar, "force-avatar", cfg.ForceAvatar, "头像已存在也重新上传")
 	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长）")
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "actors.json 路径")
@@ -194,23 +193,19 @@ func main() {
 	}
 	logger.Printf("本轮待处理 %d 个（新增 %d / 重试 %d / 刷新 %d）", len(plan), newCount, retryCount, refreshCount)
 
-	// ---------- 4. 准备抓取器和 alist ----------
+	// ---------- 4. 准备抓取器 ----------
 	hc := &http.Client{Timeout: 30 * time.Second}
 	fetcher := buildFetcher(cfg, hc, logger)
-	alist := connectAlist(ctx, cfg, logger)
 
-	// 抓取 → 生成记录 → 传头像 这条链路统一走 Engine，
+	// 抓取 → 生成记录 → 用网络头像 这条链路统一走 Engine，
 	// 和 --tg-serve 交互服务共用，避免两边行为漂移。
 	engine := &actorsync.Engine{
-		DB:          db,
-		Fetcher:     fetcher,
-		Alist:       alist,
-		Choices:     choices,
-		HTTP:        hc,
-		DataFile:    cfg.DataFile,
-		AlistDir:    cfg.AlistDir,
-		ForceAvatar: cfg.ForceAvatar,
-		Log:         logger.Printf,
+		DB:       db,
+		Fetcher:  fetcher,
+		Choices:  choices,
+		HTTP:     hc,
+		DataFile: cfg.DataFile,
+		Log:      logger.Printf,
 	}
 
 	// ---------- 5. 逐个抓 ----------
@@ -407,21 +402,6 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	return fetcher
 }
 
-// connectAlist 登录 alist；失败只告警不中断，头像上传会自动跳过。
-func connectAlist(ctx context.Context, cfg *Config, logger *log.Logger) *actorsync.AlistClient {
-	if cfg.AlistURL == "" || cfg.AlistUser == "" {
-		logger.Printf("⚠️  未配置 alist，跳过头像上传")
-		return nil
-	}
-	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistPublicBase, cfg.AlistUser, cfg.AlistPass)
-	if err := alist.Login(ctx); err != nil {
-		logger.Printf("⚠️  alist 登录失败，跳过头像上传: %v", err)
-		return nil
-	}
-	logger.Printf("alist 已连接：%s%s", cfg.AlistURL, cfg.AlistDir)
-	return alist
-}
-
 // runTelegramServe 常驻运行交互服务：长轮询收消息，发名字即走完整刮削并回候选图。
 //
 // 注意：同一个 bot token 只能有一个 getUpdates 客户端。跑这个服务时，
@@ -453,15 +433,12 @@ func runTelegramServe(ctx context.Context, cfg *Config, logger *log.Logger) erro
 	}
 
 	engine := &actorsync.Engine{
-		DB:          db,
-		Fetcher:     buildFetcher(cfg, hc, logger),
-		Alist:       connectAlist(ctx, cfg, logger),
-		Choices:     choices,
-		HTTP:        hc,
-		DataFile:    cfg.DataFile,
-		AlistDir:    cfg.AlistDir,
-		ForceAvatar: cfg.ForceAvatar,
-		Log:         logger.Printf,
+		DB:       db,
+		Fetcher:  buildFetcher(cfg, hc, logger),
+		Choices:  choices,
+		HTTP:     hc,
+		DataFile: cfg.DataFile,
+		Log:      logger.Printf,
 	}
 
 	logger.Printf("提示：同一个 bot token 只能有一个 getUpdates 客户端，批量同步那边请把 ACTORS_REVIEW_MAX 设为 0")
@@ -507,15 +484,12 @@ func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw s
 	}
 
 	engine := &actorsync.Engine{
-		DB:          db,
-		Fetcher:     buildFetcher(cfg, hc, logger),
-		Alist:       connectAlist(ctx, cfg, logger),
-		Choices:     choices,
-		HTTP:        hc,
-		DataFile:    cfg.DataFile,
-		AlistDir:    cfg.AlistDir,
-		ForceAvatar: cfg.ForceAvatar,
-		Log:         logger.Printf,
+		DB:       db,
+		Fetcher:  buildFetcher(cfg, hc, logger),
+		Choices:  choices,
+		HTTP:     hc,
+		DataFile: cfg.DataFile,
+		Log:      logger.Printf,
 	}
 	bot := &actorsync.Bot{
 		TG:         newTelegram(cfg),

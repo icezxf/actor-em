@@ -21,12 +21,10 @@ func applyLocalFile(c *Config) {
 	c.DeepLAPIKey = "" // 留空则不翻译英文简介
 	c.WikiEmail = ""   // 维基 API 的 User-Agent 联系邮箱，可留空
 
-	// ===== alist =====
+	// ===== alist（仅 --scan-nfo 用；头像直接用网络地址，不转存）=====
 	c.AlistURL = "https://alist.example.com"
 	c.AlistUser = "admin"
 	c.AlistPass = "your-password"
-	c.AlistDir = "/actors"
-	c.AlistPublicBase = "" // 有独立直链域名时填，例如 https://cdn.example.com
 
 	// ===== 演员清单 =====
 	// 唯一来源：一行一个名字的 txt

@@ -56,12 +56,6 @@ jobs:
           DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
 
-          ALIST_URL: ${{ secrets.ALIST_URL }}
-          ALIST_USER: ${{ secrets.ALIST_USER }}
-          ALIST_PASS: ${{ secrets.ALIST_PASS }}
-          ALIST_DIR: ${{ secrets.ALIST_DIR }}
-          ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
-
           # Worker webhook 模式下必须设 0：webhook 与 getUpdates 互斥，
           # 这里一旦调 getUpdates 就会拿到 409 Conflict，还会吃掉用户点击。
           ACTORS_REVIEW_MAX: "0"

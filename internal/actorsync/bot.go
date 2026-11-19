@@ -377,7 +377,7 @@ func (b *Bot) handleStatus(ctx context.Context, args string) {
 // ---------- 文本小工具 ----------
 
 const botHelpText = `发演员名字给我，我会走完整刮削流程：
-抓元数据 → 上传头像 → 把候选图发给你挑。
+抓元数据 → 用网络头像 → 把候选图发给你挑。
 
 用法
 · 直接发名字，一行一个或用逗号隔开
@@ -436,7 +436,7 @@ func actorSummary(a *Actor) string {
 		}
 	}
 	if v := StrVal(a.Avatar); v != "" {
-		parts = append(parts, "头像已上传")
+		parts = append(parts, "有头像")
 	}
 	if len(parts) == 0 {
 		return "（暂无元数据）"

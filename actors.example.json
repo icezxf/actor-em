@@ -26,15 +26,15 @@
       "bio": "小湊よつ葉，日本女演员，1996年5月10日出生于日本。2019年出道，所属事务所……（此处为中文简介，长度通常 100~800 字）",
       "bio_lang": "zh",
 
-      "avatar": "https://alist.example.com/d/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg",
-      "avatar_path": "/actors/小/小凑四叶.jpg",
-      "avatar_dir": "/actors/小",
+      "avatar": "https://cdndata.javstash.com/media/performers/8f2c1e0a/original.jpg",
+      "avatar_path": null,
+      "avatar_dir": null,
       "avatar_source": "https://cdndata.javstash.com/media/performers/8f2c1e0a/original.jpg",
       "avatar_source_site": "javstash",
-      "avatar_sha256": "3f8a9c1e5b7d2a4f6c8e0b1d3f5a7c9e2b4d6f8a0c1e3b5d7f9a2c4e6b8d0f1a",
-      "avatar_bytes": 48213,
-      "avatar_w": 480,
-      "avatar_h": 640,
+      "avatar_sha256": null,
+      "avatar_bytes": null,
+      "avatar_w": null,
+      "avatar_h": null,
 
       "provider_ids": {
         "JavStash": "8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",

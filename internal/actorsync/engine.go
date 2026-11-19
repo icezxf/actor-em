@@ -21,13 +21,10 @@ type NameFetcher interface {
 type Engine struct {
 	DB      *Db
 	Fetcher NameFetcher
-	Alist   *AlistClient
 	Choices *Choices
 	HTTP    *http.Client
 
-	DataFile    string
-	AlistDir    string
-	ForceAvatar bool
+	DataFile string
 
 	Log func(format string, args ...any)
 }
@@ -90,7 +87,6 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 		key = existing.Key
 	}
 
-	forceAvatar := e.ForceAvatar
 	manualPick := ""
 	if e.Choices != nil {
 		if url, ok := e.Choices.Get(key); ok {
@@ -98,11 +94,6 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 			if res.ImageURL != url {
 				res.ImageURL = url
 				res.ImageSite = "manual"
-			}
-			// 换图必须重传：force=false 时 alist 上还是旧文件，直链也不变，
-			// 表现出来就是「选了但没生效」。
-			if existing == nil || StrVal(existing.AvatarSource) != url {
-				forceAvatar = true
 			}
 		}
 	}
@@ -148,25 +139,10 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 		}
 	case res.ImageURL == "":
 		// 保持「无图」
-	case e.Alist == nil:
-		avatarNote = "有图但未配置 alist"
 	default:
-		imgData, err := DownloadImage(ctx, e.httpClient(), res.ImageURL)
-		if err != nil {
-			avatarNote = "图下载失败: " + err.Error()
-		} else {
-			av, err := e.Alist.UploadAvatar(ctx, e.AlistDir, actor.Name, imgData, forceAvatar)
-			if err != nil {
-				avatarNote = "上传失败: " + err.Error()
-			} else {
-				applyAvatarResult(actor, av, res.ImageURL, res.ImageSite)
-				if av.Skipped {
-					avatarNote = "头像已存在"
-				} else {
-					avatarNote = "头像已上传"
-				}
-			}
-		}
+		// 不转存：直接用数据源给的网络地址当头像。
+		applyAvatarURL(actor, res.ImageURL, res.ImageSite)
+		avatarNote = "已用网络头像"
 	}
 
 	out.AvatarNote = avatarNote
@@ -177,7 +153,8 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 	return out, nil
 }
 
-// ApplyChoice 把用户选中的图下载后传到 alist，并就地更新记录。
+// ApplyChoice 把用户选中的图片网络地址写进记录，就地更新。
+// 不下载、不转存：avatar 直接就是这张图的网络地址。
 // 返回更新后的记录与一句人类可读的说明。
 func (e *Engine) ApplyChoice(ctx context.Context, key, imageURL string) (*Actor, string, error) {
 	actor := e.DB.FindByKey(key)
@@ -188,22 +165,9 @@ func (e *Engine) ApplyChoice(ctx context.Context, key, imageURL string) (*Actor,
 	if imageURL == "" {
 		return nil, "", fmt.Errorf("图片地址为空")
 	}
-	if e.Alist == nil {
-		return actor, "未配置 alist，选择已记录（下次同步时生效）", nil
-	}
 
-	data, err := DownloadImage(ctx, e.httpClient(), imageURL)
-	if err != nil {
-		return nil, "", fmt.Errorf("下载选中图失败: %w", err)
-	}
-	// 换了图一定要 force，否则 alist 上还是旧文件、直链对不上新内容
-	av, err := e.Alist.UploadAvatar(ctx, e.AlistDir, actor.Name, data, true)
-	if err != nil {
-		return nil, "", fmt.Errorf("上传头像失败: %w", err)
-	}
-
-	applyAvatarResult(actor, av, imageURL, "manual")
-	return actor, "已上传到 alist", nil
+	applyAvatarURL(actor, imageURL, "manual")
+	return actor, "已用这张图的网络地址作头像", nil
 }
 
 // Save 把内存中的库落盘。
@@ -214,15 +178,17 @@ func (e *Engine) Save() error {
 	return e.DB.Save(e.DataFile)
 }
 
-// applyAvatarResult 把上传结果写回记录的头像字段。
-func applyAvatarResult(actor *Actor, av *AvatarResult, sourceURL, sourceSite string) {
-	actor.Avatar = StrPtr(av.URL)
-	actor.AvatarPath = StrPtr(av.Path)
-	actor.AvatarDir = StrPtr(av.Dir)
+// applyAvatarURL 把图片的网络地址直接写进头像字段，不经过任何转存。
+// avatar 与 avatar_source 都是这个地址；alist 时代的 path/dir/sha256/size/尺寸
+// 全部清空，避免旧记录残留已失效的 alist 直链信息。
+func applyAvatarURL(actor *Actor, sourceURL, sourceSite string) {
+	actor.Avatar = StrPtr(sourceURL)
 	actor.AvatarSource = StrPtr(sourceURL)
 	actor.AvatarSourceSite = StrPtr(sourceSite)
-	actor.AvatarSHA256 = StrPtr(av.SHA256)
-	actor.AvatarBytes = &av.Bytes
-	actor.AvatarW = IntPtr(av.Width)
-	actor.AvatarH = IntPtr(av.Height)
+	actor.AvatarPath = nil
+	actor.AvatarDir = nil
+	actor.AvatarSHA256 = nil
+	actor.AvatarBytes = nil
+	actor.AvatarW = nil
+	actor.AvatarH = nil
 }

@@ -63,12 +63,21 @@ func TestEngineProcessNewActor(t *testing.T) {
 	if len(out.Candidates) != 2 || out.Candidates[0] != "https://cdn.example.com/a.jpg" {
 		t.Fatalf("候选不对: %v", out.Candidates)
 	}
-	// 没配 alist：有图但传不上去，不能把 avatar 写成假直链
-	if out.Actor.Avatar != nil {
-		t.Fatalf("没配 alist 不该有 avatar: %v", StrVal(out.Actor.Avatar))
+	// 不转存：有图就直接用网络地址当 avatar
+	if got := StrVal(out.Actor.Avatar); got != "https://cdn.example.com/a.jpg" {
+		t.Fatalf("avatar 应是网络地址，实际 %q", got)
+	}
+	if StrVal(out.Actor.AvatarSource) != "https://cdn.example.com/a.jpg" {
+		t.Fatalf("avatar_source 应是网络地址，实际 %q", StrVal(out.Actor.AvatarSource))
+	}
+	if StrVal(out.Actor.AvatarSourceSite) != "javstash" {
+		t.Fatalf("avatar_source_site 应是 javstash，实际 %q", StrVal(out.Actor.AvatarSourceSite))
+	}
+	if out.Actor.AvatarPath != nil || out.Actor.AvatarSHA256 != nil {
+		t.Fatal("不该残留 alist 转存字段")
 	}
 	if out.AvatarNote == "" {
-		t.Fatal("应该说明头像为什么没传")
+		t.Fatal("应该说明头像处理结果")
 	}
 }
 
@@ -183,15 +192,33 @@ func TestApplyChoiceMissingRecord(t *testing.T) {
 	}
 }
 
-func TestApplyChoiceWithoutAlist(t *testing.T) {
+func TestApplyChoiceUsesNetworkURL(t *testing.T) {
 	e := newTestEngine(&fakeFetcher{})
-	e.DB.Actors = append(e.DB.Actors, &Actor{Key: "javstash:abc", Name: "小凑四叶"})
+	actor := &Actor{
+		Key:        "javstash:abc",
+		Name:       "小凑四叶",
+		Avatar:     StrPtr("https://alist.example.com/d/actors/old.jpg"),
+		AvatarPath: StrPtr("/actors/小/小凑四叶.jpg"),
+	}
+	e.DB.Actors = append(e.DB.Actors, actor)
 
-	_, note, err := e.ApplyChoice(context.Background(), "javstash:abc", "https://x/y.jpg")
+	got, note, err := e.ApplyChoice(context.Background(), "javstash:abc", "https://x/y.jpg")
 	if err != nil {
-		t.Fatalf("没配 alist 不该报错，只是不传: %v", err)
+		t.Fatalf("用网络地址不该报错: %v", err)
+	}
+	if got != actor {
+		t.Fatal("应返回原记录")
+	}
+	if StrVal(actor.Avatar) != "https://x/y.jpg" || StrVal(actor.AvatarSource) != "https://x/y.jpg" {
+		t.Fatalf("avatar/avatar_source 应更新为选中地址: %q / %q", StrVal(actor.Avatar), StrVal(actor.AvatarSource))
+	}
+	if StrVal(actor.AvatarSourceSite) != "manual" {
+		t.Fatalf("来源应标 manual，实际 %q", StrVal(actor.AvatarSourceSite))
+	}
+	if actor.AvatarPath != nil {
+		t.Fatal("应清掉旧的 alist 路径")
 	}
 	if note == "" {
-		t.Fatal("应该说明没传上去的原因")
+		t.Fatal("应该说明处理结果")
 	}
 }
