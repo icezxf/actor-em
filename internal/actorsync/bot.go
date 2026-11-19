@@ -2,6 +2,7 @@ package actorsync
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -98,6 +99,17 @@ func (b *Bot) Run(ctx context.Context) error {
 			}
 		}
 	}
+}
+
+// HandleUpdate 处理一条 Telegram webhook 推送的 update（JSON 原文）。
+// 常驻模式（Run）和一次性模式（--tg-once）共用同一套处理逻辑。
+func (b *Bot) HandleUpdate(ctx context.Context, raw []byte) error {
+	var u tgUpdate
+	if err := json.Unmarshal(raw, &u); err != nil {
+		return fmt.Errorf("解析 Telegram update 失败: %w", err)
+	}
+	b.safeHandle(ctx, &u)
+	return nil
 }
 
 // safeHandle 保证一条坏消息不会掀掉整个服务。

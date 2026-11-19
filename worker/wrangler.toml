@@ -1,0 +1,18 @@
+name = "actor-em-tg"
+main = "src/index.ts"
+compatibility_date = "2026-11-19"
+
+# 回调地址不写死：默认用请求 origin + /telegram。
+# 想固定域名时取消下一行注释。
+# WEBHOOK_URL = "https://actor-em-tg.<你的子域>.workers.dev/telegram"
+
+[vars]
+GH_REPO = "icezxf/actor-em"
+# 只服务自己的会话，避免别人给 bot 发消息浪费 Actions 额度
+# ALLOWED_CHAT_ID = "123456789"
+
+# 下面四个必须用 `wrangler secret put` 设置，不要写进文件：
+#   TELEGRAM_BOT_TOKEN       @BotFather 给的 token
+#   TELEGRAM_WEBHOOK_SECRET  自己生成的随机串，例如 openssl rand -hex 24
+#   SETUP_KEY                自己生成的随机串，用来调 /setup
+#   GH_TOKEN                 有 repo 权限的 GitHub Personal Access Token

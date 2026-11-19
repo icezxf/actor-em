@@ -20,9 +20,9 @@ on:
 permissions:
   contents: write
 
-# 同一时间只允许一轮在跑，避免两轮同时写 actors.json
+# 与 tg-command 共用同一个 group，避免批量同步和交互命令同时写 actors.json
 concurrency:
-  group: actor-sync
+  group: actor-data
   cancel-in-progress: false
 
 jobs:
@@ -62,10 +62,9 @@ jobs:
           ALIST_DIR: ${{ secrets.ALIST_DIR }}
           ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
 
-          # 人工选图：两个都配了才启用，留空则全自动取第一张
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          ACTORS_REVIEW_MAX: "6"
+          # Worker webhook 模式下必须设 0：webhook 与 getUpdates 互斥，
+          # 这里一旦调 getUpdates 就会拿到 409 Conflict，还会吃掉用户点击。
+          ACTORS_REVIEW_MAX: "0"
 
           ACTORS_LIMIT: ${{ github.event.inputs.limit || '150' }}
           ACTORS_VERBOSE: "1"

@@ -12,3 +12,7 @@ bin/
 
 # 本地填写的 Secrets 清单，永不入库
 secrets.env
+
+# Worker 本地依赖与构建缓存
+worker/node_modules/
+worker/.wrangler/

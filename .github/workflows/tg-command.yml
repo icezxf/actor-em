@@ -1,0 +1,76 @@
+name: actor-tg-command
+
+# 由 Cloudflare Worker 通过 repository_dispatch 触发：
+# 每条 Telegram update 跑一次，处理完提交状态文件。
+on:
+  repository_dispatch:
+    types: [actor-command]
+
+permissions:
+  contents: write
+
+# 与 actor-sync 共用同一个 group，避免两边同时写 actors.json
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  handle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Refresh dictionary
+        run: python3 scripts/gen_dict.py || echo "字典刷新失败，继续使用仓库内版本"
+
+      - name: Build
+        run: go build -o /tmp/actorsync ./cmd/actorsync
+
+      - name: Handle Telegram update
+        env:
+          TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
+          WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+
+          ALIST_URL: ${{ secrets.ALIST_URL }}
+          ALIST_USER: ${{ secrets.ALIST_USER }}
+          ALIST_PASS: ${{ secrets.ALIST_PASS }}
+          ALIST_DIR: ${{ secrets.ALIST_DIR }}
+          ALIST_PUBLIC_BASE: ${{ secrets.ALIST_PUBLIC_BASE }}
+
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ACTORS_VERBOSE: "1"
+
+          # Worker 把整条 update 作为字符串放进 client_payload.update
+          TG_UPDATE: ${{ github.event.client_payload.update }}
+        run: |
+          if [ -z "$TG_UPDATE" ]; then
+            echo "没有收到 update，退出"
+            exit 1
+          fi
+          /tmp/actorsync --tg-once "$TG_UPDATE"
+
+      - name: Commit state
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A actors.json actors.manifest.json \
+            data/avatar_review.json data/avatar_choices.json
+          [ -f actors.xlsx ] && git add actors.xlsx || true
+          if git diff --cached --quiet; then
+            echo "本次无变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "chore(actors): tg $(date -u +%F-%H%M)"
+          git pull --rebase --autostash origin main
+          git push

@@ -24,6 +24,7 @@ func main() {
 		scanNFO    bool
 		noXlsx     bool
 		serveBot   bool
+		tgOnce     string
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -42,6 +43,7 @@ func main() {
 	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
 	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
+	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
@@ -75,6 +77,14 @@ func main() {
 	if serveBot {
 		if err := runTelegramServe(ctx, cfg, logger); err != nil {
 			logger.Fatalf("交互服务退出: %v", err)
+		}
+		return
+	}
+
+	// Worker webhook 转来的一条 update：处理完就退出，给 Actions 用
+	if tgOnce != "" {
+		if err := runTelegramOnce(ctx, cfg, logger, tgOnce); err != nil {
+			logger.Fatalf("处理 Telegram update 失败: %v", err)
 		}
 		return
 	}
@@ -466,6 +476,75 @@ func runTelegramServe(ctx context.Context, cfg *Config, logger *log.Logger) erro
 		Log:      logger.Printf,
 	}
 	return bot.Run(ctx)
+}
+
+// runTelegramOnce 处理 Cloudflare Worker 转发来的一条 update 后退出。
+// 没有长轮询、不碰 getUpdates，因此可以和 webhook 共存，适合 GitHub Actions。
+func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw string) error {
+	if cfg.TelegramToken == "" || cfg.TelegramChatID == "" {
+		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN 和 TELEGRAM_CHAT_ID")
+	}
+
+	db, err := actorsync.LoadDb(cfg.DataFile)
+	if err != nil {
+		return fmt.Errorf("读取本地库失败: %w", err)
+	}
+	hc := &http.Client{Timeout: 30 * time.Second}
+	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
+	if err != nil {
+		logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
+		choices = actorsync.NewChoices(cfg.ChoicesFile)
+	}
+	state, err := actorsync.LoadReviewState(cfg.ReviewStateFile)
+	if err != nil {
+		logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
+		state = actorsync.NewReviewState(cfg.ReviewStateFile)
+	}
+	if dropped := state.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
+		logger.Printf("清理了 %d 条过期的待选记录", dropped)
+	}
+
+	engine := &actorsync.Engine{
+		DB:          db,
+		Fetcher:     buildFetcher(cfg, hc, logger),
+		Alist:       connectAlist(ctx, cfg, logger),
+		Choices:     choices,
+		HTTP:        hc,
+		DataFile:    cfg.DataFile,
+		AlistDir:    cfg.AlistDir,
+		ForceAvatar: cfg.ForceAvatar,
+		Log:         logger.Printf,
+	}
+	bot := &actorsync.Bot{
+		TG:       newTelegram(cfg),
+		Engine:   engine,
+		State:    state,
+		Choices:  choices,
+		ChatID:   cfg.TelegramChatID,
+		MaxNames: 10,
+		Log:      logger.Printf,
+	}
+
+	if err := bot.HandleUpdate(ctx, []byte(raw)); err != nil {
+		return err
+	}
+	// Bot 内部已经存过，这里再兜一次底：回调分支和异常路径都要落盘
+	if err := engine.Save(); err != nil {
+		return fmt.Errorf("保存 actors.json 失败: %w", err)
+	}
+	if err := state.Save(""); err != nil {
+		logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
+	}
+	if err := choices.Save(""); err != nil {
+		logger.Printf("⚠️  保存 %s 失败: %v", cfg.ChoicesFile, err)
+	}
+	if !cfg.DryRun {
+		if err := actorsync.ExportXLSX(cfg.XlsxFile, db); err != nil {
+			logger.Printf("⚠️  导出 Excel 失败: %v", err)
+		}
+	}
+	logger.Printf("本次 update 处理完毕：库内 %d 条", len(db.Actors))
+	return nil
 }
 
 func firstN(s []string, n int) []string {
