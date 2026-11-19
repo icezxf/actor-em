@@ -64,9 +64,11 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A actors.json actors.manifest.json \
-            data/avatar_review.json data/avatar_choices.json
-          [ -f actors.xlsx ] && git add actors.xlsx || true
+          # 交互模式不一定生成 manifest / xlsx，逐个判断存在再 add
+          for f in actors.json actors.manifest.json actors.xlsx \
+                   data/avatar_review.json data/avatar_choices.json; do
+            [ -f "$f" ] && git add -- "$f" || true
+          done
           if git diff --cached --quiet; then
             echo "本次无变化，跳过提交"
             exit 0
