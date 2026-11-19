@@ -1,0 +1,36 @@
+name: actor-tg-setup
+
+# 一次性初始化：注册 Telegram webhook 到 Worker，并输出 webhook 状态。
+# 跑完可以删掉这个文件；保留也无害（需手动 dispatch 才会触发）。
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Register webhook via Worker /setup
+        env:
+          SETUP_KEY: ${{ secrets.TG_SETUP_KEY }}
+          WORKER: https://actor-em-tg.2435817633.workers.dev
+        run: |
+          echo "=== POST /setup (register webhook) ==="
+          curl -sS -X POST "$WORKER/setup" \
+            -H "Authorization: Bearer $SETUP_KEY"
+          echo
+          echo "=== GET /setup (webhook info via Worker) ==="
+          curl -sS "$WORKER/setup" \
+            -H "Authorization: Bearer $SETUP_KEY"
+          echo
+
+      - name: Verify via Telegram API directly
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          echo "=== getMe ==="
+          curl -sS "https://api.telegram.org/bot$TOKEN/getMe"
+          echo
+          echo "=== getWebhookInfo ==="
+          curl -sS "https://api.telegram.org/bot$TOKEN/getWebhookInfo"
+          echo
