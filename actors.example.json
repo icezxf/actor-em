@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "generated_at": "2026-11-17T04:12:33Z",
   "count": 2,
   "actors": [
@@ -8,7 +8,6 @@
       "name": "小凑四叶",
       "name_original": "小湊よつ葉",
       "aliases": ["こみなとよつば", "小湊よつ葉"],
-      "emby_ids": ["local-1234"],
 
       "gender": "female",
       "birth_date": "1996-05-10",
@@ -64,7 +63,6 @@
       "name": "John Smith",
       "name_original": "John Smith",
       "aliases": [],
-      "emby_ids": ["local-8871"],
 
       "gender": "male",
       "birth_date": null,

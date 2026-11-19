@@ -3,6 +3,7 @@ package actorsync
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -72,7 +73,7 @@ func TestStoreRoundTrip(t *testing.T) {
 
 	a := &Actor{
 		Key: "javstash:abc", Name: "小凑四叶", Status: StatusOK,
-		EmbyIDs: []string{"local-1"}, CreatedAt: time.Now().UTC().Format(time.RFC3339),
+		CreatedAt: time.Now().UTC().Format(time.RFC3339),
 	}
 	if added := db.Upsert(a); !added {
 		t.Fatal("首次写入应该是新增")
@@ -90,15 +91,12 @@ func TestStoreRoundTrip(t *testing.T) {
 	}
 
 	// 再次 Upsert 同一 key，应该是更新且保留 created_at
-	b := &Actor{Key: "javstash:abc", Name: "小凑四叶", Status: StatusNoSource, EmbyIDs: []string{"local-2"}}
+	b := &Actor{Key: "javstash:abc", Name: "小凑四叶", Status: StatusNoSource}
 	if added := db2.Upsert(b); added {
 		t.Fatal("同 key 应该是更新")
 	}
 	if len(db2.Actors) != 1 {
 		t.Fatalf("不该产生重复记录: %d", len(db2.Actors))
-	}
-	if len(db2.Actors[0].EmbyIDs) != 2 {
-		t.Fatalf("EmbyIDs 应该合并: %v", db2.Actors[0].EmbyIDs)
 	}
 	if db2.Actors[0].CreatedAt == "" {
 		t.Fatal("created_at 应该保留")
@@ -113,31 +111,29 @@ func TestBuildPlan(t *testing.T) {
 	future := time.Now().UTC().Add(24 * time.Hour).Format(time.RFC3339)
 
 	db := &Db{Actors: []*Actor{
-		{Key: "javstash:1", Name: "已存在", EmbyIDs: []string{"e1"}, Status: StatusOK},
-		{Key: "javstash:2", Name: "待重试", EmbyIDs: []string{"e2"}, Status: StatusFailed, RetryAfter: &past},
-		{Key: "javstash:3", Name: "退避中", EmbyIDs: []string{"e3"}, Status: StatusFailed, RetryAfter: &future},
+		{Key: "javstash:1", Name: "已存在", Status: StatusOK},
+		{Key: "javstash:2", Name: "待重试", Status: StatusFailed, RetryAfter: &past},
+		{Key: "javstash:3", Name: "退避中", Status: StatusFailed, RetryAfter: &future},
+		{Key: "name:4", Name: "查无此人", Status: StatusNoSource, RetryAfter: &past},
 	}}
 
-	persons := []EmbyPerson{
-		{ID: "e1", Name: "已存在"},
-		{ID: "e2", Name: "待重试"},
-		{ID: "e3", Name: "退避中"},
-		{ID: "e4", Name: "新演员"},
-	}
+	names := []string{"已存在", "待重试", "退避中", "查无此人", "新演员"}
 
-	plan := BuildPlan(db, persons, nil, false)
-	if len(plan) != 2 {
-		t.Fatalf("应该只抓 1 个新增 + 1 个重试，实际 %d: %+v", len(plan), plan)
+	plan := BuildPlan(db, names, nil, false)
+	if len(plan) != 3 {
+		t.Fatalf("应该抓 1 个新增 + 2 个到期重试，实际 %d: %+v", len(plan), plan)
 	}
 	if plan[0].Reason != "new" || plan[0].Name != "新演员" {
 		t.Errorf("新演员应该排第一: %+v", plan[0])
 	}
-	if plan[1].Reason != "retry" {
-		t.Errorf("第二个应该是重试: %+v", plan[1])
+	for _, it := range plan[1:] {
+		if it.Reason != "retry" {
+			t.Errorf("后面应该是重试: %+v", it)
+		}
 	}
 
 	// --refresh 指定名字
-	plan = BuildPlan(db, persons, []string{"已存在"}, false)
+	plan = BuildPlan(db, names, []string{"已存在"}, false)
 	found := false
 	for _, it := range plan {
 		if it.Reason == "refresh" && it.Name == "已存在" {
@@ -255,11 +251,8 @@ func TestLoadNamesFile(t *testing.T) {
 	if len(got) != 3 {
 		t.Fatalf("期望 3 条，实际 %d: %+v", len(got), got)
 	}
-	if got[1].Name != "三上悠亚" {
-		t.Fatalf("应去掉首尾空格，实际 %q", got[1].Name)
-	}
-	if got[0].ID != "" {
-		t.Fatalf("txt 来源不应有 Emby Id")
+	if got[1] != "三上悠亚" {
+		t.Fatalf("应去掉首尾空格，实际 %q", got[1])
 	}
 }
 
@@ -272,7 +265,7 @@ func TestSaveNamesFileRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(got) != 2 || got[0].Name != "a" || got[1].Name != "b" {
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
 		t.Fatalf("应去重并排序，实际 %+v", got)
 	}
 }
@@ -323,5 +316,65 @@ func TestExportXLSX(t *testing.T) {
 	fi, err := os.Stat(out)
 	if err != nil || fi.Size() < 2000 {
 		t.Fatalf("导出文件异常: %v size=%v", err, fi)
+	}
+}
+
+func TestLoadDbLegacyEmbyIDs(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "actors.json")
+	legacy := `{"schema_version":1,"count":1,"actors":[{"key":"javstash:1","name":"旧记录","emby_ids":["local-1"],"status":"ok"}]}`
+	if err := os.WriteFile(p, []byte(legacy), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	db, err := LoadDb(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(db.Actors) != 1 || db.Actors[0].Name != "旧记录" {
+		t.Fatalf("旧数据应能正常读取: %+v", db.Actors)
+	}
+	if db.SchemaVersion != SchemaVersion {
+		t.Fatalf("schema_version 应升到 %d，实际 %d", SchemaVersion, db.SchemaVersion)
+	}
+
+	if err := db.Save(p); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), "emby_ids") {
+		t.Fatal("保存后不应再包含 emby_ids")
+	}
+}
+
+func TestBuildActorKeepsAvatarWhenNewImageFails(t *testing.T) {
+	old := &Actor{
+		Key:          "javstash:1",
+		Name:         "某人",
+		Avatar:       StrPtr("https://alist.example.com/d/old.jpg"),
+		AvatarPath:   StrPtr("/actors/某/某人.jpg"),
+		AvatarSource: StrPtr("https://cdn.example.com/old.jpg"),
+	}
+	res := &FetchResult{
+		NameOriginal: "某人",
+		ImageURL:     "https://cdn.example.com/new.jpg",
+		ImageSite:    "javstash",
+		ProviderIDs:  map[string]string{"JavStash": "1"},
+		Sources:      map[string]bool{"javstash": true},
+		BirthDate:    "1990-01-01",
+	}
+
+	a := BuildActor("某人", res, old)
+	if StrVal(a.Avatar) != "https://alist.example.com/d/old.jpg" {
+		t.Fatalf("新图下载失败时不应清空旧头像: %q", StrVal(a.Avatar))
+	}
+	if StrVal(a.AvatarPath) != "/actors/某/某人.jpg" {
+		t.Fatalf("旧头像路径应保留: %q", StrVal(a.AvatarPath))
+	}
+	if StrVal(a.AvatarSource) != "https://cdn.example.com/new.jpg" {
+		t.Fatalf("avatar_source 应记录本次尝试的新图: %q", StrVal(a.AvatarSource))
 	}
 }

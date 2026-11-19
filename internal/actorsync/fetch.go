@@ -32,7 +32,7 @@ type FetchResult struct {
 	Bio          string
 	BioLang      string
 
-	CanonicalName string // 数据源返回的标准名（Emby 里存 UUID 时用它兜底）
+	CanonicalName string // 数据源返回的标准名（清单里写 UUID 时用它兜底）
 	ImageURL      string
 	ImageSite     string
 	Images        []string
@@ -74,7 +74,7 @@ var countryToChinese = map[string]string{
 	"BR": "巴西",
 }
 
-// Fetch 抓一个演员。name 用 Emby 里的名字。
+// Fetch 抓一个演员。name 用清单里的名字。
 func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	res := &FetchResult{
 		NameOriginal: name,

@@ -56,7 +56,6 @@ func NameHashKey(name string) string {
 }
 
 // BuildKey 按 javstash → stashdb → tpdb → 名字哈希 的优先级生成主键。
-// Emby 的 local-1234 会随服务器变化，绝不能用。
 func BuildKey(providerIDs map[string]string, name string) string {
 	for _, k := range []string{"JavStash", "StashDB", "TPDB"} {
 		if v := strings.TrimSpace(providerIDs[k]); v != "" {
@@ -80,7 +79,7 @@ var (
 )
 
 // SanitizeFileName 只做必要处理：非法字符换 _、去首尾空白与尾部点、超长按 rune 截断。
-// 不做翻译/转写——Emby 里叫什么就是什么。
+// 不做翻译/转写——清单里叫什么就是什么。
 func SanitizeFileName(name string) string {
 	s := illegalFileChars.ReplaceAllString(name, "_")
 	s = strings.TrimSpace(s)
@@ -157,7 +156,7 @@ func DetectLanguage(text string) string {
 	return "unknown"
 }
 
-// IsUUID 判断是否是 36 位 UUID（Emby 里有些演员名直接存了 UUID）。
+// IsUUID 判断是否是 36 位 UUID（清单里可以直接写数据源 ID）。
 func IsUUID(s string) bool {
 	return len(s) == 36 && strings.Count(s, "-") == 4
 }

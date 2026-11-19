@@ -15,8 +15,8 @@ import (
 //   - 行首行尾空格自动去掉
 //   - 同名（按 NormalizeName 规范化后）只保留第一次出现的写法
 //
-// 返回的 EmbyPerson 只有 Name，ID 为空 —— 清单不再依赖 Emby。
-func LoadNamesFile(path string) ([]EmbyPerson, error) {
+// 返回去重后的名字列表，顺序与文件一致。
+func LoadNamesFile(path string) ([]string, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func LoadNamesFile(path string) ([]EmbyPerson, error) {
 	defer f.Close()
 
 	seen := map[string]bool{}
-	var out []EmbyPerson
+	var out []string
 
 	sc := bufio.NewScanner(f)
 	sc.Buffer(make([]byte, 0, 64<<10), 1<<20)
@@ -38,7 +38,7 @@ func LoadNamesFile(path string) ([]EmbyPerson, error) {
 			continue
 		}
 		seen[key] = true
-		out = append(out, EmbyPerson{Name: s})
+		out = append(out, s)
 	}
 	if err := sc.Err(); err != nil {
 		return nil, fmt.Errorf("读取演员清单 %s 失败: %w", path, err)

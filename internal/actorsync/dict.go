@@ -8,7 +8,7 @@ import (
 )
 
 // Dict 是中文名 → 日文名的映射表。
-// Emby 里演员名多为中文，而 JavStash / TPDB 只认日文或罗马字，
+// 清单里的演员名多为中文，而 JavStash / TPDB 只认日文或罗马字，
 // 没有这层映射，日系演员基本搜不到。
 type Dict struct {
 	m map[string]string

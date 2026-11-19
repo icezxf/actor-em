@@ -7,7 +7,6 @@ type Actor struct {
 	Name         string   `json:"name"`
 	NameOriginal *string  `json:"name_original"`
 	Aliases      []string `json:"aliases"`
-	EmbyIDs      []string `json:"emby_ids"`
 
 	Gender     *string `json:"gender"`
 	BirthDate  *string `json:"birth_date"`
@@ -55,7 +54,8 @@ type Db struct {
 	Actors        []*Actor `json:"actors"`
 }
 
-const SchemaVersion = 1
+// SchemaVersion 2：移除了 emby_ids，清单只来自 actors.txt。
+const SchemaVersion = 2
 
 // 记录状态
 const (
@@ -82,6 +82,6 @@ type RunStats struct {
 	Added       int    `json:"added"`
 	Updated     int    `json:"updated"`
 	Failed      int    `json:"failed"`
-	Source      string `json:"source"`       // txt / emby
+	Source      string `json:"source"`       // 固定为 txt
 	SourceCount int    `json:"source_count"` // 待抓清单里的演员总数
 }

@@ -9,12 +9,6 @@ import (
 // Config 集中所有可配置项。
 // 优先级：命令行 flag > 环境变量 > config.local.go（可选） > 下面的默认值。
 type Config struct {
-	// Emby
-	EmbyURL    string
-	EmbyUser   string
-	EmbyPass   string
-	EmbyAPIKey string // 开了 2FA 时用这个兜底
-
 	// 数据源
 	TPDBAPIKey       string
 	JavStashAPIKey   string
@@ -32,9 +26,8 @@ type Config struct {
 	AlistDir        string // /actors
 	AlistPublicBase string // 直链前缀，留空 = AlistURL
 
-	// 演员清单来源
-	Source    string // txt（默认）/ emby
-	NamesFile string // 一行一个演员名的 txt
+	// 演员清单（唯一来源，一行一个名字）
+	NamesFile string
 
 	// 本地文件
 	DataFile      string
@@ -64,7 +57,6 @@ func DefaultConfig() *Config {
 		ManifestFile:     "actors.manifest.json",
 		DictFile:         "data/actor_dict.csv",
 		DictLocalFile:    "data/actor_dict.local.csv",
-		Source:           "txt",
 		NamesFile:        "actors.txt",
 		XlsxFile:         "actors.xlsx",
 		Limit:            0,
@@ -88,10 +80,6 @@ func applyEnv(c *Config) {
 			}
 		}
 	}
-	set(&c.EmbyURL, "EMBY_URL")
-	set(&c.EmbyUser, "EMBY_USER")
-	set(&c.EmbyPass, "EMBY_PASS")
-	set(&c.EmbyAPIKey, "EMBY_API_KEY")
 	set(&c.TPDBAPIKey, "TPDB_API_KEY")
 	set(&c.JavStashAPIKey, "JAVSTASH_API_KEY")
 	set(&c.StashDBAPIKey, "STASHDB_API_KEY")
@@ -110,7 +98,6 @@ func applyEnv(c *Config) {
 	set(&c.DictFile, "ACTOR_DICT")
 	set(&c.DictLocalFile, "ACTOR_DICT_LOCAL")
 	set(&c.XlsxFile, "ACTORS_XLSX")
-	set(&c.Source, "ACTORS_SOURCE")
 	set(&c.NamesFile, "ACTORS_TXT")
 	set(&c.NFODir, "ALIST_NFO_DIR")
 	if v := os.Getenv("ALIST_NFO_MAX"); v != "" {

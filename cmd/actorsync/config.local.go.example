@@ -14,12 +14,6 @@ package main
 //
 // 注意：这里的值会被环境变量覆盖，CI 上跑的时候不需要这个文件。
 func applyLocalFile(c *Config) {
-	// ===== Emby =====
-	c.EmbyURL = "https://emby.example.com"
-	c.EmbyUser = "actor-sync" // 建议专用只读账号
-	c.EmbyPass = "your-password"
-	c.EmbyAPIKey = "" // 可选，2FA 账号填这个
-
 	// ===== 数据源 =====
 	c.TPDBAPIKey = ""
 	c.JavStashAPIKey = ""
@@ -35,9 +29,7 @@ func applyLocalFile(c *Config) {
 	c.AlistPublicBase = "" // 有独立直链域名时填，例如 https://cdn.example.com
 
 	// ===== 演员清单 =====
-	// txt：读 actors.txt（推荐，不依赖 Emby）
-	// emby：走 Emby /Persons 接口
-	c.Source = "txt"
+	// 唯一来源：一行一个名字的 txt
 	c.NamesFile = "actors.txt"
 
 	// nfo 扫描（--scan-nfo 用）：从 alist 的这个目录递归读 nfo 里的演员名

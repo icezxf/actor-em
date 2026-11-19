@@ -8,15 +8,19 @@ import (
 
 // PlanItem 是本轮要抓的一个人。
 type PlanItem struct {
-	EmbyID   string
 	Name     string
 	Reason   string // new / retry / refresh
 	Existing *Actor
 }
 
-// BuildPlan 对比 Emby 人物清单和本地库，算出本轮该抓谁。
-// 主路径只有一条：Emby 里有、库里没有 → 抓新演员。
-func BuildPlan(db *Db, persons []EmbyPerson, refresh []string, refreshAll bool) []PlanItem {
+// BuildPlan 对比 txt 清单和本地库，算出本轮该抓谁。
+//
+// 规则：
+//   - 库里没有 → new
+//   - 有记录，且 --refresh / --refresh-all 指定 → refresh
+//   - 有记录，状态是 failed / no_source，且过了 retry_after → retry
+//   - 其余（ok / partial）跳过，除非手动 refresh
+func BuildPlan(db *Db, names []string, refresh []string, refreshAll bool) []PlanItem {
 	refreshSet := map[string]bool{}
 	for _, n := range refresh {
 		refreshSet[NormalizeName(n)] = true
@@ -25,47 +29,24 @@ func BuildPlan(db *Db, persons []EmbyPerson, refresh []string, refreshAll bool) 
 	now := time.Now().UTC()
 	var items []PlanItem
 
-	for _, p := range persons {
-		name := strings.TrimSpace(p.Name)
+	for _, raw := range names {
+		name := strings.TrimSpace(raw)
 		if name == "" {
 			continue
 		}
 
-		// ① 先按 Emby Id 找
-		if a := db.FindByEmbyID(p.ID); a != nil {
-			switch {
-			case refreshAll:
-				items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "refresh", Existing: a})
-			case refreshSet[NormalizeName(name)]:
-				items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "refresh", Existing: a})
-			case a.Status == StatusFailed && retryDue(a, now):
-				items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "retry", Existing: a})
-			}
+		existing := db.FindByName(name)
+		if existing == nil {
+			items = append(items, PlanItem{Name: name, Reason: "new"})
 			continue
 		}
 
-		// ② 再按名字找：Emby 里改名了，但人还是同一个
-		if a := db.FindByName(name); a != nil && len(a.EmbyIDs) == 0 {
-			a.EmbyIDs = mergeStrings(a.EmbyIDs, []string{p.ID})
-			if refreshAll || refreshSet[NormalizeName(name)] {
-				items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "refresh", Existing: a})
-			}
-			continue
+		switch {
+		case refreshAll, refreshSet[NormalizeName(name)]:
+			items = append(items, PlanItem{Name: name, Reason: "refresh", Existing: existing})
+		case (existing.Status == StatusFailed || existing.Status == StatusNoSource) && retryDue(existing, now):
+			items = append(items, PlanItem{Name: name, Reason: "retry", Existing: existing})
 		}
-
-		// ③ 用 Emby 已有的外部 ID 再找一次（Emby 里常常已经刮到了 Tmdb/Imdb）
-		if len(p.ProviderIDs) > 0 {
-			if a := db.FindByProviderIDs(p.ProviderIDs); a != nil {
-				a.EmbyIDs = mergeStrings(a.EmbyIDs, []string{p.ID})
-				if refreshAll || refreshSet[NormalizeName(name)] {
-					items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "refresh", Existing: a})
-				}
-				continue
-			}
-		}
-
-		// ④ 库里没有 → 新演员
-		items = append(items, PlanItem{EmbyID: p.ID, Name: name, Reason: "new"})
 	}
 
 	// 新演员优先，其次是重试，最后是手动刷新
@@ -88,7 +69,7 @@ func retryDue(a *Actor, now time.Time) bool {
 }
 
 // BuildActor 把抓取结果落成一条记录。
-func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
+func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 	now := time.Now().UTC().Format(time.RFC3339)
 
 	key := BuildKey(res.ProviderIDs, name)
@@ -101,43 +82,40 @@ func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
 		}
 	}
 
-	// Emby 里把 UUID 当名字存的情况：用数据源返回的真实名字
+	// 清单里直接写 UUID 的情况：用数据源返回的真实名字
 	displayName := name
 	if IsUUID(name) && res.CanonicalName != "" {
 		displayName = res.CanonicalName
 	}
 
-	// name_original 存数据源返回的原始名（日文原名），和 Emby 里的名字不同才有价值
+	// name_original 存数据源返回的原始名（日文原名），和清单里的名字不同才有价值
 	origName := res.NameOriginal
 	if res.CanonicalName != "" && NormalizeName(res.CanonicalName) != NormalizeName(displayName) {
 		origName = res.CanonicalName
 	}
 
 	a := &Actor{
-		Key:              key,
-		Name:             displayName,
-		NameOriginal:     StrPtr(origName),
-		Aliases:          res.Aliases,
-		EmbyIDs:          mergeStrings(nil, []string{embyID}),
-		Gender:           StrPtr(res.Gender),
-		BirthDate:        StrPtr(res.BirthDate),
-		BirthPlace:       StrPtr(res.BirthPlace),
-		Country:          StrPtr(res.Country),
-		HeightCm:         IntPtr(res.HeightCm),
-		WeightKg:         IntPtr(res.WeightKg),
-		CupSize:          StrPtr(res.CupSize),
-		WaistCm:          IntPtr(res.WaistCm),
-		HipCm:            IntPtr(res.HipCm),
-		CareerStart:      IntPtr(res.CareerStart),
-		Bio:              StrPtr(res.Bio),
-		BioLang:          StrPtr(res.BioLang),
-		AvatarSource:     StrPtr(res.ImageURL),
-		AvatarSourceSite: StrPtr(res.ImageSite),
-		ProviderIDs:      res.ProviderIDs,
-		Status:           res.Outcome(),
-		Sources:          res.Sources,
-		CreatedAt:        created,
-		ScrapedAt:        now,
+		Key:          key,
+		Name:         displayName,
+		NameOriginal: StrPtr(origName),
+		Aliases:      res.Aliases,
+		Gender:       StrPtr(res.Gender),
+		BirthDate:    StrPtr(res.BirthDate),
+		BirthPlace:   StrPtr(res.BirthPlace),
+		Country:      StrPtr(res.Country),
+		HeightCm:     IntPtr(res.HeightCm),
+		WeightKg:     IntPtr(res.WeightKg),
+		CupSize:      StrPtr(res.CupSize),
+		WaistCm:      IntPtr(res.WaistCm),
+		HipCm:        IntPtr(res.HipCm),
+		CareerStart:  IntPtr(res.CareerStart),
+		Bio:          StrPtr(res.Bio),
+		BioLang:      StrPtr(res.BioLang),
+		ProviderIDs:  res.ProviderIDs,
+		Status:       res.Outcome(),
+		Sources:      res.Sources,
+		CreatedAt:    created,
+		ScrapedAt:    now,
 	}
 	if a.Aliases == nil {
 		a.Aliases = []string{}
@@ -172,13 +150,8 @@ func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
 		a.RetryAfter = nil
 	}
 
-	// 清单来自 txt 时没有 Emby Id，保留记录里原有的
-	if embyID == "" && existing != nil {
-		a.EmbyIDs = existing.EmbyIDs
-	}
-
-	// 没抓到图时，保留旧头像字段，不要把已有图擦掉
-	if a.AvatarSource == nil && existing != nil {
+	// 先保留旧头像字段：新图没抓到、或者下载/上传失败时，不要把已有直链擦掉
+	if existing != nil {
 		a.Avatar = existing.Avatar
 		a.AvatarPath = existing.AvatarPath
 		a.AvatarDir = existing.AvatarDir
@@ -188,6 +161,11 @@ func BuildActor(embyID, name string, res *FetchResult, existing *Actor) *Actor {
 		a.AvatarBytes = existing.AvatarBytes
 		a.AvatarW = existing.AvatarW
 		a.AvatarH = existing.AvatarH
+	}
+	// 有新图时记录新图来源；上传成功后由调用方覆盖所有头像字段
+	if res.ImageURL != "" {
+		a.AvatarSource = StrPtr(res.ImageURL)
+		a.AvatarSourceSite = StrPtr(res.ImageSite)
 	}
 
 	return a

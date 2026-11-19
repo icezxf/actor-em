@@ -29,7 +29,8 @@ func LoadDb(path string) (*Db, error) {
 	if db.Actors == nil {
 		db.Actors = []*Actor{}
 	}
-	if db.SchemaVersion == 0 {
+	// 旧版本（1）升级到 2：emby_ids 会被忽略，保存时自然丢弃
+	if db.SchemaVersion < SchemaVersion {
 		db.SchemaVersion = SchemaVersion
 	}
 	return db, nil
@@ -72,34 +73,7 @@ func (db *Db) FindByKey(key string) *Actor {
 	return nil
 }
 
-// FindByEmbyID 按 Emby Person Id 查（用于判断"库里有没有这个人"）。
-func (db *Db) FindByEmbyID(id string) *Actor {
-	for _, a := range db.Actors {
-		for _, eid := range a.EmbyIDs {
-			if eid == id {
-				return a
-			}
-		}
-	}
-	return nil
-}
-
-// FindByProviderIDs 用外部 ID 交集查找（Emby 里可能已经刮到了 Tmdb/Imdb）。
-func (db *Db) FindByProviderIDs(ids map[string]string) *Actor {
-	for _, a := range db.Actors {
-		for k, v := range ids {
-			if v == "" || k == "" {
-				continue
-			}
-			if a.ProviderIDs[k] == v {
-				return a
-			}
-		}
-	}
-	return nil
-}
-
-// FindByName 按规范化名字查（Emby 改名后靠它接上旧记录）。
+// FindByName 按规范化名字查（清单里改名或写别名时靠它接上旧记录）。
 func (db *Db) FindByName(name string) *Actor {
 	n := NormalizeName(name)
 	for _, a := range db.Actors {
@@ -124,8 +98,6 @@ func (db *Db) Upsert(a *Actor) (added bool) {
 		if old.CreatedAt != "" {
 			a.CreatedAt = old.CreatedAt
 		}
-		// 合并 Emby ID，避免多服务器时丢 ID
-		a.EmbyIDs = mergeStrings(old.EmbyIDs, a.EmbyIDs)
 		*old = *a
 		return false
 	}

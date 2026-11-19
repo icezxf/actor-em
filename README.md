@@ -2,13 +2,13 @@
 
 读 `actors.txt` 里的待抓清单（也可以从 alist 的 nfo 自动生成），只给**库里还没有的演员**补元数据，
 头像转存到 alist，结果写成根目录的 `actors.json`，同时导出 `actors.xlsx` 方便手工查询。
-任何程序读这一个 JSON 就能拿到全部演员信息，不需要连 Emby、也不需要数据库。
+任何程序读这一个 JSON 就能拿到全部演员信息，不依赖媒体服务器，也不需要数据库。
 
 ```
 actors.txt（手工 / nfo 扫描）
       │
       ▼
-对比 actors.json ──> 只抓新增 ──> 四源聚合 ──> alist 头像
+对比 actors.json ──> 只抓新增 ──> 五源聚合 ──> alist 头像
                                               │
                                     actors.json + manifest + actors.xlsx
 ```
@@ -63,13 +63,9 @@ make run
 
 | 环境变量 | 对应配置 | 必填 | 说明 |
 |---|---|---|---|
-| `ACTORS_SOURCE` | Source | ✅ | `txt`（默认）/ `emby` |
 | `ACTORS_TXT` | NamesFile | ✅ | 待抓清单，默认 `actors.txt` |
 | `ACTORS_XLSX` | XlsxFile | 可选 | 导出的 Excel，默认 `actors.xlsx` |
 | `ALIST_NFO_DIR` | NFODir | 扫 nfo 时必填 | alist 里 nfo 所在目录 |
-| `EMBY_URL` | EmbyURL | 仅 emby 模式 | 例 `https://emby.example.com` |
-| `EMBY_USER` / `EMBY_PASS` | EmbyUser / EmbyPass | 仅 emby 模式 | 建议新建**只读**账号，别用管理员 |
-| `EMBY_API_KEY` | EmbyAPIKey | 可选 | 账号开了 2FA 时用这个兜底 |
 | `TPDB_API_KEY` | TPDBAPIKey | 建议 | 生日、三围、体重、图的主要来源 |
 | `JAVSTASH_API_KEY` | JavStashAPIKey | ✅ | 日系演员主力源 |
 | `STASHDB_API_KEY` | StashDBAPIKey | 可选 | 欧美演员兜底 |
@@ -101,10 +97,9 @@ gh secret list                       # 核对
 ```bash
 actorsync [flags]
 
-  --source txt|emby    清单来源，默认 txt
-  --names actors.txt   清单文件（--source txt 时用）
+  --names actors.txt   清单文件，唯一的清单来源
   --limit N            本轮最多处理多少个（0 = 不限）
-  --dry-run            只打印，不写文件
+  --dry-run            只打印，不写本地文件
   --refresh 名字,名字   重抓指定演员
   --refresh-all        重抓库里所有演员（最慢）
   --force-avatar       头像已存在也重新上传
@@ -119,11 +114,10 @@ actorsync [flags]
 
 ### 清单从哪来
 
-默认读 `actors.txt`，一行一个名字，`#` 开头是注释。三种来源都行：
+清单只来自 `actors.txt`，一行一个名字，`#` 开头是注释。两种生成方式：
 
 1. 手工写（最直接，100 个演员也就几分钟）
 2. `--scan-nfo --nfo-dir /media`：递归读 alist 目录里所有 `.nfo` 的 `<actor><name>`，去重后写回
-3. `--source emby`：退回老逻辑，走 Emby `/Persons`
 
 nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<actor>` 下的 `<name>`，
 不会把 `<movie><name>` 的片名当成演员。
@@ -131,6 +125,7 @@ nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<acto
 ## 数据结构
 
 `actors.json` 是一条记录一行的扁平静态数据，空值是 `null` 不是空字符串。
+`schema_version` 为 2，已移除 Emby 相关的 `emby_ids` 字段。
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
@@ -138,7 +133,6 @@ nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<acto
 | `name` | string | 清单里的名字，也是头像文件名 |
 | `name_original` | string? | 数据源返回的原始名（多为日文原名） |
 | `aliases` | string[] | 别名 |
-| `emby_ids` | string[] | Emby Person Id，多服务器时追加 |
 | `gender` | string? | `female` / `male` |
 | `birth_date` | string? | `1996-05-10` |
 | `death_date` | string? | 目前所有源都不返回，恒为 null（占位） |
@@ -169,12 +163,12 @@ nfo 扫描会跳过隐藏目录（`.recycle`、`$RECYCLE.BIN`），只认 `<acto
 |---|---|---|
 | `ok` | 抓到生日或简介 | 不再抓 |
 | `partial` | 命中了源，但生日和简介都没有 | 不再抓（除非 `--refresh`） |
-| `no_source` | 四个源都查无此人 | 180 天后再试 |
+| `no_source` | 所有源都查无此人 | 180 天后再试 |
 | `failed` | 网络/限流错误 | 2、4 天后重试；连续 3 次转 `no_source` |
 
 ## 中文字典（很重要）
 
-Emby 里的演员名通常是中文（`小凑四叶`），而 JavStash / TPDB 只认日文或罗马字（`小湊よつ葉`）。
+清单里的演员名通常是中文（`小凑四叶`），而 JavStash / TPDB 只认日文或罗马字（`小湊よつ葉`）。
 **没有这层映射，日系演员几乎一条都搜不到。**
 
 字典分两份，两列 CSV：
@@ -205,7 +199,7 @@ python3 scripts/gen_dict.py        # 刷新主字典（workflow 每天也会刷�
 
 ## 头像
 
-路径规则：`{ALIST_DIR}/{名字首字符}/{Emby 里的名字}.jpg`
+路径规则：`{ALIST_DIR}/{名字首字符}/{清单里的名字}.jpg`
 
 ```
 /actors/小/小凑四叶.jpg
@@ -233,7 +227,6 @@ Actions 页面手动跑一次 `actor-sync` 验证。
 
 ## 注意
 
-- **只读 Emby，不回写**。Emby 侧的刮削继续用你原来的工具。
 - **不刷新老记录**。演员补了新简介不会自动更新，用 `--refresh 名字` 手动触发。
 - **不加锁**。如果两条记录用同一个名字，头像会互相覆盖（后写的胜）。
 - **Ouxiang 站点可能已失效**：代码里 `ouxiangdanku.com` 若 DNS 解析不到会直接跳过（12 秒超时），不影响其他源。

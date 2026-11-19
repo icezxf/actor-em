@@ -46,16 +46,9 @@ jobs:
 
       - name: Sync actors
         env:
-          # 清单来源：txt（actors.txt）/ emby
-          ACTORS_SOURCE: txt
+          # 清单唯一来源：actors.txt
           ACTORS_TXT: actors.txt
           ACTORS_XLSX: actors.xlsx
-
-          # Emby 只在 ACTORS_SOURCE=emby 时需要，仅作兜底
-          EMBY_URL: ${{ secrets.EMBY_URL }}
-          EMBY_USER: ${{ secrets.EMBY_USER }}
-          EMBY_PASS: ${{ secrets.EMBY_PASS }}
-          EMBY_API_KEY: ${{ secrets.EMBY_API_KEY }}
 
           TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
           JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}

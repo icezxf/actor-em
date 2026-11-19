@@ -24,14 +24,13 @@ func main() {
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
-	flag.BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "只打印结果，不写任何文件")
+	flag.BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "只打印结果，不写本地文件")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "打印每个数据源的命中情况")
 	flag.BoolVar(&cfg.ForceAvatar, "force-avatar", cfg.ForceAvatar, "头像已存在也重新上传")
 	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长）")
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "actors.json 路径")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
-	flag.StringVar(&cfg.Source, "source", cfg.Source, "演员清单来源：txt（默认）或 emby")
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
 	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
 	flag.BoolVar(&noXlsx, "no-xlsx", false, "不导出 Excel")
@@ -46,11 +45,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Hour)
 	defer cancel()
 
-	cfg.Source = strings.ToLower(strings.TrimSpace(cfg.Source))
-	if cfg.Source == "" {
-		cfg.Source = "txt"
-	}
-
 	// 只扫描 nfo 生成清单，不抓数据
 	if scanNFO {
 		if err := runScanNFO(ctx, cfg, logger); err != nil {
@@ -62,17 +56,8 @@ func main() {
 	if cfg.TPDBAPIKey == "" && cfg.JavStashAPIKey == "" && cfg.StashDBAPIKey == "" {
 		logger.Fatal("至少要配一个数据源 Key（TPDB / JavStash / StashDB），否则所有演员都会被判成 no_source")
 	}
-	switch cfg.Source {
-	case "txt":
-		if _, err := os.Stat(cfg.NamesFile); err != nil {
-			logger.Fatalf("读不到演员清单 %s：%v（用 --names 指定，或先跑 --scan-nfo 生成）", cfg.NamesFile, err)
-		}
-	case "emby":
-		if cfg.EmbyURL == "" {
-			logger.Fatal("source=emby 但缺少 Emby 地址：设置 EMBY_URL")
-		}
-	default:
-		logger.Fatalf("未知的清单来源 %q，只支持 txt / emby", cfg.Source)
+	if _, err := os.Stat(cfg.NamesFile); err != nil {
+		logger.Fatalf("读不到演员清单 %s：%v（用 --names 指定，或先跑 --scan-nfo 生成）", cfg.NamesFile, err)
 	}
 
 	// ---------- 1. 读本地库 ----------
@@ -82,25 +67,12 @@ func main() {
 	}
 	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
 
-	// ---------- 2. 读待抓清单（txt 或 Emby） ----------
-	var persons []actorsync.EmbyPerson
-	if cfg.Source == "txt" {
-		persons, err = actorsync.LoadNamesFile(cfg.NamesFile)
-		if err != nil {
-			logger.Fatalf("读取演员清单失败: %v", err)
-		}
-		logger.Printf("演员清单：%d 个（%s）", len(persons), cfg.NamesFile)
-	} else {
-		emby := actorsync.NewEmbyClient(cfg.EmbyURL, cfg.EmbyUser, cfg.EmbyPass, cfg.EmbyAPIKey)
-		if err := emby.Login(ctx); err != nil {
-			logger.Fatalf("Emby 登录失败: %v", err)
-		}
-		persons, err = emby.ListPersons(ctx)
-		if err != nil {
-			logger.Fatalf("拉取 Emby 人物清单失败: %v", err)
-		}
-		logger.Printf("Emby 人物：%d 个", len(persons))
+	// ---------- 2. 读待抓清单（只有 actors.txt） ----------
+	names, err := actorsync.LoadNamesFile(cfg.NamesFile)
+	if err != nil {
+		logger.Fatalf("读取演员清单失败: %v", err)
 	}
+	logger.Printf("演员清单：%d 个（%s）", len(names), cfg.NamesFile)
 
 	// ---------- 3. 算本轮待抓名单 ----------
 	var refreshNames []string
@@ -109,13 +81,13 @@ func main() {
 			refreshNames = append(refreshNames, s)
 		}
 	}
-	plan := actorsync.BuildPlan(db, persons, refreshNames, refreshAll)
+	plan := actorsync.BuildPlan(db, names, refreshNames, refreshAll)
 
 	stats := actorsync.RunStats{
 		StartedAt:   start.UTC().Format(time.RFC3339),
 		Picked:      len(plan),
-		Source:      cfg.Source,
-		SourceCount: len(persons),
+		Source:      "txt",
+		SourceCount: len(names),
 	}
 
 	if cfg.Limit > 0 && len(plan) > cfg.Limit {
@@ -196,7 +168,7 @@ func main() {
 		prefix := fmt.Sprintf("[%d/%d] %s（%s）", i+1, len(plan), item.Name, item.Reason)
 
 		res := fetcher.Fetch(ctx, item.Name)
-		actor := actorsync.BuildActor(item.EmbyID, item.Name, res, item.Existing)
+		actor := actorsync.BuildActor(item.Name, res, item.Existing)
 
 		avatarNote := "无图"
 		if res.ImageURL != "" && alist != nil {
@@ -211,6 +183,8 @@ func main() {
 					actor.Avatar = actorsync.StrPtr(av.URL)
 					actor.AvatarPath = actorsync.StrPtr(av.Path)
 					actor.AvatarDir = actorsync.StrPtr(av.Dir)
+					actor.AvatarSource = actorsync.StrPtr(res.ImageURL)
+					actor.AvatarSourceSite = actorsync.StrPtr(res.ImageSite)
 					actor.AvatarSHA256 = actorsync.StrPtr(av.SHA256)
 					actor.AvatarBytes = &av.Bytes
 					actor.AvatarW = actorsync.IntPtr(av.Width)
@@ -265,7 +239,7 @@ func main() {
 
 	// ---------- 6. 收尾 ----------
 	if cfg.DryRun {
-		logger.Printf("dry-run 结束：处理 %d 个，未写文件", len(plan))
+		logger.Printf("dry-run 结束：处理 %d 个，未写本地文件", len(plan))
 		return
 	}
 	if err := db.Save(cfg.DataFile); err != nil {
