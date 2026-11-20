@@ -140,6 +140,27 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		}
 	}
 
+	// 字典里指向同一人的全部别名（含改名前后的各种中文名）都要带上。
+	// Emby 侧按 name 精确匹配，用户库里的演员名常是旧名（如「桥本有菜」），
+	// 而主名取了新名（「新有菜」）——旧名若不进 aliases 就永远匹配不上。
+	if f.Dict != nil {
+		if dictAliases := f.Dict.AllAliases(name); len(dictAliases) > 0 {
+			// 主名（中文名）/原名不重复塞进 aliases
+			selfNames := map[string]bool{NormalizeName(name): true}
+			if res.ChineseName != "" {
+				selfNames[NormalizeName(res.ChineseName)] = true
+			}
+			filtered := dictAliases[:0]
+			for _, v := range dictAliases {
+				if !selfNames[NormalizeName(v)] {
+					filtered = append(filtered, v)
+				}
+			}
+			res.Aliases = mergeStrings(res.Aliases, filtered)
+			f.logf("[%s] 字典别名 %d 个：%v", name, len(filtered), filtered)
+		}
+	}
+
 	// ---------- 3. 维基：中文简介第一顺位，顺带拿日文名做搜索词 ----------
 	// 维基按标题查而不是按人查，短名字极易命中同名物（もも→桃树、DA→deviantART），
 	// 所以拿到的正文必须过一遍校验才敢用。

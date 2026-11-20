@@ -417,8 +417,20 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	}
 	logger.Printf("本地库 %d 条 / MDCx 档案 %d 人（%s）", len(db.Actors), mdcx.Size(), cfg.MDCxCSV)
 
+	// 字典用于给存量补中文别名：同一个人在字典里可能有多个中文名
+	// （如「桥本有菜」/「新有菜」都指向 橋本ありな），抓取时只取一个当主名，
+	// 其余只存在字典里。这里把它们补进 aliases，Emby 用旧名也能命中。
+	dict, err := actorsync.LoadDict(cfg.DictFile)
+	if err != nil {
+		return fmt.Errorf("读字典失败: %w", err)
+	}
+	if local, err2 := actorsync.LoadDict(cfg.DictLocalFile); err2 == nil && local.Size() > 0 {
+		dict.Merge(local)
+	}
+	logger.Printf("字典 %d 条别名（%s）", dict.Size(), cfg.DictFile)
+
 	var fakeDate, unitTag, upgraded int
-	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch int
+	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, nAlias, noMatch int
 	for _, a := range db.Actors {
 		if a == nil {
 			continue
@@ -452,6 +464,39 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 			names = append(names, v)
 		}
 		names = append(names, a.Aliases...)
+
+		// 用字典给存量补中文别名。字典里同一个日文名可能对应多个中文名，
+		// 抓取时只有一个能当主名（如「新有菜」），其余（「桥本有菜」）此前从未
+		// 进库。这里按 name/原名/现有别名反查回日文名，把全部别名并进来，
+		// 按规范化去重，Emby 用旧名就能命中。
+		if dict.Size() > 0 {
+			before := len(a.Aliases)
+			// 主名/原名不放进 aliases：它们本来就能匹配到，重复只会让表格变脏。
+			selfNames := map[string]bool{actorsync.NormalizeName(a.Name): true}
+			if v := actorsync.StrVal(a.NameOriginal); v != "" {
+				selfNames[actorsync.NormalizeName(v)] = true
+			}
+			seen := map[string]bool{}
+			for _, v := range a.Aliases {
+				seen[actorsync.NormalizeName(v)] = true
+			}
+			for _, n := range names {
+				if strings.TrimSpace(n) == "" {
+					continue
+				}
+				for _, v := range dict.AllAliases(n) {
+					k := actorsync.NormalizeName(v)
+					if k == "" || seen[k] || selfNames[k] {
+						continue
+					}
+					seen[k] = true
+					a.Aliases = append(a.Aliases, v)
+				}
+			}
+			if len(a.Aliases) > before {
+				nAlias++
+			}
+		}
 
 		var p *actorsync.MDCxProfile
 		for _, n := range names {
@@ -512,8 +557,9 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 		unitTag, fakeDate, upgraded)
 	logger.Printf("补空字段：生日 %d、三围 %d、标签 %d、身高 %d、罩杯 %d、出道年 %d、出生地 %d（MDCx 查不到 %d 条）",
 		nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch)
+	logger.Printf("补中文别名：%d 条（字典里的旧名/异名，让 Emby 按旧名也能命中）", nAlias)
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + unitTag + fakeDate + upgraded
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded
 	if total == 0 {
 		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}

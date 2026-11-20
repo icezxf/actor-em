@@ -461,6 +461,38 @@ func TestDictMissingFile(t *testing.T) {
 	}
 }
 
+// 同一个日文名在字典里有多行、多个中文名时，全部别名都要留下。
+// 典型：橋本ありな 在 amane 源写「桥本有菜」、mdcx 源写「新有菜」，
+// 主名取了「新有菜」，但 Emby 库里存的是旧名「桥本有菜」——旧名必须进 aliases。
+func TestDictAllAliasesMultipleChineseNames(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "dict.csv")
+	body := "别名,日文名,中文名,来源\n" +
+		"Arina Hashimoto,橋本ありな,新有菜,mdcx\n" +
+		"新ありな,橋本ありな,桥本有菜,amane\n" +
+		"桥本有菜,橋本ありな,桥本有菜,amane\n" +
+		"上乃木まな,橋本ありな,桥本有菜,amane\n"
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	d, err := LoadDict(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := d.ChineseName("橋本ありな"); got != "新有菜" {
+		t.Errorf("首选中文名应为新有菜，实际 %q", got)
+	}
+	for _, name := range []string{"橋本ありな", "新有菜", "桥本有菜", "新ありな", "Arina Hashimoto"} {
+		aliases := d.AllAliases(name)
+		joined := strings.Join(aliases, "|")
+		for _, want := range []string{"桥本有菜", "新有菜", "新ありな", "上乃木まな"} {
+			if !strings.Contains(joined, want) {
+				t.Errorf("AllAliases(%q)=%v 缺少 %q", name, aliases, want)
+			}
+		}
+	}
+}
+
 func TestLoadNamesFile(t *testing.T) {
 	dir := t.TempDir()
 	p := filepath.Join(dir, "actors.txt")
