@@ -21,20 +21,24 @@ func main() {
 	cfg := LoadConfig()
 
 	var (
-		refresh    string
-		refreshAll bool
-		scanNFO    bool
-		noXlsx     bool
-		serveBot   bool
-		tgOnce     string
-		backfill   bool
+		refresh     string
+		refreshAll  bool
+		fillMissing bool
+		fillFields  string
+		scanNFO     bool
+		noXlsx      bool
+		serveBot    bool
+		tgOnce      string
+		backfill    bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
 	flag.BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "只打印结果，不写本地文件")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "打印每个数据源的命中情况")
-	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长）")
+	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长；配合 --limit 0 才是全量）")
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
+	flag.BoolVar(&fillMissing, "fill-missing", false, "只重抓有缺字段的已有演员，只填空位不覆盖已有值")
+	flag.StringVar(&fillFields, "fill-fields", "", "配合 --fill-missing：要补的字段，逗号分隔；留空=全部可补字段")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "数据文件路径，默认 actors.jsonl")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
@@ -53,6 +57,26 @@ func main() {
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
 	start := time.Now()
+
+	// 四种改写模式互斥：同时开会让「谁覆盖谁」变得不可预测。
+	modes := 0
+	for _, on := range []bool{backfill, refreshAll, refresh != "", fillMissing} {
+		if on {
+			modes++
+		}
+	}
+	if modes > 1 {
+		logger.Fatal("--backfill / --refresh-all / --refresh / --fill-missing 只能选一个")
+	}
+	var fillFieldList []string
+	if fillMissing {
+		var err error
+		fillFieldList, err = actorsync.ParseFillFields(fillFields)
+		if err != nil {
+			logger.Fatalf("解析 --fill-fields 失败: %v", err)
+		}
+		logger.Printf("缺字段补值模式：%s", strings.Join(fillFieldList, ", "))
+	}
 
 	// 交互服务要一直挂着，5 小时超时只适合一次批量同步
 	var (
@@ -175,7 +199,7 @@ func main() {
 			refreshNames = append(refreshNames, s)
 		}
 	}
-	plan := actorsync.BuildPlan(db, names, refreshNames, refreshAll)
+	plan := actorsync.BuildPlanWithFill(db, names, refreshNames, refreshAll, fillFieldList)
 
 	stats := actorsync.RunStats{
 		StartedAt:   start.UTC().Format(time.RFC3339),
@@ -196,18 +220,21 @@ func main() {
 		return
 	}
 
-	newCount, retryCount, refreshCount := 0, 0, 0
+	newCount, retryCount, refreshCount, fillCount := 0, 0, 0, 0
 	for _, it := range plan {
 		switch it.Reason {
 		case "new":
 			newCount++
 		case "retry":
 			retryCount++
+		case "fill":
+			fillCount++
 		default:
 			refreshCount++
 		}
 	}
-	logger.Printf("本轮待处理 %d 个（新增 %d / 重试 %d / 刷新 %d）", len(plan), newCount, retryCount, refreshCount)
+	logger.Printf("本轮待处理 %d 个（新增 %d / 重试 %d / 刷新 %d / 补缺字段 %d）",
+		len(plan), newCount, retryCount, refreshCount, fillCount)
 
 	// ---------- 4. 组装 Engine ----------
 	// 抓取 → 生成记录 → 用网络头像 这条链路统一走 Engine，
@@ -223,7 +250,7 @@ func main() {
 
 	// ---------- 5. 逐个抓 ----------
 	srcStats := map[string]map[string]int{}
-	added, updated, failed := 0, 0, 0
+	added, updated, failed, kept := 0, 0, 0, 0
 
 	// 需要人工挑图的人：新演员、或抓完仍然没有头像的
 	type reviewCand struct {
@@ -276,14 +303,29 @@ func main() {
 	done := 0
 	for f := range results {
 		prefix := fmt.Sprintf("[%d/%d] %s（%s）", f.idx+1, len(plan), f.item.Name, f.item.Reason)
+		if len(f.item.Missing) > 0 {
+			prefix += fmt.Sprintf("（缺 %s）", strings.Join(f.item.Missing, ","))
+		}
 
-		out, perr := engine.ApplyPhase(ctx, f.item.Name, f.res, actorsync.ProcessOptions{NoDBWrite: cfg.DryRun})
+		opts := actorsync.ProcessOptions{NoDBWrite: cfg.DryRun}
+		if f.item.Reason == "fill" {
+			opts.FillFields = fillFieldList
+			opts.KeepOnFailure = true
+		}
+		out, perr := engine.ApplyPhase(ctx, f.item.Name, f.res, opts)
 		if perr != nil {
 			logger.Printf("%s → 处理失败: %v", prefix, perr)
 			failed++
 			continue
 		}
 		actor := out.Actor
+		extra := ""
+		if len(out.Filled) > 0 {
+			extra += " | 补: " + strings.Join(out.Filled, ",")
+		}
+		if out.Kept {
+			extra += "（保留旧值）"
+		}
 
 		// 只对「新演员」和「还没有头像的」发候选图；至少 2 张才值得问
 		if reviewOn && !cfg.DryRun && !out.Manual &&
@@ -297,11 +339,13 @@ func main() {
 		countSources(srcStats, f.res.Sources)
 
 		if cfg.DryRun {
-			logger.Printf("%s → %s | %s | %s", prefix, actor.Status, f.res.Summary(), out.AvatarNote)
+			logger.Printf("%s → %s | %s | %s%s", prefix, actor.Status, f.res.Summary(), out.AvatarNote, extra)
 			continue
 		}
 
-		if out.Added {
+		if out.Kept {
+			kept++
+		} else if out.Added {
 			added++
 		} else {
 			updated++
@@ -310,7 +354,7 @@ func main() {
 			failed++
 		}
 
-		logger.Printf("%s → %s | %s | %s", prefix, actor.Status, f.res.Summary(), out.AvatarNote)
+		logger.Printf("%s → %s | %s | %s%s", prefix, actor.Status, f.res.Summary(), out.AvatarNote, extra)
 
 		// 每 20 个落盘一次，中途挂掉也不丢进度
 		done++
@@ -378,8 +422,8 @@ func main() {
 			logger.Printf("Excel 已导出：%s", cfg.XlsxFile)
 		}
 	}
-	logger.Printf("完成：库内 %d 条，新增 %d，更新 %d，失败 %d，用时 %s",
-		len(db.Actors), added, updated, failed, time.Since(start).Round(time.Second))
+	logger.Printf("完成：库内 %d 条，新增 %d，更新 %d，保留 %d，失败 %d，用时 %s",
+		len(db.Actors), added, updated, kept, failed, time.Since(start).Round(time.Second))
 }
 
 // runBackfillBirthday 用 MDCx 离线档案给库里空着的生日补值。

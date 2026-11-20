@@ -9,8 +9,48 @@ import (
 // PlanItem 是本轮要抓的一个人。
 type PlanItem struct {
 	Name     string
-	Reason   string // new / retry / refresh
+	Reason   string // new / retry / refresh / fill
 	Existing *Actor
+	Missing  []string // fill 模式：本条记录缺哪些字段
+}
+
+// BuildPlanWithFill 在 BuildPlan 之上支持「缺字段重抓」。
+//
+// fillFields 非 nil 表示 --fill-missing 模式：只挑库里已经导出、但仍有空字段的
+// 记录（reason=fill），不掺 new/retry；补值在 Engine 里按只填空位合并。
+// 传 nil 时行为与 BuildPlan 完全一致。
+func BuildPlanWithFill(db *Db, names []string, refresh []string, refreshAll bool, fillFields []string) []PlanItem {
+	if fillFields == nil {
+		return BuildPlan(db, names, refresh, refreshAll)
+	}
+
+	var items []PlanItem
+	for _, raw := range names {
+		name := strings.TrimSpace(raw)
+		if name == "" {
+			continue
+		}
+		existing := db.FindByName(name)
+		if existing == nil || !existing.Exportable() {
+			// skipped / no_source / failed 本来就不进下游，补了也没人看。
+			continue
+		}
+		missing := MissingFields(existing, fillFields)
+		if len(missing) == 0 {
+			continue
+		}
+		items = append(items, PlanItem{
+			Name:     name,
+			Reason:   "fill",
+			Existing: existing,
+			Missing:  missing,
+		})
+	}
+	// 缺得最多的排前面：同样的预算先救最残的记录。
+	sort.SliceStable(items, func(i, j int) bool {
+		return len(items[i].Missing) > len(items[j].Missing)
+	})
+	return items
 }
 
 // BuildPlan 对比 txt 清单和本地库，算出本轮该抓谁。

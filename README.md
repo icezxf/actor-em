@@ -30,7 +30,7 @@
 | 工作流 | 职责 | 触发 | 产物 |
 |---|---|---|---|
 | `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping` 成中文字典；并把 MDCx 两个库导成档案宽表 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`mdcx_profiles.csv`、`data/base_sources.json` |
-| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
+| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`refresh_all`/`fill_missing`/`fill_fields`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
 | `tg-command.yml` | 处理一条 Telegram update：刮削 → 发候选图 → 换图 → 提交状态 | Cloudflare Worker 派发 | 同上（按需） |
 
 `base-db` 是**前置条件**：它没跑过，`actor-sync` 和 `tg-command` 都会在「Check dictionary」那步直接失败。
@@ -161,7 +161,9 @@ actorsync [flags]
   --limit N            本轮最多处理多少个（0 = 不限）
   --dry-run            只打印，不写本地文件
   --refresh 名字,名字   重抓指定演员
-  --refresh-all        重抓库里所有演员（最慢）
+  --refresh-all        重抓库里所有演员（配合 --limit 0 才是真全量）
+  --fill-missing       只重抓有缺字段的已有演员，只填空位、不覆盖已有值
+  --fill-fields 字段   配合 --fill-missing，逗号分隔；留空=全部可补字段
   --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
@@ -461,14 +463,18 @@ docker run -d --name actor-em --restart unless-stopped \
 3. 没问题再放开 `limit=0` 首铺
 
 - 定时：每天 04:00 UTC
-- 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`
+- 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`、`refresh_all`、`fill_missing`、`fill_fields`、`backfill`
+  - 全量重抓：`refresh_all=true` + `limit=0`（四种改写模式互斥，不能同时勾）
+  - 只补缺字段：`fill_missing=true`，默认补全部可补字段；只想补简介和生日就填 `fill_fields=bio,birthday`
+  - 补缺字段只认 `ok/partial` 记录，重抓后逐字段填空，已有值/status/头像都保留
 - 有变化才 commit，无变化不产生空提交
 - 同一时间只跑一轮（`concurrency: actor-data`）
 - `actor-sync` 超时 350 分钟
 
 ## 注意
 
-- **不刷新老记录**。演员补了新简介不会自动更新，用 `--refresh 名字` 手动触发。
+- **默认不刷新老记录**。演员补了新简介不会自动更新；用 `--refresh 名字` 单抓、
+  `--refresh-all --limit 0` 全量覆盖重抓，或 `--fill-missing` 只挑缺字段的记录补值。
 - **不加锁**。如果两条记录用同一个名字，头像会互相覆盖（后写的胜）。
 - `key` 一旦写入就不再改，即使后来匹配到了 JavStash ID——避免同一人出现两条。
 - **三围会换算**。MDCx 的厘米分项换算成英寸，并用日标杯差反推底围，写成 `36J-25-39`

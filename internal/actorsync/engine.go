@@ -51,6 +51,9 @@ type ProcessOptions struct {
 	SkipAvatar bool
 	// NoDBWrite：不写回内存中的库（--dry-run 用）。
 	NoDBWrite bool
+	// FillFields 非 nil = 缺字段补值模式：重抓结果只填 existing 的空位，
+	// 已有值、status、头像一律保留，不覆盖也不降级。
+	FillFields []string
 }
 
 // ProcessResult 是处理一个演员的完整结果。
@@ -61,9 +64,10 @@ type ProcessResult struct {
 	Res        *FetchResult
 	Candidates []string // 已去重，第 1 张是当前正在用的图
 	AvatarNote string
-	Manual     bool // 用了人工选过的图
-	Kept       bool // 抓取失败，保留了库里旧记录
-	Added      bool // 本次新入库
+	Manual     bool     // 用了人工选过的图
+	Kept       bool     // 抓取失败或没补到字段，保留了库里旧记录
+	Added      bool     // 本次新入库
+	Filled     []string // fill 模式本次实际补上的字段
 }
 
 // FetchPhase 只做网络抓取，不碰 DB，可以安全地在多个 goroutine 里并发跑。
@@ -132,6 +136,25 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 	}
 
 	actor := BuildActor(name, res, existing)
+
+	// 缺字段重抓：以旧记录为底，只把新抓到的值填进空位。
+	// 没有补到任何字段时连 scraped_at 都不动，避免制造无意义的 diff。
+	hadAvatar := false
+	if opts.FillFields != nil && existing != nil {
+		hadAvatar = StrVal(existing.Avatar) != ""
+		base := cloneActor(existing)
+		filled := MergeMissingFields(base, actor, opts.FillFields)
+		out.Filled = filled
+		if len(filled) == 0 {
+			out.Actor = base
+			out.Name = base.Name
+			out.Kept = true
+			out.AvatarNote = "没有补到新字段"
+			out.Candidates = OrderCandidates(res.Images, StrVal(base.Avatar))
+			return out, nil
+		}
+		actor = base
+	}
 	out.Actor = actor
 	out.Name = actor.Name
 
@@ -146,6 +169,9 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 		}
 	case res.ImageURL == "":
 		// 保持「无图」
+	case hadAvatar:
+		// 补值模式不换已有头像；只有原来没图时才让新图进来。
+		avatarNote = "保留已有头像"
 	default:
 		// 不转存：直接用数据源给的网络地址当头像。
 		applyAvatarURL(actor, res.ImageURL, res.ImageSite)
