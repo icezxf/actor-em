@@ -37,6 +37,8 @@ import xml.etree.ElementTree as ET
 
 AMANE_XML = "https://raw.githubusercontent.com/sqzw-x/amane/main/resources/mapping_table/mapping_actor.xml"
 MDCX_API = "https://api.github.com/repos/xiarenyyds/databases/releases/latest"
+# 同上，但走 releases/latest/download 别名，不经过 api.github.com，不受匿名额度限制
+MDCX_LATEST = "https://github.com/xiarenyyds/databases/releases/latest/download/"
 
 OUT_CSV = "actor_dict.csv"
 STATE_JSON = "data/base_sources.json"
@@ -132,29 +134,47 @@ def download(url: str, timeout: int = 600) -> bytes:
 def fetch_asset(asset_name: str, dest: str, state: dict, state_key: str, force: bool) -> tuple[str, bool, str]:
     """从 MDCx 的 release 里挑一个 asset 下下来。
 
-    返回 (本地路径, 是否有更新, release tag)。按 asset 的 sha256 digest 做增量判断。
+    返回 (本地路径, 是否有更新, release tag)。优先用 API 的 digest 判断是否变化，
+    正常情况就不必下 33MB；但 api.github.com 对匿名请求只给 60 次/小时/IP，
+    Actions 的共享出口经常被别的任务用光（403 rate limit exceeded），
+    所以 API 不可用时降级为 releases/latest/download 直连，改用 sha256 判断。
     """
-    meta, _ = http_get(MDCX_API, headers={"Accept": "application/vnd.github+json"})
-    release = json.loads(meta)
-    asset = next((a for a in release.get("assets", []) if a["name"] == asset_name), None)
-    if asset is None:
-        raise RuntimeError(f"release 里找不到 {asset_name}")
-
-    digest = (asset.get("digest") or "").removeprefix("sha256:")
-    tag = release.get("tag_name", "")
     prev = state.get(state_key, {})
+    digest = tag = ""
+    url = ""
+    try:
+        meta, _ = http_get(MDCX_API, headers={"Accept": "application/vnd.github+json"})
+        release = json.loads(meta)
+        asset = next((a for a in release.get("assets", []) if a["name"] == asset_name), None)
+        if asset is None:
+            raise RuntimeError(f"release 里找不到 {asset_name}")
+        digest = (asset.get("digest") or "").removeprefix("sha256:")
+        tag = release.get("tag_name", "")
+        url = asset["browser_download_url"]
+    except Exception as e:  # noqa: BLE001
+        log(f"{asset_name}: 查 release 失败（{e}），改用 latest/download 直连")
+        url = MDCX_LATEST + asset_name
+
     if not force and digest and prev.get("sha256") == digest and os.path.exists(dest):
         log(f"{asset_name}: digest 未变（{tag}），复用缓存")
         return dest, False, tag
 
-    log(f"{asset_name}: 下载 {tag} / {asset['size']/1024/1024:.1f} MB …")
-    body = download(asset["browser_download_url"])
+    log(f"{asset_name}: 下载 {tag or 'latest'} …")
+    body = download(url)
     got = hashlib.sha256(body).hexdigest()
     if digest and got != digest:
         raise RuntimeError(f"{asset_name} sha256 校验失败：期望 {digest}，实际 {got}")
+    # 降级路径拿不到 digest，只能靠 sha256 自己判断内容有没有变
+    if not force and not digest and prev.get("sha256") == got and os.path.exists(dest):
+        log(f"{asset_name}: 内容与缓存一致，不重写")
+        return dest, False, tag or prev.get("tag", "")
     with open(dest, "wb") as f:
         f.write(body)
-    state[state_key] = {"tag": tag, "sha256": got, "updated_at": asset.get("updated_at", "")}
+    state[state_key] = {
+        "tag": tag or prev.get("tag", ""),
+        "sha256": got,
+        "updated_at": prev.get("updated_at", ""),
+    }
     log(f"{asset_name}: 完成（{len(body)/1024/1024:.1f} MB，sha256 校验通过）")
     return dest, True, tag
 

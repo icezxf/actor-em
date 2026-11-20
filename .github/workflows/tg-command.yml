@@ -47,9 +47,9 @@ jobs:
       # 33MB 的 sqlite 不入库，现下现导；失败不阻塞（退化成只有在线源）
       - name: Export MDCx profiles
         run: |
-          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv || {
-            echo "::warning::MDCx 档案导出失败，本次只用在线源"
-          }
+          # MDCx 提供出生地/罩杯/出道年/标签，是这些字段的唯一来源。
+          # 导出失败就不要带病继续：抓出来的记录是残的，事后还得 refresh 重抓。
+          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv
 
       - name: Build
         run: go build -o /tmp/actorsync ./cmd/actorsync
