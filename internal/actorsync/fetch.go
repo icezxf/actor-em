@@ -188,8 +188,11 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	}
 
 	// ---------- 5. StashDB：欧美演员兜底 ----------
+	// 保留命中的 performer：它的 Name 是 stash-box 英文站的标准英文名，
+	// 是第 6 步搜 TPDB（英文站）最可靠的关键词。不能像以前那样丢掉返回值。
+	var sd *Performer
 	if js == nil && f.StashDB != nil && f.StashDB.APIKey != "" {
-		f.searchCandidates(ctx, res, f.StashDB, candidates)
+		sd = f.searchCandidates(ctx, res, f.StashDB, candidates)
 	}
 
 	// ---------- 5.5 生日兜底：只在 JavStash 缺席时用 MDCx ----------
@@ -205,15 +208,7 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 
 	// ---------- 6. TPDB：三围兜底 + 体重 ----------
 	if f.TPDB != nil && f.TPDB.APIKey != "" {
-		// TPDB 是欧美库，只认罗马字。拿日文名去搜必定 not found，
-		// 所以把 MDCx 的 romanization（覆盖 93.9%）排到候选最前面。
-		terms := candidates
-		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
-			terms = prependUnique(terms, p.Romaji)
-		}
-		if js != nil && js.Name != "" {
-			terms = prependUnique(terms, js.Name)
-		}
+		terms := tpdbTerms(candidates, f.MDCx, name, js, sd)
 		if p := f.searchTPDB(ctx, res, terms); p != nil {
 			f.applyPerformer(res, p)
 		}
@@ -456,6 +451,30 @@ func (f *Fetcher) pickAvatar(ctx context.Context, res *FetchResult, candidates [
 		}
 		f.mark(res, "gfriends", false)
 	}
+}
+
+// tpdbTerms 组装 TPDB 的搜索词，优先级从高到低：
+//
+//	StashDB 英文名 > JavStash 名 > MDCx 罗马字 > 清单原名/字典日文名…
+//
+// TPDB 是欧美英文站，拿中文名或日文名去搜必定 not found。StashDB 也是英文站
+// （stash-box），它命中的 performer.Name 是标准英文名，是最可靠的关键词；
+// 但 StashDB 只在 JavStash 缺席时才查，所以命中日本演员时退而用 JavStash 名
+// （也是罗马字），再退用 MDCx 的 romanization（覆盖 93.9%）。
+func tpdbTerms(candidates []string, mdcx *MDCxDB, name string, js, sd *Performer) []string {
+	terms := candidates
+	if mdcx != nil {
+		if p := mdcx.Lookup(name); p != nil && p.Romaji != "" {
+			terms = prependUnique(terms, p.Romaji)
+		}
+	}
+	if js != nil && js.Name != "" {
+		terms = prependUnique(terms, js.Name)
+	}
+	if sd != nil && sd.Name != "" {
+		terms = prependUnique(terms, sd.Name)
+	}
+	return terms
 }
 
 // buildHomePageURL 按 JavStash → TPDB 的顺序拼演员主页地址。

@@ -653,3 +653,61 @@ func TestBuildActorUsesGfriendsAvatarAndMirror(t *testing.T) {
 		t.Fatalf("来源应为 gfriends: %q", StrVal(a.AvatarSourceSite))
 	}
 }
+
+// TPDB 是英文站，必须用英文名搜。StashDB（stash-box 英文站）命中的
+// performer.Name 是最可靠的关键词，必须排在搜索词最前面。
+func TestTPDBTermsStashDBNameFirst(t *testing.T) {
+	candidates := []string{"山岸逢花", "山岸あや花"}
+	js := &Performer{Source: "javstash", Name: "Aika Yamagishi"}
+	sd := &Performer{Source: "stashdb", Name: "Aika Yamagishi"}
+
+	got := tpdbTerms(candidates, nil, "山岸逢花", nil, sd)
+	if len(got) == 0 || got[0] != "Aika Yamagishi" {
+		t.Fatalf("StashDB 英文名应排第一，得到 %v", got)
+	}
+
+	// StashDB 与 JavStash 同时给名字（正常不会同时命中，但要保证 StashDB 优先）
+	got = tpdbTerms(candidates, nil, "山岸逢花", js, sd)
+	if got[0] != sd.Name {
+		t.Fatalf("StashDB 名应压过 JavStash 名，得到 %v", got)
+	}
+}
+
+// JavStash 命中时 StashDB 不查，此时用 JavStash 的罗马字名搜 TPDB。
+func TestTPDBTermsJavStashFallback(t *testing.T) {
+	candidates := []string{"山岸逢花"}
+	js := &Performer{Source: "javstash", Name: "Aika Yamagishi"}
+	got := tpdbTerms(candidates, nil, "山岸逢花", js, nil)
+	if len(got) == 0 || got[0] != "Aika Yamagishi" {
+		t.Fatalf("JavStash 名应排第一（StashDB 缺席），得到 %v", got)
+	}
+}
+
+// 两个在线源都没命中时，退回 MDCx 罗马字，再退回清单原名。
+func TestTPDBTermsMDCxAndCandidatesFallback(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "mdcx.csv")
+	body := "name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip\n" +
+		"山岸あや花,,山岸逢花,东京都,JP,163,F,2014,,,Yamagishi Ayaka,1996-01-01,88,58,86\n"
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mdcx, err := LoadMDCxCSV(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	candidates := []string{"山岸逢花"}
+	got := tpdbTerms(candidates, mdcx, "山岸逢花", nil, nil)
+	if len(got) == 0 || got[0] != "Yamagishi Ayaka" {
+		t.Fatalf("MDCx 罗马字应排第一，得到 %v", got)
+	}
+	if got[len(got)-1] != "山岸逢花" {
+		t.Fatalf("清单原名应保留在候选末尾，得到 %v", got)
+	}
+
+	// MDCx 也没罗马字时，只剩清单原名
+	got = tpdbTerms(candidates, nil, "山岸逢花", nil, nil)
+	if len(got) != 1 || got[0] != "山岸逢花" {
+		t.Fatalf("应只剩清单原名，得到 %v", got)
+	}
+}
