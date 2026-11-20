@@ -417,23 +417,21 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	}
 	logger.Printf("本地库 %d 条 / MDCx 档案 %d 人（%s）", len(db.Actors), mdcx.Size(), cfg.MDCxCSV)
 
-	var fakeDate, unitTag, segCleared int
+	var fakeDate, unitTag, upgraded int
 	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch int
 	for _, a := range db.Actors {
 		if a == nil {
 			continue
 		}
-		// 老库的 measurements 是 TPDB 原文，第一段可能是「下胸围+杯」（34E），
-		// 和现在统一的「胸围-腰-臀」不是一个意思，留着会被当成胸围读。清掉重算。
+		// 老库的第一段可能只是胸围（44-25-39）。如果 MDCx 有罩杯，可以升级成
+		// 「底围+杯」（36J-25-39），也就是欧美内衣的标法。已经带字母的
+		// （34E-21-31，TPDB 原文）本身就是标准写法，保持不动。
+		hasBandCup := false
 		if s := actorsync.StrVal(a.Measurements); s != "" {
 			first := strings.SplitN(s, "-", 2)[0]
-			if strings.IndexFunc(first, unicode.IsLetter) >= 0 {
-				a.Measurements = nil
-				a.MeasurementsUnit = nil
-				segCleared++
-			}
+			hasBandCup = strings.IndexFunc(first, unicode.IsLetter) >= 0
 		}
-		// 剩下的三围只可能来自旧版 TPDB，标 in
+		// 老库没有 measurements_unit：那时候有三围只可能来自 TPDB（英寸）
 		if actorsync.StrVal(a.Measurements) != "" && actorsync.StrVal(a.MeasurementsUnit) == "" {
 			a.MeasurementsUnit = actorsync.StrPtr("in")
 			unitTag++
@@ -475,11 +473,17 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 			a.BirthDateSource = actorsync.StrPtr("mdcx")
 			nBirth++
 		}
-		if actorsync.StrVal(a.Measurements) == "" {
-			if s := actorsync.BustWaistHipInches(p.Bust, p.Waist, p.Hip); s != "" {
-				a.Measurements = actorsync.StrPtr(s)
-				a.MeasurementsUnit = actorsync.StrPtr("in")
-				nMeas++
+		if !hasBandCup {
+			if s := actorsync.MeasurementsInches(p.Bust, p.Waist, p.Hip, p.Cup); s != "" {
+				if actorsync.StrVal(a.Measurements) != s {
+					if actorsync.StrVal(a.Measurements) != "" {
+						upgraded++
+					} else {
+						nMeas++
+					}
+					a.Measurements = actorsync.StrPtr(s)
+					a.MeasurementsUnit = actorsync.StrPtr("in")
+				}
 			}
 		}
 		if len(a.Tags) == 0 && len(p.Tags) > 0 {
@@ -504,12 +508,12 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 		}
 	}
 
-	logger.Printf("补标来源：三围单位 %d 条、生日来源 %d 条；清掉 TPDB 旧格式三围 %d 条",
-		unitTag, fakeDate, segCleared)
+	logger.Printf("补标来源：三围单位 %d 条、生日来源 %d 条；三围升级成「底围+罩杯」%d 条",
+		unitTag, fakeDate, upgraded)
 	logger.Printf("补空字段：生日 %d、三围 %d、标签 %d、身高 %d、罩杯 %d、出道年 %d、出生地 %d（MDCx 查不到 %d 条）",
 		nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch)
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + unitTag + fakeDate + segCleared
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + unitTag + fakeDate + upgraded
 	if total == 0 {
 		logger.Printf("没有需要写回的改动")
 		return nil

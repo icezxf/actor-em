@@ -282,39 +282,78 @@ func TestMDCxMeasurements(t *testing.T) {
 }
 
 // 三围统一英寸：厘米换算四舍五入，三项缺一不可。
-func TestBustWaistHipInches(t *testing.T) {
+func TestMeasurementsInches(t *testing.T) {
 	cases := []struct {
 		b, w, h int
+		cup     string
 		want    string
 	}{
-		{112, 64, 99, "44-25-39"},
-		{82, 63, 83, "32-25-33"},
-		{0, 64, 99, ""}, // 缺任一就整条不写
-		{82, 0, 83, ""},
+		// 有罩杯：第一段是「底围+杯」。112/64/99cm J 杯 → 下胸围 79.5 → band 36
+		{112, 64, 99, "J", "36J-25-39"},
+		{87, 57, 85, "D", "32D-22-33"},
+		// 没有罩杯：第一段只能是胸围本身
+		{82, 63, 83, "", "32-25-33"},
+		// 罩杯不在日标表里（或写错），退回纯胸围，不瞎猜
+		{82, 63, 83, "ZZ", "32-25-33"},
+		// 缺任一围就整条不写
+		{0, 64, 99, "C", ""},
+		{82, 0, 83, "C", ""},
 	}
 	for _, c := range cases {
-		if got := BustWaistHipInches(c.b, c.w, c.h); got != c.want {
-			t.Errorf("BustWaistHipInches(%d,%d,%d) = %q, want %q", c.b, c.w, c.h, got, c.want)
+		if got := MeasurementsInches(c.b, c.w, c.h, c.cup); got != c.want {
+			t.Errorf("MeasurementsInches(%d,%d,%d,%q) = %q, want %q", c.b, c.w, c.h, c.cup, got, c.want)
 		}
 	}
 }
 
-// TPDB 的 measurements 第一段可能是「下胸围+杯」（34E），不能当胸围。
+// 反推底围必须用日标杯差：日标 J 差 32.5cm，美标 J 只差 25.4cm，
+// 用错标准会把 band 算小两码（实测 1.5 万人里 85% 挤到 28-30）。
+func TestBandFromBust(t *testing.T) {
+	cases := []struct {
+		bust int
+		cup  string
+		want int
+	}{
+		{112, "J", 36}, // 下胸围 79.5cm ≈ 日标 80 → 美标 36
+		{85, "C", 32},  // 下胸围 70cm
+		{87, "D", 32},  // 下胸围 69.5cm
+		{95, "F", 32},  // 下胸围 72.5cm
+		{0, "C", 0},    // 缺胸围
+		{85, "", 0},    // 缺罩杯
+		{85, "ZZ", 0},  // 罩杯不在表里
+	}
+	for _, c := range cases {
+		if got := BandFromBust(c.bust, c.cup); got != c.want {
+			t.Errorf("BandFromBust(%d,%q) = %d, want %d", c.bust, c.cup, got, c.want)
+		}
+	}
+	// bust 太小配大杯 → 下胸围低于 55cm，输入明显录错，拒绝而不是瞎算
+	if got := BandFromBust(60, "J"); got != 0 {
+		t.Errorf("异常输入应返回 0，得到 %d", got)
+	}
+}
+
+// TPDB 的第一段有两种形态，两种都原样返回：34E 是「底围+杯」，34 是胸围。
 func TestBWHInches(t *testing.T) {
-	// 34E-24-35：34 是下胸围，不是胸围 → 胸围必须留空，整条不写
+	// 34E-24-35：第一段是「底围 34 + E 杯」，正是欧美标准写法，直接留用
 	p := &Performer{Measurements: "34E-24-35", Waist: 24, Hip: 35}
-	if b, w, h := p.bwhInches(); b != 0 || w != 24 || h != 35 {
-		t.Errorf("带杯型的串应只取腰臀，得到 %d/%d/%d", b, w, h)
+	if f, w, h := p.bwhInches(); f != "34E" || w != 24 || h != 35 {
+		t.Errorf("带杯型的串应原样取第一段，得到 %q/%d/%d", f, w, h)
 	}
 	// 34-24-35：第一段就是胸围
 	p = &Performer{Measurements: "34-24-35"}
-	if b, w, h := p.bwhInches(); b != 34 || w != 24 || h != 35 {
-		t.Errorf("纯数字串应三段全取，得到 %d/%d/%d", b, w, h)
+	if f, w, h := p.bwhInches(); f != "34" || w != 24 || h != 35 {
+		t.Errorf("纯数字串应三段全取，得到 %q/%d/%d", f, w, h)
+	}
+	// 只有两段，不构成三围
+	p = &Performer{Measurements: "34E-24"}
+	if f, _, _ := p.bwhInches(); f != "" {
+		t.Errorf("不足三段应返回空，得到 %q", f)
 	}
 	// 没有 measurements，只有独立字段
 	p = &Performer{Waist: 24, Hip: 35}
-	if b, w, h := p.bwhInches(); b != 0 || w != 24 || h != 35 {
-		t.Errorf("缺 measurements 时应从独立字段取腰臀，得到 %d/%d/%d", b, w, h)
+	if f, w, h := p.bwhInches(); f != "" || w != 24 || h != 35 {
+		t.Errorf("缺 measurements 时应从独立字段取腰臀，得到 %q/%d/%d", f, w, h)
 	}
 }
 

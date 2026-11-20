@@ -268,10 +268,10 @@ func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
 	if len(p.Tags) > 0 && len(res.Tags) == 0 {
 		res.Tags = p.Tags
 	}
-	// 三围：MDCx 三项齐备就用它，换算成英寸（欧美口径）。TPDB 那套本来就是
-	// 英寸，留到第 6 步只在空缺时兜底。
+	// 三围：MDCx 三项齐备就用它，换算成英寸并用「底围+罩杯」写法（36J-25-39）。
+	// TPDB 那套本来就是英寸，留到第 6 步只在空缺时兜底。
 	if res.Measurements == "" {
-		if s := BustWaistHipInches(p.Bust, p.Waist, p.Hip); s != "" {
+		if s := MeasurementsInches(p.Bust, p.Waist, p.Hip, p.Cup); s != "" {
 			res.Measurements = s
 			res.MeasurementsUnit = "in"
 		}
@@ -379,11 +379,11 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 		res.CupSize = p.CupSize
 	}
 	// 三围：MDCx 已在第 1 步填过，这里只补空位。
-	// TPDB 的 measurements 不能直接抄：第一段可能是「下胸围+杯」（34E），
-	// 也可能就是胸围（34-24-35），得先判断再决定用不用。
+	// TPDB 的第一段可能是胸围（34-24-35），也可能是「底围+杯」（34E-24-35），
+	// 两种都原样留着——后者正是欧美标准写法。
 	if p.Source == "tpdb" && res.Measurements == "" {
-		if b, w, h := p.bwhInches(); b > 0 && w > 0 && h > 0 {
-			res.Measurements = fmt.Sprintf("%d-%d-%d", b, w, h)
+		if first, w, h := p.bwhInches(); first != "" && w > 0 && h > 0 {
+			res.Measurements = fmt.Sprintf("%s-%d-%d", first, w, h)
 			res.MeasurementsUnit = "in"
 		}
 	}
@@ -565,35 +565,78 @@ func cmToInch(cm int) int {
 	return int(math.Round(float64(cm) / 2.54))
 }
 
-// BustWaistHipInches 把厘米制的三围拼成英寸串 "44-25-39"，三项缺一不可。
+// cupDropJP 是日标（JIS L4005）每个罩杯对应的「胸围 − 下胸围」差值，单位 cm。
+//
+// 反推下胸围必须用日标差值：日本网站标的 cup 就是日标，日标 J 差 32.5cm，
+// 而美标 J 只差 25.4cm。用美标差值会把下胸围算大，反推出的 band 系统性偏两码
+// （实测 15,028 人里 85% 挤在 28-30，而实际日本女优多是 65-75cm 下胸围）。
+var cupDropJP = map[string]float64{
+	"AA": 7.5, "A": 10, "B": 12.5, "C": 15, "D": 17.5,
+	"E": 20, "F": 22.5, "G": 25, "H": 27.5, "I": 30, "J": 32.5,
+	"K": 35, "L": 37.5, "M": 40, "N": 42.5, "O": 45, "P": 47.5,
+	"Q": 50, "R": 52.5, "S": 55, "T": 57.5,
+}
+
+// BandFromBust 用「胸围 + 罩杯」反推欧美内衣底围（band，英寸偶数）。
+//
+// 日标下胸围 65/70/75cm 对应美标 30/32/34，换算时补 11cm 的放松量再折英寸取偶。
+// 误差约一码：日标罩杯算的是**上胸围**，而网站报的 bust 多是站姿胸围，站姿比
+// 上胸围小 2~3cm，反推出的下胸围因此偏大一点。宁可差一码，也好过整条空着。
+func BandFromBust(bustCm int, cup string) int {
+	drop, ok := cupDropJP[strings.ToUpper(strings.TrimSpace(cup))]
+	if !ok || bustCm <= 0 {
+		return 0
+	}
+	under := float64(bustCm) - drop
+	// 下胸围落在 55~120cm 之外说明输入有问题（bust 录错或 cup 是别的标准），不猜
+	if under < 55 || under > 120 {
+		return 0
+	}
+	band := int(math.Round((under+11)/2.54/2.0) * 2)
+	if band < 26 || band > 46 {
+		return 0
+	}
+	return band
+}
+
+// MeasurementsInches 把厘米制三围拼成英寸串，第一段优先用「底围+罩杯」写法：
+//
+//	36J-25-39   有罩杯：第一段是 band+cup，欧美内衣的标法
+//	44-25-39    没有罩杯：第一段只能是胸围本身
+//
 // 抓取路径和离线补值（--backfill）共用这一处，避免两边算出不同的数。
-func BustWaistHipInches(bust, waist, hip int) string {
+func MeasurementsInches(bust, waist, hip int, cup string) string {
 	if bust <= 0 || waist <= 0 || hip <= 0 {
 		return ""
 	}
-	return fmt.Sprintf("%d-%d-%d", cmToInch(bust), cmToInch(waist), cmToInch(hip))
+	first := strconv.Itoa(cmToInch(bust))
+	if band := BandFromBust(bust, cup); band > 0 {
+		first = fmt.Sprintf("%d%s", band, strings.ToUpper(strings.TrimSpace(cup)))
+	}
+	return fmt.Sprintf("%s-%d-%d", first, cmToInch(waist), cmToInch(hip))
 }
 
-// bwhInches 从 TPDB 的记录里取出「胸围-腰围-臀围」（英寸）。
+// bwhInches 从 TPDB 的记录里取出「第一段 + 腰围 + 臀围」，第一段原样返回。
 //
-// 关键在 measurements 的第一段：TPDB 有时写成 `34-24-35`（第一段就是胸围），
-// 有时写成 `34E-24-35`（34 是**下胸围**，E 是杯型）。后者要还原成胸围得加杯差，
-// 而杯差在美标/日标之间差好几厘米，猜就必然错——所以那种情况退回只看
-// extras.waist / extras.hips，胸围留空、整条三围不写。
-func (p *Performer) bwhInches() (bust, waist, hip int) {
-	bust, waist, hip = 0, p.Waist, p.Hip
+// measurements 的第一段有两种形态，两种都是下游要的写法，不必还原：
+//
+//	34-24-35   第一段就是胸围
+//	34E-24-35  第一段是「底围 34 + E 杯」，欧美内衣的标准标法
+//
+// 旧版把带字母的那种整条丢弃，理由是「34 是下胸围不是胸围」——那没错，但现在
+// measurements 的第一段本来就允许是底围+杯，所以原样留着比丢掉有价值。
+func (p *Performer) bwhInches() (first string, waist, hip int) {
+	waist, hip = p.Waist, p.Hip
 	parts := strings.Split(strings.TrimSpace(p.Measurements), "-")
 	if len(parts) < 3 {
-		return bust, waist, hip
+		return "", waist, hip
 	}
-	if n, err := strconv.Atoi(strings.TrimSpace(parts[0])); err == nil && n > 0 {
-		bust = n
-	}
+	first = strings.ToUpper(strings.TrimSpace(parts[0]))
 	if waist == 0 {
 		waist, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
 	}
 	if hip == 0 {
 		hip, _ = strconv.Atoi(strings.TrimSpace(parts[2]))
 	}
-	return bust, waist, hip
+	return first, waist, hip
 }

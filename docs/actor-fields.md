@@ -58,30 +58,49 @@
 
 ### 2.3 身体
 
-> **口径统一**：三围一律**英寸**，格式固定为 `胸围-腰围-臀围`（`44-25-39`）。
+> **口径统一**：三围一律**英寸**，第一段优先用**「底围+罩杯」**的欧美标法：
+> `36J-25-39`。没有罩杯数据时第一段退回胸围本身：`44-25-39`。
 > MDCx 给的是厘米分项（覆盖 80%），读入时换算；TPDB 本来就是英寸。
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
 | `height_cm` | int? | MDCx `height`（75.5%）→ JavStash → TPDB | 纯数字 |
 | `weight_kg` | int? | JavStash `weight` → TPDB `extras.weight` | 只有这两个源有，MDCx 完全没有 |
-| `measurements` | string? | MDCx `bust/waist/hip`（**80% 齐备**）→ TPDB | `44-25-39`，英寸，胸围/腰围/臀围 |
+| `measurements` | string? | MDCx `bust/waist/hip/cup`（**80% 齐备**）→ TPDB 原文 | `36J-25-39`（底围+杯-腰-臀）或 `44-25-39`（无罩杯时首段是胸围） |
 | `measurements_unit` | string? | 跟着 `measurements` 走 | 目前恒为 `in`；空表示没有三围 |
-| `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段 |
+| `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段，同时参与首段拼装 |
 
 **为什么 MDCx 排前面**：MDCx 的 `bust`/`waist`/`hip` 是分项字段，17,494 人三项齐备
 （80.0%）；TPDB 是欧美库，只命中 46%。旧版只认 TPDB，等于白白扔掉 80% 的数据。
+
+**首段怎么来的（`BandFromBust`）**：
+
+```
+下胸围 = 胸围 − 日标杯差          （112 − 32.5 = 79.5cm）
+band   = (下胸围 + 11cm) / 2.54，取最近偶数   （→ 36）
+结果   = band + 罩杯              （36J）
+```
+
+- **必须用日标杯差**（JIS L4005）：日标 J 差 32.5cm，美标 J 只差 25.4cm。换成美标差值
+  反推出的 band 会系统性偏两码——实测 15,028 人里 85% 挤在 28-30，而日系演员的实际
+  下胸围多是 65-75cm。
+- `+11cm` 是日标转美标的放松量：日标 65/70/75cm 对应美标 30/32/34。
+- **误差约一码**：日标罩杯算的是上胸围，而网站报的 `bust` 多是站姿胸围（小 2~3cm），
+  反推出的下胸围因此略偏大。宁可差一码，也好过整条空着。
+- 罩杯不在表里、或反推出的下胸围落在 55~120cm 之外（输入录错），首段退回纯胸围。
+
+全库产出分布（14,865 个三项齐备 + 有罩杯的人）：band 30 占 45.5%、32 占 40.0%、
+34 占 6.1%、28 占 5.7%，反推失败 0.2%。能写成「底围+杯」的占全库 67.9%。
 
 **换算与语义的三个坑**：
 
 1. `cmOrZero` 只接受 50~200 的值。上游偶尔混入 `34/24/35` 这种英寸串，一旦当厘米收下
    两者就分不开了，宁可留空。
-2. 换算在 `BustWaistHipInches()` 一处完成，抓取和 `--backfill` 共用，避免两边算出
-   不同的数。112/64/99cm → 44/25/39in（四舍五入）。
-3. **TPDB 的 `measurements` 第一段不一定是胸围**。它可能是 `34E-24-35`（34 是
-   *下胸围*，E 是杯型），也可能是 `34-24-35`（34 就是胸围）。前一种还原成胸围要加
-   杯差，而杯差在美标/日标之间差好几厘米，猜必错——所以 `bwhInches()` 遇到带字母的
-   第一段就让胸围留空、整条三围不写，只保留 `waist`/`hips` 两个独立字段。
+2. 换算在 `MeasurementsInches()` 一处完成，抓取和 `--backfill` 共用，避免两边算出
+   不同的数。
+3. **TPDB 的第一段也有两种形态**：`34E-24-35`（底围+杯）和 `34-24-35`（胸围）。
+   旧版把带字母的那种整条丢弃，理由是「34 是下胸围不是胸围」——现在首段本来就允许
+   是底围+杯，所以原样保留，反而比丢掉有价值。
 
 已删除：`bust_cm` / `waist_cm` / `hip_cm`——旧版把 TPDB 的英寸值当厘米存，口径是错的。
 
@@ -288,7 +307,7 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 ## 5. Overview 头部格式
 
 ```
-【三围 44-25-39｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+【三围 32D-23-34｜身高 158cm｜体重 48kg｜出道 2019｜出身 东京都】
 
 （简介正文）
 ```
@@ -304,7 +323,7 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 实际渲染（数据全）：
 
 ```
-【三围 44-25-39｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+【三围 32D-23-34｜身高 158cm｜体重 48kg｜出道 2019｜出身 东京都】
 
 小湊よつ葉，日本女演员，1996年5月10日出生于东京都。2019年出道……
 ```
@@ -366,14 +385,14 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 | `birth_place` | `ProductionLocations`（+ Overview 头部） |
 | `career_start` | `ProductionYear`（+ Overview 头部） |
 | `bio` | `Overview` 正文 |
-| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段；三围是英寸 `44-25-39`） |
+| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段；三围写成 `36J-25-39` 这种底围+罩杯） |
 | `avatar` / `avatar_cn` | 主图，**必须落成 `folder.jpg`**，网络 URL 不能直接用 |
 | `homepage_url` | `HomePageUrl` |
 | `provider_ids` | `ProviderIds` |
 | `tags` | `Tags`（黑名单过滤 → 简繁归一 → 截断 8 个） |
 | `name_original` / `aliases` | 不落 Emby，只供检索（Overview 已定不要别名） |
 | `gender` / `country` | 不落 Emby（`country` 信息已含在 `birth_place`） |
-| `cup_size` | 不落 Emby（没有罩杯字段；三围串是「胸-腰-臀」，本身不含罩杯，罩杯只在这个字段里） |
+| `cup_size` | 不落 Emby（没有罩杯字段；但已拼进 `measurements` 首段，如 `36J`） |
 | `key` / `status` / `sources` / `fail_count` / `retry_after` / `created_at` / `scraped_at` | 不落 Emby，内部记账 |
 
 一句话：**11 个 JSONL 字段喂满了 Emby Person 全部 9 个可用字段，进不去的都是 Emby 没有地方放。**

@@ -12,9 +12,9 @@ gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数�
 
 工作流 2（每天 04:00 UTC）
   actor_dict.csv ──> 演员清单（全量）
-  MDCx profile ────> 出生地/罩杯/身高/出道年/标签 ─┐
+  MDCx profile ────> 三围/出生地/罩杯/身高/标签 ──┐
   JavStash ────────> 生日（唯一权威）+ 主页 ID     │
-  TPDB ────────────> 三围（唯一来源，原样字符串）   ├─> actors.jsonl（真源）
+  TPDB ────────────> 三围兜底（英寸原文）          ├─> actors.jsonl（真源）
   维基 / theactorbase ─> 中文简介                  │      └─> actors.json + manifest + xlsx
   gfriends ────────> 头像（+ jsDelivr 国内镜像）   ┘
 ```
@@ -96,7 +96,7 @@ MDCX_CSV=/tmp/mdcx_profiles.csv GFRIENDS=1 THEACTORBASE=1 ACTORS_CONCURRENCY=10 
 | 环境变量 | 必填 | 说明 |
 |---|---|---|
 | `JAVSTASH_API_KEY` | ✅ | 日系主力源，**生日唯一权威**，也提供主页 ID |
-| `TPDB_API_KEY` | 建议 | **三围唯一来源**（原样字符串，不换算），另有身高/体重 |
+| `TPDB_API_KEY` | 建议 | 三围兜底（MDCx 缺项时才用）+ 体重/长简介 |
 | `STASHDB_API_KEY` | 可选 | 欧美演员兜底 |
 | `WIKI_EMAIL` | 可选 | 维基 API 的 User-Agent 联系邮箱，填了更礼貌 |
 | `TPDB_ENDPOINT` / `JAVSTASH_ENDPOINT` / `STASHDB_ENDPOINT` | 可选 | 换镜像/代理时用 |
@@ -187,9 +187,9 @@ actorsync [flags]
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
 | `height_cm` | int? | 身高厘米 |
 | `weight_kg` | int? | 体重公斤。**只有 JavStash / TPDB 有**，MDCx 无此字段 |
-| `measurements` | string? | `44-25-39`，**英寸**，胸围-腰围-臀围；MDCx 厘米数据换算而来 |
+| `measurements` | string? | **英寸**，首段是「底围+罩杯」：`36J-25-39`。没有罩杯数据时首段退回胸围：`44-25-39` |
 | `measurements_unit` | string? | 恒为 `in`；空表示没有三围 |
-| `cup_size` | string? | 纯字母，如 `E`；来自 MDCx（73.1%），比 TPDB 全 |
+| `cup_size` | string? | 纯字母，如 `E`；来自 MDCx（73.1%），同时拼进 `measurements` 首段 |
 | `career_start` | int? | 出道年份，取 MDCx `career_period` 的首年 |
 | `tags` | string[] | 标签，来自 MDCx（覆盖 43.3%，已过滤敏感/未成年相关） |
 | `bio` | string? | 简介，优先中文；顺序 维基 → theactorbase → MDCx |
@@ -452,5 +452,6 @@ docker run -d --name actor-em --restart unless-stopped \
 - **不刷新老记录**。演员补了新简介不会自动更新，用 `--refresh 名字` 手动触发。
 - **不加锁**。如果两条记录用同一个名字，头像会互相覆盖（后写的胜）。
 - `key` 一旦写入就不再改，即使后来匹配到了 JavStash ID——避免同一人出现两条。
-- **三围不做单位换算**。TPDB 给 `34E-21-31` 就存 `34E-21-31`，不拆成 waist/hip 厘米。
+- **三围会换算**。MDCx 的厘米分项换算成英寸，并用日标杯差反推底围，写成 `36J-25-39`
+  这种欧美标法（误差约一码，见 `docs/actor-fields.md`）。TPDB 的原文本来就是这个写法，直接留用。
 - **`docs/actor-fields.md` 与代码里的 `schema_version` 必须同步**，改字段先改文档。
