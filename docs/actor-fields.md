@@ -69,11 +69,44 @@
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
-| `bio` | string? | 中文维基 → theactorbase → MDCx `minnano_bio` 字段串 | **不取英文简介，不调 DeepL** |
-| `bio_lang` | string? | 恒 `zh` | |
+| `bio` | string? | 中文维基 → theactorbase | **不取英文简介，不调 DeepL** |
+| `bio_lang` | string? | `zh` / `ja` | 中文维基常返回繁中 |
 
-MDCx 的 `minnano_bio` 覆盖 97.3%，但它是结构化字段串（中位 61 字符、93% 含 `|`、超过 200 字的只有 17 条），
-只能当最后兜底，不能当简介看。
+维基是**按标题查**而不是按人查，短名字会命中同名物，且看起来完全合法。实测
+936 条里有 82% 的简介是垃圾：
+
+```
+もも  → 桃（學名：Prunus persica）是源自中国，蔷薇科李属的一种植物
+DA    → Da或DA可能是指以下事物：deviantART 的常用缩写
+David → 大衛王是公元前10世紀以色列聯合王國的第二任國王
+```
+
+所以 `bio` 写入前必须过 `ValidBio()`，四条全过才留（见 `internal/actorsync/bio.go`）：
+
+| 检查 | 拦住了什么 |
+|---|---|
+| 不是消歧义页（`可能是指`/`可以指`/`指以下`/`是源于`…） | `JULIA` 的「Julia语言…」「あいり」的二十几行名单 |
+| 含 AV 圈关键词（`AV`/`女优`/`写真偶像`/`グラビア`…） | 桃树、`アメリア・イヤハート`（美国航空先驱） |
+| 不是 MDCx 属性串（`^身高:`/`^罩杯:`/`^三围:`…） | 「身高: 166cm \| 罩杯: D \| 三围: 84/60/86」，与 Overview 头部重复 |
+| 不是在讲男性（`日本男`/`男優`/`男演员`…） | `つよぽん`→草彅剛、`そらる`→男性歌手 |
+
+还有一条**跨字段对账**：简介里抽出来的身高与记录冲突超过 3cm 就丢简介。
+实测 `Mio Fukada` 的简介写着「161cm 出生于 1995-11-12」，而 JavStash 给的是
+`153cm / 1998-12-27` —— 抓到的是同名的另一个人。
+
+**不做名字匹配校验**：`志田明里` 的简介讲「あいだ飛鳥」、`橘日菜` 讲「立花日菜」，
+看着像错配，其实是同一人的艺名变更和汉字/假名写法（aliases 里都有）。按名字卡
+会大量误杀。
+
+> 结果是简介覆盖率从「60%（含 82% 垃圾）」降到 **约 8%（纯净）**。空着比写着
+> 「桃是蔷薇科植物」好 —— Overview 里那行元数据头已经把身高/罩杯/三围/出道年
+> 都写了，简介本来也不该重复这些。
+>
+> MDCx 的 `minnano_bio`（覆盖 97.3%）已**完全弃用**：它是「身高: 166 \| 罩杯: D \|
+> 三围: …」这种属性串（中位 61 字符、93% 含 `\|`、超 200 字的只有 17 条），
+> 当简介是错的，当兜底也是错的。
+
+新记录**到 theactorbase 为止**，不再往 MDCx 回落。
 
 ### 2.6 头像
 
@@ -115,6 +148,16 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 | `homepage_url` | string? | JavStash `https://javstash.org/performers/<uuid>` → TPDB 演员页 | 填 Emby `HomePageUrl`，唯一的外链出口 |
 | `provider_ids` | object | JavStash / StashDB / TPDB / Tmdb / Imdb / Wikidata / Wikipedia | |
 | `status` `sources` `fail_count` `retry_after` `created_at` `scraped_at` | — | 程序自己维护 | 与 v2 一致 |
+
+`status` 取值：`ok`（有生日或简介）／`partial`（命中源但两者都空）／`no_source`
+（所有源都没这人）／`failed`（网络错误，下轮重试）／**`skipped`**（不是目标演员）。
+
+`skipped` 目前只有一个触发条件：**性别为男**。字典来自 amane 映射表，里面混着男优
+和同名的男艺人（`Panda`、`Kento Rabbit`、`れんと`、`つよぽん`），命中率约 4%。这些人
+抓得到数据，但进演员库就是错的。标 `skipped` 而不是直接丢弃，是为了两头兼顾：
+
+- 记录留在 `actors.jsonl`，`plan.go` 只重试 `failed`/`no_source`，所以下次不会重复抓
+- `ExportJSON` 导出 `actors.json` 时跳过它们，下游 Emby 看不到
 
 ### 2.8 标签
 

@@ -127,13 +127,23 @@ func (db *Db) SaveJSONL(path string) error {
 }
 
 // ExportJSON 从内存库派生一份 actors.json（完整对象），供只认 json 的下游使用。
+//
+// skipped 的记录不导出：那些是男性或非目标演员，留在 actors.jsonl 里只是为了
+// 下次不再重复抓，下游没有理由看到它们。
 func (db *Db) ExportJSON(path string) error {
-	sort.Slice(db.Actors, func(i, j int) bool { return db.Actors[i].Key < db.Actors[j].Key })
+	var kept []*Actor
+	for _, a := range db.Actors {
+		if a.Status == StatusSkipped {
+			continue
+		}
+		kept = append(kept, a)
+	}
+	sort.Slice(kept, func(i, j int) bool { return kept[i].Key < kept[j].Key })
 	out := &Db{
 		SchemaVersion: SchemaVersion,
 		GeneratedAt:   time.Now().UTC().Format(time.RFC3339),
-		Count:         len(db.Actors),
-		Actors:        db.Actors,
+		Count:         len(kept),
+		Actors:        kept,
 	}
 	if out.Actors == nil {
 		out.Actors = []*Actor{}

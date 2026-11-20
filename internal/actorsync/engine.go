@@ -109,7 +109,9 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 	// 否则一次数据源抖动就会把好好的 ok 记录改成 no_source，元数据全丢。
 	if opts.KeepOnFailure && manualPick == "" {
 		switch res.Outcome() {
-		case StatusOK, StatusPartial:
+		// skipped 也要落盘：它是「判定过、不是目标演员」的结论，
+		// 不写进去下次还会重新抓一遍，白费 900 次请求。
+		case StatusOK, StatusPartial, StatusSkipped:
 		default:
 			if existing == nil {
 				// 库里没有、这次也没抓到：不入库。

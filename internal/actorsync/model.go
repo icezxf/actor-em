@@ -61,6 +61,7 @@ const (
 	StatusPartial  = "partial"   // 命中了源，但生日和简介都为空
 	StatusNoSource = "no_source" // 所有源都没有这个人
 	StatusFailed   = "failed"    // 网络/限流错误，需要重试
+	StatusSkipped  = "skipped"   // 不是目标演员（男性等），留档但不再抓、不导出
 )
 
 // Manifest 是 actors.manifest.json 的结构，给人和监控看。

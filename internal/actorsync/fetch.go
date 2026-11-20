@@ -127,9 +127,15 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	}
 
 	// ---------- 3. 维基：中文简介第一顺位，顺带拿日文名做搜索词 ----------
+	// 维基按标题查而不是按人查，短名字极易命中同名物（もも→桃树、DA→deviantART），
+	// 所以拿到的正文必须过一遍校验才敢用。
 	wikiCtx, wcancel := context.WithTimeout(ctx, 10*time.Second)
 	jaTitle, zhBio := fetchWikiBoth(wikiCtx, f.HTTP, name, lang, f.WikiEmail)
 	wcancel()
+	if zhBio != "" && !ValidBio(zhBio) {
+		f.logf("[%s] 维基简介不像本人，丢弃：%s", name, TruncateUTF8(zhBio, 120))
+		zhBio = ""
+	}
 	if zhBio != "" {
 		f.mark(res, "wiki", true)
 		res.Bio = zhBio
@@ -168,34 +174,37 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	}
 
 	// ---------- 7. theactorbase：中文简介第二顺位 ----------
-	if res.Bio == "" && f.TheActorBase != nil {
+	// 维基往往只有一句话（「XXX是一位日本AV女优。」），theactorbase 给的是整段经历。
+	// 所以拿到短简介时继续往下问，谁长用谁。
+	if len([]rune(res.Bio)) < bioUpgradeRunes && f.TheActorBase != nil {
 		terms := candidates
 		// 站点 slug 用罗马字拼，日文名拼不出来。MDCx 的 romanization 覆盖 93.9%，放最前面。
 		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
 			terms = prependUnique(terms, p.Romaji)
 		}
-		if bio := f.TheActorBase.FetchBio(ctx, terms); bio != "" {
+		if bio := f.TheActorBase.FetchBio(ctx, terms); bio != "" && ValidBio(bio) {
 			f.mark(res, "theactorbase", true)
-			res.Bio = bio
+			if len([]rune(bio)) > len([]rune(res.Bio)) {
+				res.Bio = bio
+			}
 		} else {
 			f.mark(res, "theactorbase", false)
 		}
 	}
 
-	// ---------- 8. 简介最后兜底：MDCx 的字段串（不是文章，只算「有字」）----------
-	if res.Bio == "" {
-		if p := f.MDCx.Lookup(name); p != nil && p.BioRaw != "" {
-			res.Bio = p.BioRaw
-			f.logf("[%s] 简介回落到 MDCx 字段串", name)
-		}
-	}
+	// 简介到 theactorbase 为止。MDCx 那个「身高: 166cm | 罩杯: D | 三围: 84/60/86」
+	// 是字段串不是文章，塞进 Overview 只会跟头部那行五项重复，宁可空着。
+
 	res.Bio = strings.TrimSpace(res.Bio)
+	// 简介和结构化字段打架时以结构化字段为准：实测抓到过同名的另一个人，
+	// 简介写「161cm 出生于 1995-11-12」，而 JavStash 给的是 153cm / 1998-12-27。
+	if res.Bio != "" && BioConflictsHeight(res.Bio, res.HeightCm) {
+		f.logf("[%s] 简介身高 %dcm 与记录 %dcm 冲突，丢弃简介",
+			name, BioHeightCm(res.Bio), res.HeightCm)
+		res.Bio = ""
+	}
 	if res.Bio != "" {
 		res.BioLang = DetectLanguage(res.Bio)
-		if res.BioLang == "unknown" || res.BioLang == "en" {
-			// 只存中文；万一上游给的是日文，也留 ja 记明语种
-			res.BioLang = DetectLanguage(res.Bio)
-		}
 	}
 	res.Bio = TruncateUTF8(res.Bio, 6000)
 
@@ -444,6 +453,12 @@ func prependUnique(list []string, v string) []string {
 
 // Outcome 把抓取结果折算成 status。
 func (r *FetchResult) Outcome() string {
+	// 先判性别：字典来自 amane 映射表，里面混着男优和同名的男艺人
+	// （Panda、Kento Rabbit、れんと…）。这些人抓得到数据，但进了演员库就是错的。
+	// 标成 skipped 而不是丢掉，这样下次运行不会重复抓，记录也还留着可查。
+	if strings.EqualFold(r.Gender, "male") {
+		return StatusSkipped
+	}
 	anyHit := false
 	for _, ok := range r.Sources {
 		if ok {

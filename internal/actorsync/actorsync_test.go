@@ -162,6 +162,14 @@ func TestOutcome(t *testing.T) {
 	if got := r.Outcome(); got != StatusFailed {
 		t.Errorf("有网络错误应为 failed，得到 %s", got)
 	}
+	// 男性即使抓到了全套资料，也不能算 ok
+	r = &FetchResult{
+		Sources:   map[string]bool{"javstash": true},
+		BirthDate: "1990-01-01", Gender: "MALE",
+	}
+	if got := r.Outcome(); got != StatusSkipped {
+		t.Errorf("男性应为 skipped，得到 %s", got)
+	}
 }
 
 func TestEncodePath(t *testing.T) {
