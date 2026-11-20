@@ -3,6 +3,8 @@ cmd/actorsync/config.local.go
 
 # 构建产物
 bin/
+__pycache__/
+*.pyc
 /actorsync
 *.exe
 
