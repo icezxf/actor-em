@@ -24,7 +24,7 @@ type Performer struct {
 	Gender       string
 	Height       int
 	Weight       int
-	Measurements string // 仅 TPDB：原样英寸制串，如 "34E-21-31"，不换算
+	Measurements string // 仅 TPDB：英寸串，第一段可能是胸围也可能是「下胸围+杯」
 	CupSize      string
 	Waist        int
 	Hip          int

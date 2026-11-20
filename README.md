@@ -187,9 +187,9 @@ actorsync [flags]
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
 | `height_cm` | int? | 身高厘米 |
 | `weight_kg` | int? | 体重公斤。**只有 JavStash / TPDB 有**，MDCx 无此字段 |
-| `measurements` | string? | `82-63-83`（厘米，MDCx）或 `34E-21-31`（英寸，TPDB 原文），靠下一字段区分 |
-| `measurements_unit` | string? | `cm` / `in`；空表示没有三围 |
-| `cup_size` | string? | 纯字母，如 `E`（TPDB 的 `34E` 会剥掉 band） |
+| `measurements` | string? | `44-25-39`，**英寸**，胸围-腰围-臀围；MDCx 厘米数据换算而来 |
+| `measurements_unit` | string? | 恒为 `in`；空表示没有三围 |
+| `cup_size` | string? | 纯字母，如 `E`；来自 MDCx（73.1%），比 TPDB 全 |
 | `career_start` | int? | 出道年份，取 MDCx `career_period` 的首年 |
 | `tags` | string[] | 标签，来自 MDCx（覆盖 43.3%，已过滤敏感/未成年相关） |
 | `bio` | string? | 简介，优先中文；顺序 维基 → theactorbase → MDCx |

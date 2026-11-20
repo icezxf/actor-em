@@ -11,9 +11,9 @@
 |---|---|---|---|
 | **amane** `mapping_actor.xml` | 中日名映射（别名 → 日文原名） | 5,351 演员 / 15,941 别名 | 字典骨架，更新很慢（2026-08 后无提交） |
 | **MDCx** `actor-mapping.sqlite3` | 中文名（`zh_cn`）、别名、罗马字 | 22,209 演员，中文名 99.9% | 补字典用，接入后字典涨到 21,161 演员 / 64,319 别名 |
-| **MDCx** `actor-profile.sqlite3` | 演艺期间、身高、三围、出生地、别名、结构化简介 | 21,860 演员 | 结构化字段的主力，但中文简介是字段串不是文章 |
-| **JavStash** | 生日、出道年、三围、图、别名、外链 | 日系演员主力 | **生日唯一权威源** |
-| **TPDB** | 三围原样、体重、长简介、出道年、图 | 三围 90% / 体重 13% / 长简介 27% | **三围唯一来源**，存原样不换算 |
+| **MDCx** `actor-profile.sqlite3` | 演艺期间、身高、**三围分项（bust/waist/hip，80%）**、罩杯、出生地、别名、结构化简介 | 21,860 演员 | 结构化字段的主力；三围是厘米，读入时换算成英寸 |
+| **JavStash** | 生日、出道年、图、别名、外链 | 日系演员主力 | **生日唯一权威源** |
+| **TPDB** | 三围（英寸）、体重、长简介、出道年、图 | 三围 46% / 体重 13% / 长简介 27% | 三围**兜底**：第一段可能是「下胸围+杯」，不能直接当胸围 |
 | **中文维基** | 中文简介 | 命中率一般，但质量最高 | 简介第 1 顺位，需带 `WIKI_EMAIL` 防风控 |
 | **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 简介第 2 顺位，可兜底 OU 的缺口 |
 | **gfriends** | 头像图库（51 分类 / 107,720 条 / 10GB，每日更新） | 一个演员可能多张 | **头像首选**，同时给国内镜像 |
@@ -58,23 +58,30 @@
 
 ### 2.3 身体
 
-> **口径统一**：三围是一个字符串 + 一个单位字段。MDCx 的分项是厘米（覆盖 80%），
-> TPDB 是英寸原串（36%），两套混在一个字段里必须靠 `measurements_unit` 区分。
+> **口径统一**：三围一律**英寸**，格式固定为 `胸围-腰围-臀围`（`44-25-39`）。
+> MDCx 给的是厘米分项（覆盖 80%），读入时换算；TPDB 本来就是英寸。
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
 | `height_cm` | int? | MDCx `height`（75.5%）→ JavStash → TPDB | 纯数字 |
 | `weight_kg` | int? | JavStash `weight` → TPDB `extras.weight` | 只有这两个源有，MDCx 完全没有 |
-| `measurements` | string? | MDCx `bust/waist/hip`（**80% 齐备**，厘米）→ TPDB `extras.measurements`（英寸原文） | `82-63-83` 或 `34E-21-31` |
-| `measurements_unit` | string? | 跟着 `measurements` 走 | `cm`（MDCx）/ `in`（TPDB）；空表示没有三围 |
+| `measurements` | string? | MDCx `bust/waist/hip`（**80% 齐备**）→ TPDB | `44-25-39`，英寸，胸围/腰围/臀围 |
+| `measurements_unit` | string? | 跟着 `measurements` 走 | 目前恒为 `in`；空表示没有三围 |
 | `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段 |
 
 **为什么 MDCx 排前面**：MDCx 的 `bust`/`waist`/`hip` 是分项字段，17,494 人三项齐备
-（80.0%），而且是厘米制，跟日系演员的实际报法一致；TPDB 是欧美库，只命中 46%，
-且是英寸制。旧版只认 TPDB，等于白白扔掉 80% 的数据。
+（80.0%）；TPDB 是欧美库，只命中 46%。旧版只认 TPDB，等于白白扔掉 80% 的数据。
 
-`cmOrZero` 只接受 50~200 的值：上游偶尔混入 `34/24/35` 这种英寸串，一旦当厘米存
-进去两者就分不开了，宁可留空。
+**换算与语义的三个坑**：
+
+1. `cmOrZero` 只接受 50~200 的值。上游偶尔混入 `34/24/35` 这种英寸串，一旦当厘米收下
+   两者就分不开了，宁可留空。
+2. 换算在 `BustWaistHipInches()` 一处完成，抓取和 `--backfill` 共用，避免两边算出
+   不同的数。112/64/99cm → 44/25/39in（四舍五入）。
+3. **TPDB 的 `measurements` 第一段不一定是胸围**。它可能是 `34E-24-35`（34 是
+   *下胸围*，E 是杯型），也可能是 `34-24-35`（34 就是胸围）。前一种还原成胸围要加
+   杯差，而杯差在美标/日标之间差好几厘米，猜必错——所以 `bwhInches()` 遇到带字母的
+   第一段就让胸围留空、整条三围不写，只保留 `waist`/`hips` 两个独立字段。
 
 已删除：`bust_cm` / `waist_cm` / `hip_cm`——旧版把 TPDB 的英寸值当厘米存，口径是错的。
 
@@ -281,7 +288,7 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 ## 5. Overview 头部格式
 
 ```
-【三围 34E-21-31｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+【三围 44-25-39｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
 
 （简介正文）
 ```
@@ -297,7 +304,7 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 实际渲染（数据全）：
 
 ```
-【三围 34E-21-31｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+【三围 44-25-39｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
 
 小湊よつ葉，日本女演员，1996年5月10日出生于东京都。2019年出道……
 ```
@@ -359,14 +366,14 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 | `birth_place` | `ProductionLocations`（+ Overview 头部） |
 | `career_start` | `ProductionYear`（+ Overview 头部） |
 | `bio` | `Overview` 正文 |
-| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段；三围按 `measurements_unit` 带 cm/in） |
+| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段；三围是英寸 `44-25-39`） |
 | `avatar` / `avatar_cn` | 主图，**必须落成 `folder.jpg`**，网络 URL 不能直接用 |
 | `homepage_url` | `HomePageUrl` |
 | `provider_ids` | `ProviderIds` |
 | `tags` | `Tags`（黑名单过滤 → 简繁归一 → 截断 8 个） |
 | `name_original` / `aliases` | 不落 Emby，只供检索（Overview 已定不要别名） |
 | `gender` / `country` | 不落 Emby（`country` 信息已含在 `birth_place`） |
-| `cup_size` | 不落 Emby（没有罩杯字段；只有 TPDB 的三围串自带 `34E` 前缀，MDCx 的厘米三围不含罩杯） |
+| `cup_size` | 不落 Emby（没有罩杯字段；三围串是「胸-腰-臀」，本身不含罩杯，罩杯只在这个字段里） |
 | `key` / `status` / `sources` / `fail_count` / `retry_after` / `created_at` / `scraped_at` | 不落 Emby，内部记账 |
 
 一句话：**11 个 JSONL 字段喂满了 Emby Person 全部 9 个可用字段，进不去的都是 Emby 没有地方放。**

@@ -281,6 +281,43 @@ func TestMDCxMeasurements(t *testing.T) {
 	}
 }
 
+// 三围统一英寸：厘米换算四舍五入，三项缺一不可。
+func TestBustWaistHipInches(t *testing.T) {
+	cases := []struct {
+		b, w, h int
+		want    string
+	}{
+		{112, 64, 99, "44-25-39"},
+		{82, 63, 83, "32-25-33"},
+		{0, 64, 99, ""}, // 缺任一就整条不写
+		{82, 0, 83, ""},
+	}
+	for _, c := range cases {
+		if got := BustWaistHipInches(c.b, c.w, c.h); got != c.want {
+			t.Errorf("BustWaistHipInches(%d,%d,%d) = %q, want %q", c.b, c.w, c.h, got, c.want)
+		}
+	}
+}
+
+// TPDB 的 measurements 第一段可能是「下胸围+杯」（34E），不能当胸围。
+func TestBWHInches(t *testing.T) {
+	// 34E-24-35：34 是下胸围，不是胸围 → 胸围必须留空，整条不写
+	p := &Performer{Measurements: "34E-24-35", Waist: 24, Hip: 35}
+	if b, w, h := p.bwhInches(); b != 0 || w != 24 || h != 35 {
+		t.Errorf("带杯型的串应只取腰臀，得到 %d/%d/%d", b, w, h)
+	}
+	// 34-24-35：第一段就是胸围
+	p = &Performer{Measurements: "34-24-35"}
+	if b, w, h := p.bwhInches(); b != 34 || w != 24 || h != 35 {
+		t.Errorf("纯数字串应三段全取，得到 %d/%d/%d", b, w, h)
+	}
+	// 没有 measurements，只有独立字段
+	p = &Performer{Waist: 24, Hip: 35}
+	if b, w, h := p.bwhInches(); b != 0 || w != 24 || h != 35 {
+		t.Errorf("缺 measurements 时应从独立字段取腰臀，得到 %d/%d/%d", b, w, h)
+	}
+}
+
 func TestEncodePath(t *testing.T) {
 	got := encodePath("/actors/小/小凑四叶.jpg")
 	want := "/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg"

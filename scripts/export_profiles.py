@@ -14,8 +14,8 @@ CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,b
     不是文章，**不要拿它当 Overview**，只从里面抽「标签:」那一项
   - birthday 是 JavStash 的兜底：覆盖 65.7%，但约 24% 与 JavStash 不一致，
     所以 Go 侧只在 JavStash 缺席时才用，并标 birth_date_source
-  - bust / waist / hip 是三围分项，单位厘米，三项齐备约 80%。TPDB 那份只有
-    36%，所以 Go 侧先看这里，不齐备才退回 TPDB（那套是英寸制）
+  - bust / waist / hip 是三围分项，单位厘米，三项齐备约 80%。对外统一成英寸
+    （`44-25-39`），换算在 Go 侧的 BustWaistHipInches() 一处完成
 
 用法：
     python3 scripts/export_profiles.py                 # 下载并导出到 /tmp/mdcx_profiles.csv
@@ -212,7 +212,8 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
                 # 所以 Go 侧只在 JavStash 没有时才用，并标 birth_date_source=mdcx。
                 f.get("birthday", ""),
                 # 三围分项（厘米）。TPDB 只覆盖 36%，而这里三项齐备约 80%，
-                # 是日系演员三围最全的来源。分三列传，由 Go 侧判断是否齐备再拼。
+                # 是日系演员三围最全的来源。分三列原样导出（厘米），
+                # Go 侧判断齐备后统一换算成英寸（对外口径）。
                 f.get("bust", ""),
                 f.get("waist", ""),
                 f.get("hip", ""),

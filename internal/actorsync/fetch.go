@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -33,7 +35,7 @@ type FetchResult struct {
 	Country         string
 	HeightCm        int
 	WeightKg        int
-	Measurements    string // "82-63-83"（cm，来自 MDCx）或 "34E-21-31"（TPDB 原文）
+	Measurements    string // "44-25-39"，英寸，胸围-腰围-臀围
 	// MeasurementsUnit 区分上面那串是厘米还是英寸。两套数据源单位不同，
 	// 不标出来下游没法比较大小。空表示还没有三围。
 	MeasurementsUnit string
@@ -180,7 +182,7 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		f.logf("[%s] 生日兜底用 MDCx：%s", name, mdcxBirth)
 	}
 
-	// ---------- 6. TPDB：三围原样 + 体重 ----------
+	// ---------- 6. TPDB：三围兜底 + 体重 ----------
 	if f.TPDB != nil && f.TPDB.APIKey != "" {
 		// TPDB 是欧美库，只认罗马字。拿日文名去搜必定 not found，
 		// 所以把 MDCx 的 romanization（覆盖 93.9%）排到候选最前面。
@@ -266,11 +268,13 @@ func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
 	if len(p.Tags) > 0 && len(res.Tags) == 0 {
 		res.Tags = p.Tags
 	}
-	// 三围：MDCx 三项齐备就用它（厘米，覆盖约 80%），TPDB 那套（英寸，
-	// 覆盖 36%）留到第 6 步只在空缺时兜底。两边单位不同，必须标 unit。
-	if p.Bust > 0 && p.Waist > 0 && p.Hip > 0 && res.Measurements == "" {
-		res.Measurements = fmt.Sprintf("%d-%d-%d", p.Bust, p.Waist, p.Hip)
-		res.MeasurementsUnit = "cm"
+	// 三围：MDCx 三项齐备就用它，换算成英寸（欧美口径）。TPDB 那套本来就是
+	// 英寸，留到第 6 步只在空缺时兜底。
+	if res.Measurements == "" {
+		if s := BustWaistHipInches(p.Bust, p.Waist, p.Hip); s != "" {
+			res.Measurements = s
+			res.MeasurementsUnit = "in"
+		}
 	}
 	if len(p.Aliases) > 0 {
 		res.Aliases = mergeStrings(res.Aliases, p.Aliases)
@@ -374,10 +378,14 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 	if p.CupSize != "" && res.CupSize == "" {
 		res.CupSize = p.CupSize
 	}
-	// 三围：MDCx 已在第 1 步填过（厘米），这里只补空位，用 TPDB 原文（英寸）
-	if p.Source == "tpdb" && p.Measurements != "" && res.Measurements == "" {
-		res.Measurements = p.Measurements
-		res.MeasurementsUnit = "in"
+	// 三围：MDCx 已在第 1 步填过，这里只补空位。
+	// TPDB 的 measurements 不能直接抄：第一段可能是「下胸围+杯」（34E），
+	// 也可能就是胸围（34-24-35），得先判断再决定用不用。
+	if p.Source == "tpdb" && res.Measurements == "" {
+		if b, w, h := p.bwhInches(); b > 0 && w > 0 && h > 0 {
+			res.Measurements = fmt.Sprintf("%d-%d-%d", b, w, h)
+			res.MeasurementsUnit = "in"
+		}
 	}
 	if p.CareerStart > 0 && res.CareerStart == 0 {
 		res.CareerStart = p.CareerStart
@@ -531,7 +539,7 @@ func (r *FetchResult) Summary() string {
 	if r.WeightKg > 0 {
 		weight = fmt.Sprintf("%d", r.WeightKg)
 	}
-	// 三围带上单位，否则 "34E-21-31" 和 "82-63-83" 在日志里没法区分
+	// 三围是英寸，日志里带上单位省得和厘米混
 	meas := orDash(r.Measurements)
 	if meas != "-" && r.MeasurementsUnit != "" {
 		meas += r.MeasurementsUnit
@@ -546,4 +554,46 @@ func orDash(s string) string {
 		return "-"
 	}
 	return s
+}
+
+// cmToInch 把厘米换成英寸（四舍五入）。三围统一走英寸口径，
+// 112/64/99cm → 44-25-39in。
+func cmToInch(cm int) int {
+	if cm <= 0 {
+		return 0
+	}
+	return int(math.Round(float64(cm) / 2.54))
+}
+
+// BustWaistHipInches 把厘米制的三围拼成英寸串 "44-25-39"，三项缺一不可。
+// 抓取路径和离线补值（--backfill）共用这一处，避免两边算出不同的数。
+func BustWaistHipInches(bust, waist, hip int) string {
+	if bust <= 0 || waist <= 0 || hip <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("%d-%d-%d", cmToInch(bust), cmToInch(waist), cmToInch(hip))
+}
+
+// bwhInches 从 TPDB 的记录里取出「胸围-腰围-臀围」（英寸）。
+//
+// 关键在 measurements 的第一段：TPDB 有时写成 `34-24-35`（第一段就是胸围），
+// 有时写成 `34E-24-35`（34 是**下胸围**，E 是杯型）。后者要还原成胸围得加杯差，
+// 而杯差在美标/日标之间差好几厘米，猜就必然错——所以那种情况退回只看
+// extras.waist / extras.hips，胸围留空、整条三围不写。
+func (p *Performer) bwhInches() (bust, waist, hip int) {
+	bust, waist, hip = 0, p.Waist, p.Hip
+	parts := strings.Split(strings.TrimSpace(p.Measurements), "-")
+	if len(parts) < 3 {
+		return bust, waist, hip
+	}
+	if n, err := strconv.Atoi(strings.TrimSpace(parts[0])); err == nil && n > 0 {
+		bust = n
+	}
+	if waist == 0 {
+		waist, _ = strconv.Atoi(strings.TrimSpace(parts[1]))
+	}
+	if hip == 0 {
+		hip, _ = strconv.Atoi(strings.TrimSpace(parts[2]))
+	}
+	return bust, waist, hip
 }

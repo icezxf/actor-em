@@ -19,8 +19,8 @@ type Actor struct {
 
 	HeightCm         *int    `json:"height_cm"`
 	WeightKg         *int    `json:"weight_kg"`         // 只有 TPDB 有，覆盖很低
-	Measurements     *string `json:"measurements"`      // "82-63-83"，单位见下
-	MeasurementsUnit *string `json:"measurements_unit"` // cm（MDCx，约 80%）/ in（TPDB）
+	Measurements     *string `json:"measurements"`      // "44-25-39"，英寸，胸围-腰围-臀围
+	MeasurementsUnit *string `json:"measurements_unit"` // 恒为 in；空表示没有三围
 	CupSize          *string `json:"cup_size"`
 
 	CareerStart *int     `json:"career_start"` // 出道年，Emby 的 ProductionYear
