@@ -9,10 +9,13 @@ type Actor struct {
 	NameOriginal *string  `json:"name_original"`
 	Aliases      []string `json:"aliases"`
 
-	Gender     *string `json:"gender"`
-	BirthDate  *string `json:"birth_date"` // 只认 JavStash
-	BirthPlace *string `json:"birth_place"`
-	Country    *string `json:"country"`
+	Gender    *string `json:"gender"`
+	BirthDate *string `json:"birth_date"`
+	// BirthDateSource 只有两个值：javstash（权威）/ mdcx（兜底）。
+	// 空表示还没有生日。下游若不信任二手生日，按这个字段过滤即可。
+	BirthDateSource *string `json:"birth_date_source"`
+	BirthPlace      *string `json:"birth_place"`
+	Country         *string `json:"country"`
 
 	HeightCm     *int    `json:"height_cm"`
 	WeightKg     *int    `json:"weight_kg"`    // 只有 TPDB 有，覆盖很低

@@ -181,7 +181,8 @@ actorsync [flags]
 | `name_original` | string? | 日文原名 |
 | `aliases` | string[] | 别名（来自 MDCx） |
 | `gender` | string? | `female` / `male`，小写 |
-| `birth_date` | string? | `1996-05-10`，**只认 JavStash** |
+| `birth_date` | string? | `1996-05-10`，JavStash 优先、MDCx 兜底（覆盖 40.9% → 65.7%） |
+| `birth_date_source` | string? | `javstash` / `mdcx`，标明这条生日是权威还是二手 |
 | `birth_place` | string? | 中文地名，如 `东京都`（MDCx 出生地经简繁归一） |
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
 | `height_cm` `weight_kg` | int? | 身高体重 |

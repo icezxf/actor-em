@@ -5,12 +5,15 @@
 而清洗逻辑（简繁归一、剔废值、推国家码、拆标签）用 Python 写更省事。
 所以这里做完清洗，输出一个扁平的 CSV，Go 只负责读。
 
-CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio
+CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday
   - aliases / tags 用 | 分隔
   - birthplace 已归一为简体，且剔除「海外/国外」这类废值
   - country 是从出生地推出来的两位码，推不出就是空
   - career_start 取「演艺期间」的首年
-  - bio 是 minnano 的结构化字段串，只能当简介兜底
+  - bio 是 minnano 的结构化字段串（「身高: 155cm | 罩杯: F | 三围: 84/60/86」），
+    不是文章，**不要拿它当 Overview**，只从里面抽「标签:」那一项
+  - birthday 是 JavStash 的兜底：覆盖 65.7%，但约 24% 与 JavStash 不一致，
+    所以 Go 侧只在 JavStash 缺席时才用，并标 birth_date_source
 
 用法：
     python3 scripts/export_profiles.py                 # 下载并导出到 /tmp/mdcx_profiles.csv
@@ -203,6 +206,9 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
                 "|".join(e.get("tags") or []),
                 e.get("bio", "") or f.get("minnano_bio", ""),
                 f.get("romanization", ""),
+                # 生日只是 JavStash 的兜底：MDCx 覆盖 65%，但约 24% 与 JavStash 冲突，
+                # 所以 Go 侧只在 JavStash 没有时才用，并标 birth_date_source=mdcx。
+                f.get("birthday", ""),
             ])
     finally:
         con.close()
@@ -212,7 +218,7 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
     with open(out_path, "w", encoding="utf-8", newline="") as fp:
         w = csv.writer(fp, lineterminator="\n")
         w.writerow(["name", "name_cn", "aliases", "birthplace", "country",
-                    "height", "cup", "career_start", "tags", "bio", "romaji"])
+                    "height", "cup", "career_start", "tags", "bio", "romaji", "birthday"])
         w.writerows(rows)
 
     with_place = sum(1 for r in rows if r[3])

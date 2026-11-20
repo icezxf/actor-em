@@ -24,6 +24,10 @@ on:
       refresh:
         description: "重抓指定演员，逗号分隔（留空则只抓还没入库的）"
         default: ""
+      backfill:
+        description: "只做离线补值：用 MDCx 档案给空生日补上，不联网、不抓取"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -69,7 +73,18 @@ jobs:
       - name: Build
         run: go build -o /tmp/actorsync ./cmd/actorsync
 
+      # 只给存量记录补生日：不联网、几秒跑完。
+      # 抓取侧的 MDCx 兜底只对新抓的人生效，已经 ok 的记录不会被 BuildPlan 重抓，
+      # 所以想给老数据套上兜底，就跑这个开关。
+      - name: Backfill birthday from MDCx
+        if: ${{ github.event.inputs.backfill == 'true' }}
+        env:
+          MDCX_CSV: /tmp/mdcx_profiles.csv
+          ACTORS_XLSX: actors.xlsx
+        run: /tmp/actorsync --backfill-birthday
+
       - name: Sync actors
+        if: ${{ github.event.inputs.backfill != 'true' }}
         env:
           ACTORS_TXT: actors.txt
           ACTORS_XLSX: actors.xlsx

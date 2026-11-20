@@ -22,8 +22,9 @@ type MDCxProfile struct {
 	Cup         string
 	CareerStart int      // 出道年
 	Tags        []string // 已过滤黑名单、已简繁归一
-	BioRaw      string   // 结构化字段串，只当简介最后兜底
+	BioRaw      string   // 结构化字段串，只用来抽标签，不当简介
 	Romaji      string   // 罗马字（"Momonogi Kana"），拼 theactorbase 的 slug 用
+	Birthday    string   // YYYY-MM-DD，JavStash 的兜底（约 24% 与 JavStash 冲突）
 }
 
 // MDCxDB 是内存索引，支持按日文名、中文名、别名查同一个人。
@@ -36,7 +37,7 @@ func NewMDCxDB() *MDCxDB {
 	return &MDCxDB{byKey: map[string]*MDCxProfile{}}
 }
 
-// CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji
+// CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday
 // aliases 和 tags 用 | 分隔。
 func LoadMDCxCSV(path string) (*MDCxDB, error) {
 	db := NewMDCxDB()
@@ -87,6 +88,10 @@ func LoadMDCxCSV(path string) (*MDCxDB, error) {
 		}
 		if len(rec) >= 11 {
 			p.Romaji = strings.TrimSpace(rec[10])
+		}
+		// 第 12 列是后加的，老 CSV 没有，读不到就当空
+		if len(rec) >= 12 {
+			p.Birthday = normalizeDate(strings.TrimSpace(rec[11]))
 		}
 		if p.Name == "" {
 			continue

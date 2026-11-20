@@ -216,6 +216,44 @@ func TestExportJSONKeepsOnlyUsable(t *testing.T) {
 	}
 }
 
+// MDCx 生日是第 12 列，后加的；老格式只有 11 列，读到空串不能崩。
+func TestLoadMDCxCSVBirthday(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "p.csv")
+	body := "name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday\n" +
+		"桃乃木かな,桃乃木香奈,,东京都,JP,153,E,2015,,,Momonogi Kana,1996-12-24\n" +
+		"三上悠亜,三上悠亚,,爱知县,JP,159,F,2015,,,Mikami Yua,1993-08-16\n"
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	db, err := LoadMDCxCSV(path)
+	if err != nil {
+		t.Fatalf("加载失败: %v", err)
+	}
+	if got := db.Lookup("桃乃木かな").Birthday; got != "1996-12-24" {
+		t.Errorf("Birthday = %q, want 1996-12-24", got)
+	}
+	// 别名也要能查到同一份档案
+	if got := db.Lookup("桃乃木香奈").Birthday; got != "1996-12-24" {
+		t.Errorf("按中文名查到生日 %q", got)
+	}
+
+	// 老格式：11 列，没有 birthday
+	old := filepath.Join(dir, "old.csv")
+	body = "name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji\n" +
+		"三上悠亜,三上悠亚,,爱知县,JP,159,F,2015,,,Mikami Yua\n"
+	if err := os.WriteFile(old, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	db, err = LoadMDCxCSV(old)
+	if err != nil {
+		t.Fatalf("老格式加载失败: %v", err)
+	}
+	if p := db.Lookup("三上悠亜"); p == nil || p.Birthday != "" {
+		t.Errorf("老格式应解析成功且生日为空，得到 %+v", p)
+	}
+}
+
 func TestEncodePath(t *testing.T) {
 	got := encodePath("/actors/小/小凑四叶.jpg")
 	want := "/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg"

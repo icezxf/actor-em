@@ -26,6 +26,7 @@ func main() {
 		noXlsx     bool
 		serveBot   bool
 		tgOnce     string
+		backfill   bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -39,6 +40,7 @@ func main() {
 	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
 	flag.BoolVar(&noXlsx, "no-xlsx", false, "不导出 Excel")
 	flag.BoolVar(&scanNFO, "scan-nfo", false, "只扫描 alist 里的 nfo 生成演员清单，不刮削")
+	flag.BoolVar(&backfill, "backfill-birthday", false, "只用 MDCx 离线档案给空的生日补值，不联网、不需要 API Key")
 	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
 	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
@@ -65,6 +67,14 @@ func main() {
 	if scanNFO {
 		if err := runScanNFO(ctx, cfg, logger); err != nil {
 			logger.Fatalf("扫描 nfo 失败: %v", err)
+		}
+		return
+	}
+
+	// 只做离线补值：不联网、不需要任何 API Key
+	if backfill {
+		if err := runBackfillBirthday(cfg, logger); err != nil {
+			logger.Fatalf("补生日失败: %v", err)
 		}
 		return
 	}
@@ -367,6 +377,101 @@ func main() {
 	}
 	logger.Printf("完成：库内 %d 条，新增 %d，更新 %d，失败 %d，用时 %s",
 		len(db.Actors), added, updated, failed, time.Since(start).Round(time.Second))
+}
+
+// runBackfillBirthday 用 MDCx 离线档案给库里空着的生日补值。
+//
+// 为什么要单独一个命令：抓取侧的兜底只在 Fetch 里生效，而 BuildPlan 只挑
+// 「库里没有 / failed / no_source / 手动 refresh」的人，已经 ok 的记录不会重抓。
+// 存量两万条想套上兜底，只能靠这个离线命令——秒级完成，不用再烧一轮 API。
+//
+// 三条规则：
+//   - 已有生日一律不动（JavStash 是权威）
+//   - 旧记录有生日但没标来源的，补标 javstash（那时候只有这一个来源）
+//   - 只给 ok/partial 的空生日补 MDCx 值，并标 mdcx
+func runBackfillBirthday(cfg *Config, logger *log.Logger) error {
+	if cfg.MDCxCSV == "" {
+		return fmt.Errorf("缺少 MDCX_CSV，先跑 scripts/export_profiles.py 导出档案")
+	}
+	mdcx, err := actorsync.LoadMDCxCSV(cfg.MDCxCSV)
+	if err != nil {
+		return fmt.Errorf("读 MDCx 档案失败: %w", err)
+	}
+	if mdcx.Size() == 0 {
+		return fmt.Errorf("%s 里没有演员档案", cfg.MDCxCSV)
+	}
+	db, err := actorsync.LoadDb(cfg.DataFile)
+	if err != nil {
+		return fmt.Errorf("读本地库失败: %w", err)
+	}
+	logger.Printf("本地库 %d 条 / MDCx 档案 %d 人（%s）", len(db.Actors), mdcx.Size(), cfg.MDCxCSV)
+
+	var withDate, tagged, filled, noMatch int
+	for _, a := range db.Actors {
+		if a == nil {
+			continue
+		}
+		if v := actorsync.StrVal(a.BirthDate); v != "" {
+			withDate++
+			// 老库没有 birth_date_source，那时候的生日只可能来自 JavStash
+			if actorsync.StrVal(a.BirthDateSource) == "" {
+				a.BirthDateSource = actorsync.StrPtr("javstash")
+				tagged++
+			}
+			continue
+		}
+		// skipped / no_source / failed 不补：它们不进下游，补了也没人看
+		if !a.Exportable() {
+			continue
+		}
+
+		// 中文名 → 日文原名 → 别名，逐个试（MDCx 索引里三种都可能有）
+		names := []string{a.Name}
+		if v := actorsync.StrVal(a.NameOriginal); v != "" {
+			names = append(names, v)
+		}
+		names = append(names, a.Aliases...)
+
+		hit := false
+		for _, n := range names {
+			if strings.TrimSpace(n) == "" {
+				continue
+			}
+			if p := mdcx.Lookup(n); p != nil && p.Birthday != "" {
+				a.BirthDate = actorsync.StrPtr(p.Birthday)
+				a.BirthDateSource = actorsync.StrPtr("mdcx")
+				filled++
+				hit = true
+				break
+			}
+		}
+		if !hit {
+			noMatch++
+		}
+	}
+
+	logger.Printf("已有生日 %d 条（补标来源 %d），空生日补上 %d 条，查不到仍空 %d 条",
+		withDate, tagged, filled, noMatch)
+	if filled == 0 && tagged == 0 {
+		logger.Printf("没有需要写回的改动")
+		return nil
+	}
+	if cfg.DryRun {
+		logger.Printf("dry-run：不写文件")
+		return nil
+	}
+	if err := db.Save(cfg.DataFile); err != nil {
+		return fmt.Errorf("保存 %s 失败: %w", cfg.DataFile, err)
+	}
+	logger.Printf("已写回 %s", cfg.DataFile)
+	if actorsync.IsJSONLPath(cfg.DataFile) {
+		jsonPath := strings.TrimSuffix(cfg.DataFile, ".jsonl") + ".json"
+		if err := db.ExportJSON(jsonPath); err != nil {
+			return fmt.Errorf("派生 %s 失败: %w", jsonPath, err)
+		}
+		logger.Printf("已派生 %s", jsonPath)
+	}
+	return nil
 }
 
 // runScanNFO 递归读 alist 目录下的 nfo，把演员名写成待抓清单。

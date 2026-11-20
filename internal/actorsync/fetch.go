@@ -18,24 +18,27 @@ var ErrNotFound = errors.New("not found")
 // FetchResult 是多源聚合后的中间结果，还没落成 Actor。
 //
 // 字段来源见 docs/actor-fields.md，这里只强调三条硬规则：
-//   - 生日只认 JavStash（MDCx 的生日错值多，只做交叉校验，不写库）
+//   - 生日以 JavStash 为准，它缺席时才用 MDCx（并标 BirthDateSource=mdcx）
 //   - 三围只认 TPDB，存原样字符串，不换算
-//   - 简介只要中文：wiki → theactorbase → MDCx 字段串，不取英文、不机翻
+//   - 简介只要中文：wiki → theactorbase，不取英文、不机翻
 type FetchResult struct {
 	NameOriginal string
 	Aliases      []string
 	Gender       string
 	BirthDate    string
-	BirthPlace   string
-	Country      string
-	HeightCm     int
-	WeightKg     int
-	Measurements string // TPDB 原样，如 "34E-21-31"
-	CupSize      string
-	CareerStart  int
-	Tags         []string
-	Bio          string
-	BioLang      string
+	// BirthDateSource 记生日是哪来的：javstash（权威）/ mdcx（兜底）。
+	// MDCx 覆盖 65.7% 但约 24% 与 JavStash 冲突，标出来下游才能自己决定信不信。
+	BirthDateSource string
+	BirthPlace      string
+	Country         string
+	HeightCm        int
+	WeightKg        int
+	Measurements    string // TPDB 原样，如 "34E-21-31"
+	CupSize         string
+	CareerStart     int
+	Tags            []string
+	Bio             string
+	BioLang         string
 
 	CanonicalName string // 数据源返回的标准名（清单里写 UUID 时用它兜底）
 	ChineseName   string // 中文名，Emby 的 Name 用它；没有就退回清单名
@@ -94,10 +97,16 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 
 	// ---------- 1. MDCx 离线档案：结构化字段的地基 ----------
 	// 它是本地库，不打网络，先铺一层；后面的在线源只填空位，不覆盖。
+	//
+	// 生日例外：这里只把 MDCx 的生日暂存起来，等 JavStash 查完再决定用不用。
+	// 不能在这一步直接写，因为 applyPerformer 拿到 JavStash 生日是直接赋值的，
+	// 顺序反了就会被兜底值顶掉权威值。
+	var mdcxBirth string
 	if f.MDCx != nil {
 		if p := f.MDCx.Lookup(name); p != nil {
 			f.mark(res, "mdcx", true)
 			f.applyMDCx(res, p)
+			mdcxBirth = p.Birthday
 			f.logf("[%s] mdcx 命中：%s", name, p.Name)
 		} else {
 			f.mark(res, "mdcx", false)
@@ -155,6 +164,17 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	// ---------- 5. StashDB：欧美演员兜底 ----------
 	if js == nil && f.StashDB != nil && f.StashDB.APIKey != "" {
 		f.searchCandidates(ctx, res, f.StashDB, candidates)
+	}
+
+	// ---------- 5.5 生日兜底：只在 JavStash 缺席时用 MDCx ----------
+	// JavStash 是唯一权威，它给了就不碰。实测 866 条里 354 条有生日（40.9%），
+	// 剩下的 512 条里 MDCx 能补 215 条 → 覆盖率 65.7%。
+	// MDCx 生日本身约 76% 与 JavStash 一致（冲突 24%，多发生在短名/常见名上），
+	// 但这里是「空着」对「76% 概率对」，补了是净收益。标 source 让下游自己判断。
+	if res.BirthDate == "" && mdcxBirth != "" {
+		res.BirthDate = mdcxBirth
+		res.BirthDateSource = "mdcx"
+		f.logf("[%s] 生日兜底用 MDCx：%s", name, mdcxBirth)
 	}
 
 	// ---------- 6. TPDB：三围原样 + 体重 ----------
@@ -218,7 +238,8 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 }
 
 // applyMDCx 把离线档案铺进结果。只填空位，不覆盖已有值。
-// 注意：不写生日（只认 JavStash），不写简介（简介有单独的优先级链）。
+// 注意：不写生日（JavStash 优先，MDCx 生日留到 Fetch 第 5.5 步兜底），
+// 不写简介（简介有单独的优先级链）。
 func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
 	if res.CanonicalName == "" && p.Name != "" {
 		res.CanonicalName = p.Name
@@ -315,9 +336,10 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 		res.CanonicalName = p.Name
 	}
 
-	// 生日只认 JavStash；其他源的生日一律丢弃（MDCx 错值多，TPDB 也偶有偏差）
+	// 生日以 JavStash 为准；其他源的生日一律丢弃（MDCx 走 5.5 步的兜底，TPDB 也偶有偏差）
 	if p.Source == "javstash" && p.BirthDate != "" {
 		res.BirthDate = p.BirthDate
+		res.BirthDateSource = "javstash"
 	}
 
 	if p.Country != "" && res.Country == "" {

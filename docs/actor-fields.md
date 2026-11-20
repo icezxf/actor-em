@@ -39,10 +39,22 @@
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
 | `gender` | string? | JavStash → TPDB | `female` / `male` |
-| `birth_date` | string? | **只认 JavStash** | MDCx 的 `birthday`（65.2%）只做交叉校验，不写库 |
+| `birth_date` | string? | **JavStash → MDCx 兜底** | 见下方「生日的两级来源」 |
+| `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx`，空表示没有生日 |
 | `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
 | `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | 落到 Emby `ProductionLocations` |
 | `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
+
+**生日的两级来源**：JavStash 是权威，它给了就绝不覆盖；只有它没给时才用 MDCx。
+
+| | 覆盖率 | 与 JavStash 一致率 | 处理 |
+|---|---|---|---|
+| JavStash | 40.9%（866 条实测） | — | 直接写，`birth_date_source=javstash` |
+| MDCx `birthday` | 65.2%（14,254 条） | 75.8%（178 条都有里 135 条一致） | 只在空位补，`birth_date_source=mdcx` |
+
+两者加起来把覆盖率从 40.9% 提到 **65.7%**（+215 条 / 866 条）。冲突的 24.2% 里 79% 连年份都不同，多发生在短名和常见名上（`AI`、`MINAMO`、`SOPHIA`、`かわいさとみ`），本质是 MDCx 按名字索引撞了同名异人。
+
+**为什么不担心"引入错误数据"**：兜底只在 `birth_date` 为空时生效，JavStash 命中时这个分支根本走不到，所以对已有权威值零影响。对原本空着的记录来说，填一个 76% 概率正确的日期，仍然比空着更可用；下游若只要权威值，按 `birth_date_source == "javstash"` 过滤即可。
 
 ### 2.3 身体
 
@@ -221,7 +233,7 @@ Emby Person 的官方元数据字段一共 12 项（语义以 dev.emby.media 的
 | # | Emby 字段 | 官方语义 | 我们填什么 | 状态 |
 |---|---|---|---|---|
 | 1 | `Name` | 人物名 | `name`（中文名） | ✅ |
-| 2 | `PremiereDate` | *For persons this is **date of birth*** | `birth_date`（仅 JavStash） | ✅ |
+| 2 | `PremiereDate` | *For persons this is **date of birth*** | `birth_date`（JavStash 优先，MDCx 兜底） | ✅ |
 | 3 | `ProductionYear` | 年份 | `career_start`（**出道年份**） | ✅ |
 | 4 | `HomePageUrl` | 主页 | `homepage_url`（**JavStash 演员页**） | ✅ |
 | 5 | `Overview` | 简介 | 一行元数据头 + `bio` 正文 | ✅ |
