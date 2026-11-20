@@ -1,5 +1,7 @@
 package actorsync
 
+import "strings"
+
 // Actor 是 actors.jsonl 里的一行（一个演员）。
 // 字段全部扁平，空值一律 null（用指针表达），不写空字符串。
 // 数组字段空时写 []，不写 null。
@@ -83,9 +85,16 @@ func (a *Actor) Exportable() bool {
 	}
 	switch a.Status {
 	case StatusOK, StatusPartial:
-		return true
+	default:
+		return false
 	}
-	return false
+	// 老字典把拉丁名里的空格写成了下划线（Kristina_Rose / Lucy_Heart）。
+	// build_base_db.py 现在会规范成空格，新版名字会作为新人入库——旧名如果还
+	// 出现在下游，Emby 里就是同一个人的两条重复记录。留着 jsonl 备查，不导出。
+	if strings.Contains(a.Name, "_") {
+		return false
+	}
+	return true
 }
 
 // Manifest 是 actors.manifest.json 的结构，给人和监控看。

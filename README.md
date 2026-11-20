@@ -255,6 +255,10 @@ JavStash / TPDB / 维基查、然后全部落空变成 `no_source`，白烧一�
 继续搜到；片商名只做整名匹配，`TECHNO`、`SODA みく` 这类真名不会被误杀。规则改了
 要同步 `scripts/test_build_base_db.py`。
 
+旧字典留下的下划线记录（`Kristina_Rose` / `Lucy_Heart`）仍留在 `actors.jsonl` 备查，
+但 `Exportable()` 会把它们挡在 `actors.json` 之外——否则新名字和旧名字会在 Emby 里
+重复成两条。
+
 手工补充写 `data/actor_dict.local.csv`（两列就够，`中文名,日文名`），它覆盖主字典同名条目：
 
 ```csv

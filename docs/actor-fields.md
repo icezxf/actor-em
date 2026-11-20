@@ -221,6 +221,10 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 | `no_source` | 所有源都查无此人——多是片商名、导演、系列名混进了字典 |
 | `failed` | 这轮网络/限流没抓成，下轮会重试，此刻只是一行空壳 |
 
+`ok` / `partial` 里还有一种也不导出：`name` 含下划线的老名字（`Kristina_Rose`、
+`Lucy_Heart`）。`build_base_db.py` 现在会把下划线规范成空格，新名字会作为新人入库；
+旧名若还留在下游，Emby 里就是同一个人的两条重复记录。真源仍保留它们备查。
+
 留档是为了让 `plan.go` 认出「这个人已经试过了」，避免每轮重抓。真源与派生物的这层
 分工，是本项目「代价只付一次」的核心——所以**不要为了表好看去删 `actors.jsonl` 里的行**。
 

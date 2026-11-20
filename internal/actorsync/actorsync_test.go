@@ -185,6 +185,7 @@ func TestExportJSONKeepsOnlyUsable(t *testing.T) {
 		{Key: "c", Name: "男性", Status: StatusSkipped},
 		{Key: "d", Name: "查无此人", Status: StatusNoSource},
 		{Key: "e", Name: "这轮抓失败", Status: StatusFailed},
+		{Key: "f", Name: "Kristina_Rose", Status: StatusPartial}, // 老字典下划线名
 	}}
 	if err := db.Save(jsonl); err != nil {
 		t.Fatalf("写 jsonl 失败: %v", err)
@@ -211,8 +212,8 @@ func TestExportJSONKeepsOnlyUsable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("读回 jsonl 失败: %v", err)
 	}
-	if len(src.Actors) != 5 {
-		t.Errorf("actors.jsonl 应保留全部 5 条，得到 %d", len(src.Actors))
+	if len(src.Actors) != 6 {
+		t.Errorf("actors.jsonl 应保留全部 6 条，得到 %d", len(src.Actors))
 	}
 }
 
