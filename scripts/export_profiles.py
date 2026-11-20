@@ -147,16 +147,26 @@ def clean_tags(v: str, h2z: dict[str, str]) -> list[str]:
     return out
 
 
-def read_mapping(db_path: str, h2z: dict[str, str]) -> dict[str, dict]:
-    """从 actor-mapping 里取标签和结构化简介。
+def _bio_number(bio: str, label: str) -> int:
+    """从 bio 串里取「身高: 167cm」这类数字，取不到返回 0。"""
+    m = re.search(rf"{label}[:：]\s*([0-9]+)", bio or "")
+    return int(m.group(1)) if m else 0
+
+
+def read_mapping(db_path: str, h2z: dict[str, str]) -> dict[str, list[dict]]:
+    """从 actor-mapping 里取标签和结构化简介，按 jp 保留**全部同名候选**。
 
     注意标签**不在** actor-profile 里（那边 tags 字段 0 覆盖，minnano_bio 也没有），
     只在 mapping 的 bio 串里：「身高: 155cm | 罩杯: F | ... | 标签: 美人,美乳」。
+
+    同一 jp 在 mapping 里可能有多条记录（实测 1086 组），既有本人也有同名新人。
+    旧版用后写覆盖前写，会串数据；这里保留候选列表，交给 export 按生日/身高校验，
+    只有和 profile 对得上的才采用。校验信息随候选一起带出来。
     """
-    out: dict[str, dict] = {}
+    out: dict[str, list[dict]] = {}
     con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     try:
-        for jp, bio in con.execute("SELECT jp, bio FROM entries"):
+        for jp, bio, birth in con.execute("SELECT jp, bio, birth_date FROM entries"):
             jp = (jp or "").split(",")[0].strip()
             bio = (bio or "").strip()
             if not jp or not bio:
@@ -165,15 +175,75 @@ def read_mapping(db_path: str, h2z: dict[str, str]) -> dict[str, dict]:
             m = re.search(r"标签[:：]\s*([^|]+)", bio)
             if m:
                 tags = m.group(1)
-            out[jp] = {"tags": clean_tags(tags, h2z), "bio": bio}
+            cand = {
+                "tags": clean_tags(tags, h2z),
+                "bio": bio,
+                "birth": (birth or "").strip(),
+                "height": _bio_number(bio, "身高"),
+            }
+            out.setdefault(jp, []).append(cand)
     finally:
         con.close()
     return out
 
 
+def pick_mapping(extra: dict[str, list[dict]], names: list[str],
+                 birthday: str, height: int) -> dict:
+    """按名字找 mapping 候选，用生日/身高挑出真正同一个人。
+
+    names 是 profile 的名字 + 别名（含旧名）。遍历时优先用直接同名，其次别名；
+    每个候选用生日或身高校验：任一字段两边都有且不一致就判为不同人，直接跳过。
+    这样「新ありな」通过旧名「橋本ありな」找到的 2005 年生/G 杯记录会被拒绝，
+    不会把别人的标签贴到本人身上。没有校验信息时退回「只认直接同名、别名的
+    候选必须有标签」的保守策略，宁可空着也不错贴。
+    """
+    def birth_year(s: str) -> int:
+        m = re.match(r"((?:19|20)\d{2})", s or "")
+        return int(m.group(1)) if m else 0
+
+    best: dict = {}
+    for i, name in enumerate(names):
+        for cand in extra.get(name, []):
+            # 校验：身高是更可靠的身份特征（差 ≤1cm 视为同人）；成人业界生日来源
+            # 常年互相差 1~2 年，年份差 ≤2 也算同人。两者任一通过即可，避免误伤。
+            # 但两边信息都齐、身高差 >1 且生日年份差 >2 时，判为不同人直接挡掉。
+            has_h = bool(cand["height"] and height)
+            has_b = bool(cand["birth"] and birthday)
+            h_ok = has_h and abs(cand["height"] - height) <= 1
+            b_ok = has_b and abs(birth_year(cand["birth"]) - birth_year(birthday)) <= 2
+            if has_h and has_b and not h_ok and not b_ok:
+                continue
+            if has_h and not h_ok and not has_b:
+                continue
+            if has_b and not b_ok and not has_h:
+                continue
+            # 优先级：直接同名 > 别名；校验通过的 > 无校验信息的
+            score = (0 if i == 0 else 1) + (0 if (h_ok or b_ok) else 1)
+            if not best or score < best["_score"]:
+                cand = dict(cand)
+                cand["_score"] = score
+                best = cand
+    return best
+
+
 def flat(s: str) -> str:
     """把换行/制表符压成空格。上游别名里确实有换行，不处理会把 CSV 拆断行。"""
     return re.sub(r"[\r\n\t]+", " ", s or "").strip()
+
+
+def split_aliases(s: str) -> list[str]:
+    """切分别名列表。
+
+    actor-profile 的 aliases 有 51% 用**换行**分隔（如「上乃木まな\\n岩谷志季\\n橋本ありな」），
+    少数用逗号/顿号。flat() 会把换行压成空格，若只按标点切，整串会粘成一个别名，
+    改过名的人（新ありな 的旧名 橋本ありな）因此无法被 alias 索引命中。
+    这里先把换行/制表符归一成 |，再按标点切；刻意不按空格切，避免把罗马字名
+    「Arina Hashimoto」拆成两段。
+    """
+    if not s:
+        return []
+    normalized = re.sub(r"[\r\n\t]+", "|", s)
+    return [p.strip() for p in re.split(r"[,，、|/]", normalized) if p.strip()]
 
 
 def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, str]) -> int:
@@ -185,7 +255,10 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
         names = {r["id"]: flat(r["name"]) for r in con.execute("SELECT id, name FROM entries")}
         fields: dict[int, dict[str, str]] = {}
         for r in con.execute("SELECT entry_id, field, value FROM website_fields"):
-            v = flat(r["value"] or "")
+            raw = r["value"] or ""
+            # aliases 的换行是主要分隔符（51% 的别名靠它分开），不能先压平，
+            # 否则「橋本ありな」这类旧名会粘进上一个别名里，永远索引不到。
+            v = raw if r["field"] == "aliases" else flat(raw)
             if v:
                 fields.setdefault(r["entry_id"], {})[r["field"]] = v
 
@@ -195,11 +268,16 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
                 continue
             f = fields.get(eid, {})
             place = clean_place(f.get("birthplace", ""), h2z)
-            e = extra.get(name, {})
+            # profile 的名字 + 别名一起作为 mapping 的查找键：改名的人（如
+            # 新ありな/橋本ありな）靠别名才能找到旧 mapping 记录。
+            profile_names = [name] + split_aliases(f.get("aliases", ""))
+            birth = (f.get("birthday", "") or "")[:10]
+            height = int(re.sub(r"\D", "", f.get("height", "") or "") or 0)
+            e = pick_mapping(extra, profile_names, birth, height)
             rows.append([
                 name,
                 f.get("name_cn", ""),
-                "|".join(p.strip() for p in re.split(r"[,，、|/]", f.get("aliases", "")) if p.strip()),
+                "|".join(split_aliases(f.get("aliases", ""))),
                 place,
                 guess_country(place),
                 f.get("height", ""),

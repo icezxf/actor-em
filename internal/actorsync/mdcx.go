@@ -137,10 +137,17 @@ func (m *MDCxDB) Size() int {
 	return m.total
 }
 
+// splitPipe 切分别名/标签。CSV 正常用 | 分隔；但历史导出（以及上游没走
+// split_aliases 的版本）会把多行别名用空格粘成一串，导致「橋本ありな」这类
+// 旧名无法被单独索引。这里对没有 | 的长串补一次按换行/制表符的切分。
+// 刻意不按普通空格切，避免把罗马字名「Arina Hashimoto」拆成两段。
 func splitPipe(s string) []string {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return nil
+	}
+	if !strings.Contains(s, "|") {
+		s = strings.NewReplacer("\n", "|", "\r", "|", "\t", "|").Replace(s)
 	}
 	parts := strings.Split(s, "|")
 	out := make([]string, 0, len(parts))

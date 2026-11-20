@@ -255,6 +255,37 @@ func TestLoadMDCxCSVBirthday(t *testing.T) {
 	}
 }
 
+// 改名演员的旧名要能被别名索引命中。新导出用 | 分隔别名，旧名必须单独可查。
+// 罗马字名里的空格不能被误拆成两段。
+func TestMDCxAliasLookupRenamed(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "alias.csv")
+	body := "name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip\n" +
+		"新ありな,,上乃木まな(デリヘル)|岩谷志季(撮影会)|橋本ありな|Arina Hashimoto,东京都,JP,167,C,2016,,,Arata Arina,1996-12-15,84,56,83\n"
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	db, err := LoadMDCxCSV(path)
+	if err != nil {
+		t.Fatalf("加载失败: %v", err)
+	}
+	// 别名里的旧名「橋本ありな」应单独命中本人
+	if p := db.Lookup("橋本ありな"); p == nil || p.Name != "新ありな" {
+		t.Fatalf("旧名 橋本ありな 应按别名命中 新ありな，得到 %+v", p)
+	}
+	// 罗马字别名内的空格要保留，整名可查
+	if p := db.Lookup("Arina Hashimoto"); p == nil || p.Name != "新ありな" {
+		t.Fatalf("罗马字别名 Arina Hashimoto 应命中，得到 %+v", p)
+	}
+	if p := db.Lookup("橋本ありな"); p != nil && p.Birthday != "1996-12-15" {
+		t.Errorf("命中档案生日错误: %q", p.Birthday)
+	}
+	// splitPipe 对历史换行粘连也能切开（CSV 里用引号包裹内嵌换行的情况）
+	if got := splitPipe("上乃木まな\n岩谷志季\n橋本ありな"); len(got) != 3 || got[2] != "橋本ありな" {
+		t.Errorf("换行粘连切分错误: %#v", got)
+	}
+}
+
 // MDCx 三围是厘米分项，三项齐备才用；英寸值要挡掉，不能当厘米存。
 func TestMDCxMeasurements(t *testing.T) {
 	dir := t.TempDir()
