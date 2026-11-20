@@ -1,17 +1,52 @@
 {
   "schema_version": 3,
-  "generated_at": "",
-  "count": 0,
-  "by_status": {},
-  "last_run": {
-    "started_at": "",
-    "duration_sec": 0,
-    "picked": 0,
-    "added": 0,
-    "updated": 0,
-    "failed": 0,
-    "source": "dict",
-    "source_count": 0
+  "generated_at": "2026-11-20T10:07:59Z",
+  "count": 19151,
+  "by_status": {
+    "failed": 328,
+    "no_source": 2252,
+    "ok": 7219,
+    "partial": 9158,
+    "skipped": 194
   },
-  "sources": {}
+  "last_run": {
+    "started_at": "2026-11-20T07:59:41Z",
+    "duration_sec": 7698,
+    "picked": 21293,
+    "added": 19151,
+    "updated": 2142,
+    "failed": 328,
+    "source": "txt",
+    "source_count": 21293
+  },
+  "sources": {
+    "gfriends": {
+      "miss": 7055,
+      "ok": 14238
+    },
+    "javstash": {
+      "miss": 6757,
+      "ok": 14536
+    },
+    "mdcx": {
+      "miss": 7069,
+      "ok": 14224
+    },
+    "stashdb": {
+      "miss": 6439,
+      "ok": 318
+    },
+    "theactorbase": {
+      "miss": 19595,
+      "ok": 1638
+    },
+    "tpdb": {
+      "miss": 13632,
+      "ok": 7661
+    },
+    "wiki": {
+      "miss": 20547,
+      "ok": 746
+    }
+  }
 }
