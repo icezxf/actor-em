@@ -52,8 +52,8 @@ gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数�
 |---|---|---|
 | `actor_dict.csv` | 中文字典，4 列：`别名,日文名,中文名,来源` | `base-db.yml` |
 | `data/base_sources.json` | 增量状态：amane 的 etag+sha256、MDCx 的 tag+sha256 | `base-db.yml` |
-| `actors.jsonl` | **唯一真源**，一行一个演员，追加友好、diff 干净 | `actor-sync.yml` |
-| `actors.json` | 由 jsonl 派生的整体对象 `{schema_version, generated_at, count, actors[]}`，给消费方用 | `actor-sync.yml` |
+| `actors.jsonl` | **唯一真源**，一行一个演员，追加友好、diff 干净（含 skipped / no_source，留档不重抓） | `actor-sync.yml` |
+| `actors.json` | 由 jsonl 派生的整体对象 `{schema_version, generated_at, count, actors[]}`，**只含 `ok` / `partial`**，给消费方用 | `actor-sync.yml` |
 | `actors.manifest.json` | 健康度快照：各状态数量、各源命中率、上轮耗时 | `actor-sync.yml` |
 | `actors.xlsx` | 由数据导出的只读表格，带筛选和冻结首行，**改它不会回流** | `actor-sync.yml` |
 | `data/actor_dict.local.csv` | 手工补充字典，覆盖主字典同名条目 | 你 |
@@ -196,7 +196,7 @@ actorsync [flags]
 | `avatar_source_site` | string? | `gfriends` / `javstash` / `tpdb` / `theactorbase` |
 | `homepage_url` | string? | Emby 的 `HomePageUrl`，JavStash → TPDB 降级 |
 | `provider_ids` | object | `{JavStash, StashDB, TPDB, ...}` |
-| `status` | string | `ok` / `partial` / `no_source` / `failed` |
+| `status` | string | `ok` / `partial` / `skipped` / `no_source` / `failed` |
 | `sources` | object | 各源是否命中：`mdcx` `wiki` `javstash` `stashdb` `tpdb` `theactorbase` `gfriends` |
 | `fail_count` | int | 连续失败次数 |
 | `retry_after` | string? | 下次可重试时间 |
@@ -204,12 +204,17 @@ actorsync [flags]
 
 ### 状态机
 
-| status | 含义 | 后续行为 |
-|---|---|---|
-| `ok` | 至少关键字段有值 | 不再抓 |
-| `partial` | 命中了源，但生日和简介都没有 | 不再抓（除非 `--refresh`） |
-| `no_source` | 所有源都查无此人 | 180 天后再试 |
-| `failed` | 网络/限流错误 | 2、4 天后重试；连续 3 次转 `no_source` |
+| status | 含义 | 后续行为 | 进 `actors.json` |
+|---|---|---|---|
+| `ok` | 至少关键字段有值 | 不再抓 | ✅ |
+| `partial` | 命中了源，但生日和简介都没有 | 不再抓（除非 `--refresh`） | ✅ |
+| `skipped` | 性别为男，不是目标演员（实测 9.5%） | 不重抓 | ❌ |
+| `no_source` | 所有源都查无此人（多是片商/导演/系列名混进字典） | 180 天后再试 | ❌ |
+| `failed` | 网络/限流错误 | 2、4 天后重试；连续 3 次转 `no_source` | ❌ |
+
+`actors.jsonl` 保留全部五种状态（让 `plan.go` 认出「已经试过了」，不必重抓），
+`actors.json` 只导出 `ok` / `partial`。所以 **2 万行的 jsonl 不等于 2 万个演员**，
+看可用人数要看 `actors.manifest.json` 的 `by_status`。
 
 ### 并发模型
 
@@ -228,8 +233,24 @@ actorsync [flags]
 ```
 
 - 同一个日文名会有多行（每个别名一行），加载时合并
-- 约 68,375 个别名 / 21,322 个演员 / 21,311 个有中文名
+- 约 68,343 个别名 / 21,312 个演员 / 21,301 个有中文名
 - **不要手改这个文件**，它是 `base-db.yml` 的产物，每次都会被覆盖
+
+上游不仅收女优，还收导演、片商、作品系列名。这些条目在同步阶段会挨个去
+JavStash / TPDB / 维基查、然后全部落空变成 `no_source`，白烧一轮请求，所以
+`build_base_db.py` 的 `clean_actor_name()` 在生成清单时就把它们剔掉：
+
+| 判据 | 例子 |
+|---|---|
+| 导演头衔 | `AV監督トッキー` |
+| 性别符号 | `ようく♂` |
+| 素人标签 | `素人(万引き娘)`、`素人（円光娘）` |
+| 片商 / 系列名（整名精确匹配） | `SOD`、`WILD SEVEN`、`TECH`、`S級素人` |
+| 下划线 → 规范成空格（**不丢**） | `Kristina_Rose` → `Kristina Rose` |
+
+下划线那条是「修正」不是「删除」：拉丁名里的空格被上游写成 `_`，改回空格还能
+继续搜到；片商名只做整名匹配，`TECHNO`、`SODA みく` 这类真名不会被误杀。规则改了
+要同步 `scripts/test_build_base_db.py`。
 
 手工补充写 `data/actor_dict.local.csv`（两列就够，`中文名,日文名`），它覆盖主字典同名条目：
 

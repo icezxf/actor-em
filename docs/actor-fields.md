@@ -153,11 +153,29 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 （所有源都没这人）／`failed`（网络错误，下轮重试）／**`skipped`**（不是目标演员）。
 
 `skipped` 目前只有一个触发条件：**性别为男**。字典来自 amane 映射表，里面混着男优
-和同名的男艺人（`Panda`、`Kento Rabbit`、`れんと`、`つよぽん`），命中率约 4%。这些人
-抓得到数据，但进演员库就是错的。标 `skipped` 而不是直接丢弃，是为了两头兼顾：
+和同名的男艺人（`Panda`、`Kento Rabbit`、`Flash Brown`、`Isiah Maxwell`），实测占
+**9.5%（19/200）**。这些人抓得到数据，但进演员库就是错的。标 `skipped` 而不是直接
+丢弃，是为了两头兼顾：
 
 - 记录留在 `actors.jsonl`，`plan.go` 只重试 `failed`/`no_source`，所以下次不会重复抓
-- `ExportJSON` 导出 `actors.json` 时跳过它们，下游 Emby 看不到
+- 不进 `actors.json`，下游 Emby 看不到
+
+判定只能靠 StashDB 返回的 `gender` 字段——MDCx 的 `actor-profile` 里**没有性别字段**
+（`website_fields` 只有 height / cup / birthday 等 24 种），离线阶段无从判断。
+
+### 2.7.1 哪些记录会进下游
+
+`actors.jsonl` 是真源，**五种状态全部保留**；`actors.json` 只导出 `ok` 和 `partial`
+（`Actor.Exportable()`），另外三类不进：
+
+| 状态 | 不进下游的原因 |
+|---|---|
+| `skipped` | 男性或非目标演员 |
+| `no_source` | 所有源都查无此人——多是片商名、导演、系列名混进了字典 |
+| `failed` | 这轮网络/限流没抓成，下轮会重试，此刻只是一行空壳 |
+
+留档是为了让 `plan.go` 认出「这个人已经试过了」，避免每轮重抓。真源与派生物的这层
+分工，是本项目「代价只付一次」的核心——所以**不要为了表好看去删 `actors.jsonl` 里的行**。
 
 ### 2.8 标签
 
