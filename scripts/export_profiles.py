@@ -5,7 +5,7 @@
 而清洗逻辑（简繁归一、剔废值、推国家码、拆标签）用 Python 写更省事。
 所以这里做完清洗，输出一个扁平的 CSV，Go 只负责读。
 
-CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday
+CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip
   - aliases / tags 用 | 分隔
   - birthplace 已归一为简体，且剔除「海外/国外」这类废值
   - country 是从出生地推出来的两位码，推不出就是空
@@ -14,6 +14,8 @@ CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,b
     不是文章，**不要拿它当 Overview**，只从里面抽「标签:」那一项
   - birthday 是 JavStash 的兜底：覆盖 65.7%，但约 24% 与 JavStash 不一致，
     所以 Go 侧只在 JavStash 缺席时才用，并标 birth_date_source
+  - bust / waist / hip 是三围分项，单位厘米，三项齐备约 80%。TPDB 那份只有
+    36%，所以 Go 侧先看这里，不齐备才退回 TPDB（那套是英寸制）
 
 用法：
     python3 scripts/export_profiles.py                 # 下载并导出到 /tmp/mdcx_profiles.csv
@@ -209,6 +211,11 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
                 # 生日只是 JavStash 的兜底：MDCx 覆盖 65%，但约 24% 与 JavStash 冲突，
                 # 所以 Go 侧只在 JavStash 没有时才用，并标 birth_date_source=mdcx。
                 f.get("birthday", ""),
+                # 三围分项（厘米）。TPDB 只覆盖 36%，而这里三项齐备约 80%，
+                # 是日系演员三围最全的来源。分三列传，由 Go 侧判断是否齐备再拼。
+                f.get("bust", ""),
+                f.get("waist", ""),
+                f.get("hip", ""),
             ])
     finally:
         con.close()
@@ -218,18 +225,21 @@ def export(mapping_path: str, profile_path: str, out_path: str, h2z: dict[str, s
     with open(out_path, "w", encoding="utf-8", newline="") as fp:
         w = csv.writer(fp, lineterminator="\n")
         w.writerow(["name", "name_cn", "aliases", "birthplace", "country",
-                    "height", "cup", "career_start", "tags", "bio", "romaji", "birthday"])
+                    "height", "cup", "career_start", "tags", "bio", "romaji", "birthday",
+                    "bust", "waist", "hip"])
         w.writerows(rows)
 
     with_place = sum(1 for r in rows if r[3])
     with_year = sum(1 for r in rows if r[7])
     with_tags = sum(1 for r in rows if r[8])
     with_cup = sum(1 for r in rows if r[6])
+    with_meas = sum(1 for r in rows if r[12] and r[13] and r[14])
     log(f"导出 {len(rows)} 人 → {out_path}")
     log(f"  出生地 {with_place} ({with_place/len(rows)*100:.1f}%) / "
         f"罩杯 {with_cup} ({with_cup/len(rows)*100:.1f}%) / "
         f"出道年 {with_year} ({with_year/len(rows)*100:.1f}%) / "
-        f"标签 {with_tags} ({with_tags/len(rows)*100:.1f}%)")
+        f"标签 {with_tags} ({with_tags/len(rows)*100:.1f}%) / "
+        f"三围齐备 {with_meas} ({with_meas/len(rows)*100:.1f}%)")
     return 0
 
 

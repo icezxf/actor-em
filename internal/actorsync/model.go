@@ -17,10 +17,11 @@ type Actor struct {
 	BirthPlace      *string `json:"birth_place"`
 	Country         *string `json:"country"`
 
-	HeightCm     *int    `json:"height_cm"`
-	WeightKg     *int    `json:"weight_kg"`    // 只有 TPDB 有，覆盖很低
-	Measurements *string `json:"measurements"` // 原样字符串，如 "34E-21-31"，来自 TPDB
-	CupSize      *string `json:"cup_size"`
+	HeightCm         *int    `json:"height_cm"`
+	WeightKg         *int    `json:"weight_kg"`         // 只有 TPDB 有，覆盖很低
+	Measurements     *string `json:"measurements"`      // "82-63-83"，单位见下
+	MeasurementsUnit *string `json:"measurements_unit"` // cm（MDCx，约 80%）/ in（TPDB）
+	CupSize          *string `json:"cup_size"`
 
 	CareerStart *int     `json:"career_start"` // 出道年，Emby 的 ProductionYear
 	Tags        []string `json:"tags"`
@@ -56,6 +57,7 @@ type Db struct {
 //   - 删 death_date / waist_cm / hip_cm（忌日不要；三围改成原样字符串)
 //   - 删 alist 时代的 avatar_path/dir/sha256/bytes/w/h 和冗余的 avatar_source
 //   - 增 measurements / tags / avatar_cn / homepage_url
+//   - 增 birth_date_source（javstash / mdcx）与 measurements_unit（cm / in）
 const SchemaVersion = 3
 
 // 记录状态

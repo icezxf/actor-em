@@ -58,14 +58,23 @@
 
 ### 2.3 身体
 
-> **口径统一**：三围只用 TPDB 的 `measurements`，原样存字符串，不换算、不拆成厘米。
+> **口径统一**：三围是一个字符串 + 一个单位字段。MDCx 的分项是厘米（覆盖 80%），
+> TPDB 是英寸原串（36%），两套混在一个字段里必须靠 `measurements_unit` 区分。
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
 | `height_cm` | int? | MDCx `height`（75.5%）→ JavStash → TPDB | 纯数字 |
-| `weight_kg` | int? | TPDB（13%）→ JavStash 旧 schema | 覆盖低，缺就 `null` |
-| `measurements` | string? | **只认 TPDB** `extras.measurements` | 形如 `34E-21-31`（下胸围-罩杯-腰-臀），**原样** |
+| `weight_kg` | int? | JavStash `weight` → TPDB `extras.weight` | 只有这两个源有，MDCx 完全没有 |
+| `measurements` | string? | MDCx `bust/waist/hip`（**80% 齐备**，厘米）→ TPDB `extras.measurements`（英寸原文） | `82-63-83` 或 `34E-21-31` |
+| `measurements_unit` | string? | 跟着 `measurements` 走 | `cm`（MDCx）/ `in`（TPDB）；空表示没有三围 |
 | `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段 |
+
+**为什么 MDCx 排前面**：MDCx 的 `bust`/`waist`/`hip` 是分项字段，17,494 人三项齐备
+（80.0%），而且是厘米制，跟日系演员的实际报法一致；TPDB 是欧美库，只命中 46%，
+且是英寸制。旧版只认 TPDB，等于白白扔掉 80% 的数据。
+
+`cmOrZero` 只接受 50~200 的值：上游偶尔混入 `34/24/35` 这种英寸串，一旦当厘米存
+进去两者就分不开了，宁可留空。
 
 已删除：`bust_cm` / `waist_cm` / `hip_cm`——旧版把 TPDB 的英寸值当厘米存，口径是错的。
 
@@ -193,13 +202,15 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 
 | 字段 | 类型 | 来源 | 说明 |
 |---|---|---|---|
-| `tags` | string[] | MDCx `actor-mapping.bio` 里的「标签:」串（**11,387 / 15,840 = 71.8%**） | 填 Emby `Tags` |
+| `tags` | string[] | MDCx `actor-mapping.bio` 里的「标签:」串（**9,473 / 21,859 = 43.3%**） | 填 Emby `Tags` |
 
-覆盖与分布（实测）：
+覆盖与分布（实测，21,859 人档案）：
 
-- 972 个不同标签值，头部是 `熟女 3626`、`巨乳 2920`、`美人 2067`、`巨尻 1217`、`美乳 1121`、`美少女 847`。
-- 人均 2.46 个，中位 2 个，最多 40 个；**≤8 个的占 99.1%**。
+- 9,473 人有标签，头部是 `熟女 3001`、`巨乳 2359`、`美人 1691`、`巨尻 884`、`美乳 872`、`美少女 684`。
+- 有标签的人里人均 2.4 个，中位 2 个，最多 40 个；**≤8 个的占 99%**。
 - 分隔符是 `,` / `，` / `、`，个别条目混用。
+- 落到清单层（21,312 人）是 44.2%，落到进库记录（936 条实测）是 43.8%——三者口径一致，
+  说明标签不依赖抓取成功与否，MDCx 命中就有。
 
 两条处理规则：
 
@@ -348,14 +359,14 @@ Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字�
 | `birth_place` | `ProductionLocations`（+ Overview 头部） |
 | `career_start` | `ProductionYear`（+ Overview 头部） |
 | `bio` | `Overview` 正文 |
-| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段） |
+| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段；三围按 `measurements_unit` 带 cm/in） |
 | `avatar` / `avatar_cn` | 主图，**必须落成 `folder.jpg`**，网络 URL 不能直接用 |
 | `homepage_url` | `HomePageUrl` |
 | `provider_ids` | `ProviderIds` |
 | `tags` | `Tags`（黑名单过滤 → 简繁归一 → 截断 8 个） |
 | `name_original` / `aliases` | 不落 Emby，只供检索（Overview 已定不要别名） |
 | `gender` / `country` | 不落 Emby（`country` 信息已含在 `birth_place`） |
-| `cup_size` | 不落 Emby（已含在 `measurements` 里） |
+| `cup_size` | 不落 Emby（没有罩杯字段；只有 TPDB 的三围串自带 `34E` 前缀，MDCx 的厘米三围不含罩杯） |
 | `key` / `status` / `sources` / `fail_count` / `retry_after` / `created_at` / `scraped_at` | 不落 Emby，内部记账 |
 
 一句话：**11 个 JSONL 字段喂满了 Emby Person 全部 9 个可用字段，进不去的都是 Emby 没有地方放。**

@@ -254,6 +254,33 @@ func TestLoadMDCxCSVBirthday(t *testing.T) {
 	}
 }
 
+// MDCx 三围是厘米分项，三项齐备才用；英寸值要挡掉，不能当厘米存。
+func TestMDCxMeasurements(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "m.csv")
+	body := "name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip\n" +
+		"橘めぐみ,橘惠,,东京都,JP,165,J,2021,巨乳,,,1998-01-01,112,64,99\n" + // 齐备
+		"柏浦千晶,,,,,160,D,2022,,,,-,87,57,\n" + // 缺臀围
+		"欧美派,,,,,170,C,,,,,-,34,24,35\n" // 英寸制，应全丢
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	db, err := LoadMDCxCSV(path)
+	if err != nil {
+		t.Fatalf("加载失败: %v", err)
+	}
+	p := db.Lookup("橘めぐみ")
+	if p == nil || p.Bust != 112 || p.Waist != 64 || p.Hip != 99 {
+		t.Fatalf("三围解析错误: %+v", p)
+	}
+	if p := db.Lookup("柏浦千晶"); p == nil || p.Hip != 0 {
+		t.Errorf("缺臀围时应为 0，得到 %+v", p)
+	}
+	if p := db.Lookup("欧美派"); p == nil || p.Bust != 0 || p.Waist != 0 || p.Hip != 0 {
+		t.Errorf("英寸值应被丢弃，得到 %+v", p)
+	}
+}
+
 func TestEncodePath(t *testing.T) {
 	got := encodePath("/actors/小/小凑四叶.jpg")
 	want := "/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg"

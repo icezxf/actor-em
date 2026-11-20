@@ -78,7 +78,7 @@ func ExportXLSX(path string, db *Db) error {
 			StrVal(a.BirthPlace),
 			intOrBlank(a.HeightCm),
 			intOrBlank(a.WeightKg),
-			StrVal(a.Measurements),
+			StrVal(a.Measurements) + StrVal(a.MeasurementsUnit),
 			StrVal(a.CupSize),
 			intOrBlank(a.CareerStart),
 			strings.Join(a.Tags, " / "),

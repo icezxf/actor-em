@@ -25,6 +25,9 @@ type MDCxProfile struct {
 	BioRaw      string   // 结构化字段串，只用来抽标签，不当简介
 	Romaji      string   // 罗马字（"Momonogi Kana"），拼 theactorbase 的 slug 用
 	Birthday    string   // YYYY-MM-DD，JavStash 的兜底（约 24% 与 JavStash 冲突）
+	Bust        int      // 胸围 cm
+	Waist       int      // 腰围 cm
+	Hip         int      // 臀围 cm
 }
 
 // MDCxDB 是内存索引，支持按日文名、中文名、别名查同一个人。
@@ -37,8 +40,8 @@ func NewMDCxDB() *MDCxDB {
 	return &MDCxDB{byKey: map[string]*MDCxProfile{}}
 }
 
-// CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday
-// aliases 和 tags 用 | 分隔。
+// CSV 列：name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip
+// aliases 和 tags 用 | 分隔。后三列是厘米制三围，老 CSV 没有。
 func LoadMDCxCSV(path string) (*MDCxDB, error) {
 	db := NewMDCxDB()
 	if path == "" {
@@ -93,6 +96,12 @@ func LoadMDCxCSV(path string) (*MDCxDB, error) {
 		if len(rec) >= 12 {
 			p.Birthday = normalizeDate(strings.TrimSpace(rec[11]))
 		}
+		// 第 13~15 列（三围）也是后加的；只认 20~200cm 区间，防止上游塞英寸或脏值
+		if len(rec) >= 15 {
+			p.Bust = cmOrZero(rec[12])
+			p.Waist = cmOrZero(rec[13])
+			p.Hip = cmOrZero(rec[14])
+		}
 		if p.Name == "" {
 			continue
 		}
@@ -146,6 +155,16 @@ func splitPipe(s string) []string {
 func atoiOrZero(s string) int {
 	n, err := strconv.Atoi(strings.TrimSpace(s))
 	if err != nil {
+		return 0
+	}
+	return n
+}
+
+// cmOrZero 解析三围分项。只接受 50~200cm：上游偶尔混入英寸制数字
+// （34/24/35），那套数字全在 50 以下，混进厘米组里就分不开了，宁可留空。
+func cmOrZero(s string) int {
+	n := atoiOrZero(s)
+	if n < 50 || n > 200 {
 		return 0
 	}
 	return n

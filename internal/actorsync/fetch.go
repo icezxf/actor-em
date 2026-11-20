@@ -33,12 +33,15 @@ type FetchResult struct {
 	Country         string
 	HeightCm        int
 	WeightKg        int
-	Measurements    string // TPDB 原样，如 "34E-21-31"
-	CupSize         string
-	CareerStart     int
-	Tags            []string
-	Bio             string
-	BioLang         string
+	Measurements    string // "82-63-83"（cm，来自 MDCx）或 "34E-21-31"（TPDB 原文）
+	// MeasurementsUnit 区分上面那串是厘米还是英寸。两套数据源单位不同，
+	// 不标出来下游没法比较大小。空表示还没有三围。
+	MeasurementsUnit string
+	CupSize          string
+	CareerStart      int
+	Tags             []string
+	Bio              string
+	BioLang          string
 
 	CanonicalName string // 数据源返回的标准名（清单里写 UUID 时用它兜底）
 	ChineseName   string // 中文名，Emby 的 Name 用它；没有就退回清单名
@@ -239,7 +242,8 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 
 // applyMDCx 把离线档案铺进结果。只填空位，不覆盖已有值。
 // 注意：不写生日（JavStash 优先，MDCx 生日留到 Fetch 第 5.5 步兜底），
-// 不写简介（简介有单独的优先级链）。
+// 不写简介（简介有单独的优先级链）。三围写在这里，因为 MDCx 的厘米分项
+// 覆盖 80%，比 TPDB 的 36% 全，后面的源只补空位。
 func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
 	if res.CanonicalName == "" && p.Name != "" {
 		res.CanonicalName = p.Name
@@ -261,6 +265,12 @@ func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
 	}
 	if len(p.Tags) > 0 && len(res.Tags) == 0 {
 		res.Tags = p.Tags
+	}
+	// 三围：MDCx 三项齐备就用它（厘米，覆盖约 80%），TPDB 那套（英寸，
+	// 覆盖 36%）留到第 6 步只在空缺时兜底。两边单位不同，必须标 unit。
+	if p.Bust > 0 && p.Waist > 0 && p.Hip > 0 && res.Measurements == "" {
+		res.Measurements = fmt.Sprintf("%d-%d-%d", p.Bust, p.Waist, p.Hip)
+		res.MeasurementsUnit = "cm"
 	}
 	if len(p.Aliases) > 0 {
 		res.Aliases = mergeStrings(res.Aliases, p.Aliases)
@@ -364,9 +374,10 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 	if p.CupSize != "" && res.CupSize == "" {
 		res.CupSize = p.CupSize
 	}
-	// 三围只认 TPDB，原样存，不拆不换算
-	if p.Source == "tpdb" && p.Measurements != "" {
+	// 三围：MDCx 已在第 1 步填过（厘米），这里只补空位，用 TPDB 原文（英寸）
+	if p.Source == "tpdb" && p.Measurements != "" && res.Measurements == "" {
 		res.Measurements = p.Measurements
+		res.MeasurementsUnit = "in"
 	}
 	if p.CareerStart > 0 && res.CareerStart == 0 {
 		res.CareerStart = p.CareerStart
@@ -516,9 +527,18 @@ func (r *FetchResult) Summary() string {
 	if birth == "" {
 		birth = "-"
 	}
-	return fmt.Sprintf("生日=%s 身高=%d 三围=%s 出道=%d 简介=%d字 命中[%s] 未命中[%s]",
-		birth, r.HeightCm, orDash(r.Measurements), r.CareerStart, len([]rune(r.Bio)),
-		strings.Join(hits, ","), strings.Join(misses, ","))
+	weight := "-"
+	if r.WeightKg > 0 {
+		weight = fmt.Sprintf("%d", r.WeightKg)
+	}
+	// 三围带上单位，否则 "34E-21-31" 和 "82-63-83" 在日志里没法区分
+	meas := orDash(r.Measurements)
+	if meas != "-" && r.MeasurementsUnit != "" {
+		meas += r.MeasurementsUnit
+	}
+	return fmt.Sprintf("生日=%s 身高=%d 体重=%s 三围=%s 出道=%d 标签=%d 简介=%d字 命中[%s] 未命中[%s]",
+		birth, r.HeightCm, weight, meas, r.CareerStart, len(r.Tags),
+		len([]rune(r.Bio)), strings.Join(hits, ","), strings.Join(misses, ","))
 }
 
 func orDash(s string) string {

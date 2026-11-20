@@ -185,11 +185,13 @@ actorsync [flags]
 | `birth_date_source` | string? | `javstash` / `mdcx`，标明这条生日是权威还是二手 |
 | `birth_place` | string? | 中文地名，如 `东京都`（MDCx 出生地经简繁归一） |
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
-| `height_cm` `weight_kg` | int? | 身高体重 |
-| `measurements` | string? | **三围原样字符串**，如 `34E-21-31`，只来自 TPDB，不做单位换算 |
+| `height_cm` | int? | 身高厘米 |
+| `weight_kg` | int? | 体重公斤。**只有 JavStash / TPDB 有**，MDCx 无此字段 |
+| `measurements` | string? | `82-63-83`（厘米，MDCx）或 `34E-21-31`（英寸，TPDB 原文），靠下一字段区分 |
+| `measurements_unit` | string? | `cm` / `in`；空表示没有三围 |
 | `cup_size` | string? | 纯字母，如 `E`（TPDB 的 `34E` 会剥掉 band） |
 | `career_start` | int? | 出道年份，取 MDCx `career_period` 的首年 |
-| `tags` | string[] | 标签，来自 MDCx（已过滤敏感/未成年相关） |
+| `tags` | string[] | 标签，来自 MDCx（覆盖 43.3%，已过滤敏感/未成年相关） |
 | `bio` | string? | 简介，优先中文；顺序 维基 → theactorbase → MDCx |
 | `bio_lang` | string? | `zh` / `ja` / `en` |
 | `avatar` | string? | 头像**网络地址**（数据源原图），不下载转存 |
