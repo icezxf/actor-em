@@ -128,12 +128,14 @@ func (db *Db) SaveJSONL(path string) error {
 
 // ExportJSON 从内存库派生一份 actors.json（完整对象），供只认 json 的下游使用。
 //
-// skipped 的记录不导出：那些是男性或非目标演员，留在 actors.jsonl 里只是为了
-// 下次不再重复抓，下游没有理由看到它们。
+// 只导出 ok / partial：skipped 是男性或非目标演员，no_source 是所有源都查无此人
+// （多是片商名、导演、系列名混进了字典），failed 是这轮没抓成下轮要重试的空壳。
+// 这三类都留在 actors.jsonl 真源里备查，但下游没有理由看到它们——否则 Emby 里
+// 会凭空多出一堆没有头像、没有生日的条目。
 func (db *Db) ExportJSON(path string) error {
 	var kept []*Actor
 	for _, a := range db.Actors {
-		if a.Status == StatusSkipped {
+		if !a.Exportable() {
 			continue
 		}
 		kept = append(kept, a)

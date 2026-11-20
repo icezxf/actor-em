@@ -49,6 +49,43 @@ UA = "actor-em/1.0 (+https://github.com/icezxf/actor-em)"
 MARK_RE = re.compile(r"[【】\[\]]")
 BAD_KEY_RE = re.compile(r"^[\s\W_]+$", re.UNICODE)
 
+# ---- 演员名清洗 ----------------------------------------------------------
+# 上游字典（amane + MDCx）除了女优，还收导演、片商、作品系列名。它们不是人，
+# 同步阶段去 JavStash/TPDB/维基挨个查必定全部落空，最后变成 no_source 白烧一轮
+# 请求。所以生成清单时就在源头剔掉。
+#
+# 判据必须是「名字本身就是结论」的强特征，不能靠猜：宁可漏掉几条噪音留在
+# no_source 里，也不要误杀一个真演员——漏掉的只是浪费一次请求，误杀的是永久缺人。
+DIRECTOR_RE = re.compile(r"監督|导演|ディレクター")
+GENDER_MARK_RE = re.compile(r"[♂♀]")
+AMATEUR_RE = re.compile(r"^素人[\(（]")  # 素人(万引き娘) / 素人（円光娘）这类标签式条目
+
+# 片商 / 系列名：上游把厂牌当成「出演者」收录进来。
+# 整名精确匹配（大小写不敏感），不做包含匹配，避免误伤真名里带这些词的艺人。
+STUDIO_NAMES = {
+    "SOD", "WILD SEVEN", "TECH", "S1", "S級素人", "MOODYZ", "PRESTIGE",
+    "IDEAPOCKET", "MUTEKI", "FALENO", "MADONNA", "ATTACKERS", "OPPAI",
+    "E-BODY", "GLORY QUEST", "MAX-A", "シロウトTV",
+}
+
+
+def clean_actor_name(jp: str) -> str:
+    """清洗一个「日文名」，返回空串表示这不是演员、整行都该丢。
+
+    只丢证据充分的：性别符号、导演头衔、素人标签、片商名。
+    下划线不丢——那是拉丁名里空格被写成 `_`（Kristina_Rose），规范回空格还能继续搜。
+    """
+    jp = (jp or "").replace("\u3000", " ").strip()
+    if not jp:
+        return ""
+    if GENDER_MARK_RE.search(jp) or DIRECTOR_RE.search(jp) or AMATEUR_RE.match(jp):
+        return ""
+    if "_" in jp:
+        jp = re.sub(r"\s*_\s*", " ", jp).strip()
+    if jp.upper() in STUDIO_NAMES:
+        return ""
+    return jp
+
 
 def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
@@ -201,7 +238,7 @@ def parse_amane(path: str) -> list[tuple[str, str, str, str]]:
     root = ET.parse(path).getroot()
     rows = []
     for a in root.iter("a"):
-        jp = (a.get("jp") or "").split(",")[0].strip()
+        jp = clean_actor_name((a.get("jp") or "").split(",")[0])
         if not jp:
             continue
         zh = (a.get("zh_cn") or "").strip()
@@ -219,7 +256,7 @@ def parse_mdcx(path: str) -> list[tuple[str, str, str, str]]:
         cur = con.execute("SELECT jp, zh_cn, zh_tw, keyword FROM entries")
         rows = []
         for jp, zh_cn, zh_tw, keyword in cur:
-            jp = (jp or "").split(",")[0].strip()
+            jp = clean_actor_name((jp or "").split(",")[0])
             if not jp:
                 continue
             zh = (zh_cn or "").strip()

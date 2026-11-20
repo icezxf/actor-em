@@ -172,6 +172,50 @@ func TestOutcome(t *testing.T) {
 	}
 }
 
+// ExportJSON 只给下游 ok / partial：skipped 是男性、no_source 是查无此人、
+// failed 是这轮没抓成的空壳，三者留在 jsonl 真源里备查即可。
+func TestExportJSONKeepsOnlyUsable(t *testing.T) {
+	dir := t.TempDir()
+	jsonl := filepath.Join(dir, "actors.jsonl")
+	jsonPath := filepath.Join(dir, "actors.json")
+
+	db := &Db{SchemaVersion: SchemaVersion, Actors: []*Actor{
+		{Key: "a", Name: "有数据的", Status: StatusOK},
+		{Key: "b", Name: "只抓到一部分", Status: StatusPartial},
+		{Key: "c", Name: "男性", Status: StatusSkipped},
+		{Key: "d", Name: "查无此人", Status: StatusNoSource},
+		{Key: "e", Name: "这轮抓失败", Status: StatusFailed},
+	}}
+	if err := db.Save(jsonl); err != nil {
+		t.Fatalf("写 jsonl 失败: %v", err)
+	}
+	if err := db.ExportJSON(jsonPath); err != nil {
+		t.Fatalf("导出 json 失败: %v", err)
+	}
+
+	out, err := LoadDb(jsonPath)
+	if err != nil {
+		t.Fatalf("读回 json 失败: %v", err)
+	}
+	if out.Count != 2 || len(out.Actors) != 2 {
+		t.Fatalf("actors.json 应只剩 2 条，得到 count=%d len=%d", out.Count, len(out.Actors))
+	}
+	for _, a := range out.Actors {
+		if a.Status != StatusOK && a.Status != StatusPartial {
+			t.Errorf("导出了不该有的状态 %s（%s）", a.Status, a.Name)
+		}
+	}
+
+	// 真源不能跟着缩水，否则下次运行会把 skipped/no_source 当成新人重抓
+	src, err := LoadDb(jsonl)
+	if err != nil {
+		t.Fatalf("读回 jsonl 失败: %v", err)
+	}
+	if len(src.Actors) != 5 {
+		t.Errorf("actors.jsonl 应保留全部 5 条，得到 %d", len(src.Actors))
+	}
+}
+
 func TestEncodePath(t *testing.T) {
 	got := encodePath("/actors/小/小凑四叶.jpg")
 	want := "/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg"

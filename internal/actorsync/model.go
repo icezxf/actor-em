@@ -64,6 +64,25 @@ const (
 	StatusSkipped  = "skipped"   // 不是目标演员（男性等），留档但不再抓、不导出
 )
 
+// Exportable 表示这条记录该不该交给下游（actors.json / Emby 刮削）。
+//
+// 只有拿到过数据的记录才算数：
+//   - skipped：男性或非目标演员，留档只为不再重抓
+//   - no_source：所有源都没有这个人（多是片商名、导演、系列名混进了字典）
+//   - failed：网络/限流没抓成，下轮会重试，此刻给下游只会是一行空壳
+//
+// 三类都还留在 actors.jsonl 真源里，只是不进派生物。
+func (a *Actor) Exportable() bool {
+	if a == nil {
+		return false
+	}
+	switch a.Status {
+	case StatusOK, StatusPartial:
+		return true
+	}
+	return false
+}
+
 // Manifest 是 actors.manifest.json 的结构，给人和监控看。
 type Manifest struct {
 	SchemaVersion int                       `json:"schema_version"`
