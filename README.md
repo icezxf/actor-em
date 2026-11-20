@@ -9,6 +9,7 @@ gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数�
 工作流 1（手动 / 数据源有更新时）
   amane 映射表 XML ─┐
   MDCx actor-mapping┴─> actor_dict.csv（68k 别名 / 21k 演员）
+  MDCx profile + mapping ─> mdcx_profiles.csv（2 万行档案宽表，根目录可直接查）
 
 工作流 2（每天 04:00 UTC）
   actor_dict.csv ──> 演员清单（全量）
@@ -26,8 +27,8 @@ gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数�
 
 | 工作流 | 职责 | 触发 | 产物 |
 |---|---|---|---|
-| `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping`，去重清洗成中文字典 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`data/base_sources.json` |
-| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`） | `actors.jsonl`、`actors.json`、`actors.manifest.json`、`actors.xlsx` |
+| `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping` 成中文字典；并把 MDCx 两个库导成档案宽表 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`mdcx_profiles.csv`、`data/base_sources.json` |
+| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
 | `tg-command.yml` | 处理一条 Telegram update：刮削 → 发候选图 → 换图 → 提交状态 | Cloudflare Worker 派发 | 同上（按需） |
 
 `base-db` 是**前置条件**：它没跑过，`actor-sync` 和 `tg-command` 都会在「Check dictionary」那步直接失败。
@@ -51,11 +52,12 @@ gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数�
 | 文件 | 说明 | 谁写 |
 |---|---|---|
 | `actor_dict.csv` | 中文字典，4 列：`别名,日文名,中文名,来源` | `base-db.yml` |
+| `mdcx_profiles.csv` | MDCx 两个 sqlite 导出的宽表（约 4MB / 2 万行）：`name,name_cn,aliases,birthplace,country,height,cup,career_start,tags,bio,romaji,birthday,bust,waist,hip`，aliases/tags 用 `|` 分隔。在仓库根目录，可直接点开查 | `base-db.yml` |
 | `data/base_sources.json` | 增量状态：amane 的 etag+sha256、MDCx 的 tag+sha256 | `base-db.yml` |
 | `actors.jsonl` | **唯一真源**，一行一个演员，追加友好、diff 干净（含 skipped / no_source，留档不重抓） | `actor-sync.yml` |
 | `actors.json` | 由 jsonl 派生的整体对象 `{schema_version, generated_at, count, actors[]}`，**只含 `ok` / `partial`**，给消费方用 | `actor-sync.yml` |
 | `actors.manifest.json` | 健康度快照：各状态数量、各源命中率、上轮耗时 | `actor-sync.yml` |
-| `actors.xlsx` | 由数据导出的只读表格，带筛选和冻结首行，**改它不会回流** | `actor-sync.yml` |
+| `actors.xlsx` | 只读表格（带筛选、冻结首行，改它不回流）。**不在仓库里**，是 `actor-sync` 运行结束挂出的 artifact：Actions → 该次运行 → 页面底部 Artifacts → `actors-xlsx`（保留 90 天） | `actor-sync.yml` |
 | `data/actor_dict.local.csv` | 手工补充字典，覆盖主字典同名条目 | 你 |
 | `data/avatar_choices.json` | 人工选图结果（key → 选中的图片 URL），优先于自动抓取 | bot |
 | `data/avatar_review.json` | 选图交互状态（发过的消息 id、getUpdates 游标） | bot |

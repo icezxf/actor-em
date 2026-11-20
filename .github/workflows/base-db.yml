@@ -1,8 +1,10 @@
 name: base-db
 
 # 工作流 1：基础数据库更新
-# 拉 amane + MDCx 的演员映射表，合并去重，产出仓库根目录的 actor_dict.csv。
-# 两个源都没变时脚本直接退出，不产生提交。
+# 拉 amane + MDCx 的演员映射表，合并去重，产出仓库根目录的 actor_dict.csv；
+# 另外把 MDCx 的两个 sqlite（actor-profile + actor-mapping）导成一张宽表
+# mdcx_profiles.csv（约 4MB）也放根目录，方便直接在 GitHub 上查演员档案。
+# 两个源都没变、且导出 CSV 也没变化时，不产生提交。
 
 on:
   workflow_dispatch:
@@ -42,17 +44,29 @@ jobs:
           if [ "$FORCE" = "true" ]; then ARGS="--force"; fi
           python3 scripts/build_base_db.py $ARGS
 
+      # MDCx 的 actor-profile 是 33MB、actor-mapping 也不小，都不入库；
+      # 这里现下现导成一张扁平宽表（约 4MB）放根目录，方便在 GitHub 上直接查。
+      # 与 actor-sync 那份导出逻辑同源（同一个脚本），只是落点不同。
+      - name: Export MDCx profiles CSV
+        env:
+          FORCE: ${{ github.event.inputs.force }}
+        run: |
+          ARGS=""
+          if [ "$FORCE" = "true" ]; then ARGS="--force"; fi
+          python3 scripts/export_profiles.py -o mdcx_profiles.csv $ARGS
+
       - name: Commit
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add actor_dict.csv data/base_sources.json
+          git add actor_dict.csv mdcx_profiles.csv data/base_sources.json
           if git diff --cached --quiet; then
-            echo "字典无变化，跳过提交"
+            echo "字典与 MDCx CSV 均无变化，跳过提交"
             exit 0
           fi
           rows=$(wc -l < actor_dict.csv)
-          git commit -m "chore(base-db): update actor_dict.csv (${rows} rows)"
+          prows=$(wc -l < mdcx_profiles.csv)
+          git commit -m "chore(base-db): update actor_dict.csv (${rows} rows) + mdcx_profiles.csv (${prows} rows)"
           git pull --rebase --autostash origin main
           git push
 
@@ -60,8 +74,14 @@ jobs:
         if: always()
         run: |
           echo "### 基础数据库" >> "$GITHUB_STEP_SUMMARY"
+          echo "**actor_dict.csv**（抓取清单）" >> "$GITHUB_STEP_SUMMARY"
           if [ -f actor_dict.csv ]; then
             echo "- 文件大小：$(du -h actor_dict.csv | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
             echo "- 行数：$(wc -l < actor_dict.csv)" >> "$GITHUB_STEP_SUMMARY"
             echo "- 去重演员：$(tail -n +2 actor_dict.csv | cut -d, -f2 | sort -u | wc -l)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "**mdcx_profiles.csv**（MDCx 演员档案，仓库根目录可直接查）" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f mdcx_profiles.csv ]; then
+            echo "- 文件大小：$(du -h mdcx_profiles.csv | cut -f1) / 行数：$(wc -l < mdcx_profiles.csv)" >> "$GITHUB_STEP_SUMMARY"
+            echo "- 列：name, name_cn, aliases, birthplace, country, height, cup, career_start, tags, bio, romaji, birthday, bust, waist, hip" >> "$GITHUB_STEP_SUMMARY"
           fi

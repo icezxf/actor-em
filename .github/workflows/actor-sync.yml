@@ -155,3 +155,12 @@ jobs:
           if [ -f actors.jsonl ]; then
             echo "- 演员数：$(wc -l < actors.jsonl)" >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Excel 表格（actors.xlsx）在哪下载" >> "$GITHUB_STEP_SUMMARY"
+          echo "xlsx 是给人看的派生物，**不提交进仓库**（2 万行二进制日更会把仓库撑爆），而是挂成 Actions 的 artifact。" >> "$GITHUB_STEP_SUMMARY"
+          echo "下载方法：打开本仓库 **Actions** 标签 → 点开这次 \`actor-sync\` 运行 → 拉到页面最底部 **Artifacts** 区 → 下载 \`actors-xlsx\`（解压后即 actors.xlsx，保留 90 天）。" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f actors.xlsx ]; then
+            echo "- 本次已生成 actors.xlsx：$(du -h actors.xlsx | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- 本次未生成 actors.xlsx（dry_run 或产物缺失），请检查 Upload Excel 步骤。" >> "$GITHUB_STEP_SUMMARY"
+          fi
