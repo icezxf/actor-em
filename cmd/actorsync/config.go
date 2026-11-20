@@ -23,6 +23,7 @@ type Config struct {
 	Gfriends      bool   // GFRIENDS=1：启用 gfriends 头像库（要拉 6MB 索引）
 	GfriendsIndex string // GFRIENDS_INDEX：本地 Filetree.json，填了就不联网拉
 	TheActorBase  bool   // THEACTORBASE=1：启用 theactorbase 中文简介兜底
+	DramaFace     bool   // DRAMAFACE=0 关闭；默认开启，中文简介优先补充源
 
 	// alist（仅 --scan-nfo 读 nfo 用；头像不转存）
 	AlistURL  string
@@ -105,6 +106,8 @@ func applyEnv(c *Config) {
 	set(&c.GfriendsIndex, "GFRIENDS_INDEX")
 	c.Gfriends = os.Getenv("GFRIENDS") == "1" || strings.EqualFold(os.Getenv("GFRIENDS"), "true")
 	c.TheActorBase = os.Getenv("THEACTORBASE") == "1" || strings.EqualFold(os.Getenv("THEACTORBASE"), "true")
+	// dramaface 默认开启（DRAMAFACE=0 可关）：中文简介补充，无 Key 需求
+	c.DramaFace = !(os.Getenv("DRAMAFACE") == "0" || strings.EqualFold(os.Getenv("DRAMAFACE"), "false"))
 	set(&c.AlistURL, "ALIST_URL")
 	set(&c.AlistUser, "ALIST_USER")
 	set(&c.AlistPass, "ALIST_PASS")

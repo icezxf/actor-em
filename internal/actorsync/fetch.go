@@ -19,10 +19,11 @@ var ErrNotFound = errors.New("not found")
 
 // FetchResult 是多源聚合后的中间结果，还没落成 Actor。
 //
-// 字段来源见 docs/actor-fields.md，这里只强调三条硬规则：
+// 字段来源见 docs/actor-fields.md，这里只强调四条硬规则：
 //   - 生日以 JavStash 为准，它缺席时才用 MDCx（并标 BirthDateSource=mdcx）
-//   - 三围只认 TPDB，存原样字符串，不换算
-//   - 简介只要中文：wiki → theactorbase，不取英文、不机翻
+//   - 三围 MDCx 打底（厘米反推成「底围+杯」英寸写法），TPDB 兜底
+//   - 简介只要中文：wiki → dramaface → theactorbase，不取英文、不机翻
+//   - 搜 TPDB 必须用 StashDB 英文名（英文站），从 JavStash 的 stashdb 链接 UUID 反查
 type FetchResult struct {
 	NameOriginal string
 	Aliases      []string
@@ -63,6 +64,7 @@ type Fetcher struct {
 	JavStash     *StashBoxClient
 	StashDB      *StashBoxClient
 	TheActorBase *TheActorBaseClient
+	DramaFace    *DramaFaceClient
 	Gfriends     *Gfriends
 	MDCx         *MDCxDB
 	Dict         *Dict
@@ -187,12 +189,31 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		js = f.searchCandidates(ctx, res, f.JavStash, candidates)
 	}
 
-	// ---------- 5. StashDB：欧美演员兜底 ----------
-	// 保留命中的 performer：它的 Name 是 stash-box 英文站的标准英文名，
-	// 是第 6 步搜 TPDB（英文站）最可靠的关键词。不能像以前那样丢掉返回值。
+	// ---------- 5. StashDB：英文名是搜 TPDB 的硬规定关键词 ----------
+	// 用户硬性要求：搜 TPDB 必须用 StashDB 的标准英文名（TPDB 是英文站）。
+	// 两条路径拿这个英文名：
+	//   (a) JavStash 命中 → 它的 urls 里常直接带 stashdb.org/performers/<uuid>
+	//       （实测 12432 个 JavStash 命中里 3817 个带，31%），用 UUID 精确反查，
+	//       这样日本演员也有 StashDB 英文名可搜 TPDB。
+	//   (b) JavStash 没命中（欧美演员）→ 按候选名查 StashDB。
+	// 拿到的 performer.Name 供第 6 步 tpdbTerms 排第一。
 	var sd *Performer
-	if js == nil && f.StashDB != nil && f.StashDB.APIKey != "" {
-		sd = f.searchCandidates(ctx, res, f.StashDB, candidates)
+	if f.StashDB != nil && f.StashDB.APIKey != "" {
+		sdUUID := ""
+		if js != nil {
+			if ids := extractProviderIDs(js.URLs); ids["StashDB"] != "" {
+				sdUUID = ids["StashDB"]
+			}
+		}
+		if sdUUID != "" {
+			if p, err := f.StashDB.Search(ctx, sdUUID); err == nil && p != nil {
+				sd = p
+				f.logf("[%s] StashDB 按 JavStash 链接 UUID 命中：%s", name, p.Name)
+			}
+		}
+		if sd == nil && js == nil {
+			sd = f.searchCandidates(ctx, res, f.StashDB, candidates)
+		}
 	}
 
 	// ---------- 5.5 生日兜底：只在 JavStash 缺席时用 MDCx ----------
@@ -214,22 +235,44 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		}
 	}
 
-	// ---------- 7. theactorbase：中文简介第二顺位 ----------
-	// 维基往往只有一句话（「XXX是一位日本AV女优。」），theactorbase 给的是整段经历。
-	// 所以拿到短简介时继续往下问，谁长用谁。
-	if len([]rune(res.Bio)) < bioUpgradeRunes && f.TheActorBase != nil {
+	// ---------- 7. 中文简介补充：dramaface → theactorbase ----------
+	// 维基往往只有一句话（「XXX是一位日本AV女优。」），另外两个站给的是整段经历。
+	// 两者的英文站 slug 都只认罗马字，MDCx 的 romanization 覆盖 93.9%，放最前面。
+	// 拿到短简介时继续往下问，谁长用谁；dramaface 中文质量更高，排在前面。
+	if len([]rune(res.Bio)) < bioUpgradeRunes {
 		terms := candidates
-		// 站点 slug 用罗马字拼，日文名拼不出来。MDCx 的 romanization 覆盖 93.9%，放最前面。
 		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
 			terms = prependUnique(terms, p.Romaji)
 		}
-		if bio := f.TheActorBase.FetchBio(ctx, terms); bio != "" && ValidBio(bio) {
-			f.mark(res, "theactorbase", true)
-			if len([]rune(bio)) > len([]rune(res.Bio)) {
-				res.Bio = bio
+		// 数据源返回的标准英文名也是可靠 slug（如 StashDB 的 "Kana Momonogi"）
+		if js != nil && js.Name != "" {
+			terms = prependUnique(terms, js.Name)
+		}
+		if sd != nil && sd.Name != "" {
+			terms = prependUnique(terms, sd.Name)
+		}
+
+		if f.DramaFace != nil {
+			if bio := f.DramaFace.FetchBio(ctx, terms); bio != "" && ValidBio(bio) {
+				f.mark(res, "dramaface", true)
+				if len([]rune(bio)) > len([]rune(res.Bio)) {
+					res.Bio = bio
+					res.BioLang = "zh"
+				}
+			} else {
+				f.mark(res, "dramaface", false)
 			}
-		} else {
-			f.mark(res, "theactorbase", false)
+		}
+		if f.TheActorBase != nil {
+			if bio := f.TheActorBase.FetchBio(ctx, terms); bio != "" && ValidBio(bio) {
+				f.mark(res, "theactorbase", true)
+				if len([]rune(bio)) > len([]rune(res.Bio)) {
+					res.Bio = bio
+					res.BioLang = "zh"
+				}
+			} else {
+				f.mark(res, "theactorbase", false)
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 # actor-em
 
-给 Emby 用的演员元数据库。以 **MDCx 的演员档案为主干**，用 JavStash / TPDB / 维基 / theactorbase /
+给 Emby 用的演员元数据库。以 **MDCx 的演员档案为主干**，用 JavStash / TPDB / 维基 / dramaface / theactorbase /
 gfriends 把每个演员补齐到 Emby 的 12 项标准，产出一份扁平数据 + 一份 Excel。
 
 任何程序读 `actors.json` 就能拿到全部演员信息，不依赖媒体服务器，也不需要数据库。

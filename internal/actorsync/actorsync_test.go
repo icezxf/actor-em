@@ -1,6 +1,10 @@
 package actorsync
 
 import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -709,5 +713,111 @@ func TestTPDBTermsMDCxAndCandidatesFallback(t *testing.T) {
 	got = tpdbTerms(candidates, nil, "山岸逢花", nil, nil)
 	if len(got) != 1 || got[0] != "山岸逢花" {
 		t.Fatalf("应只剩清单原名，得到 %v", got)
+	}
+}
+
+// 硬规定：搜 TPDB 必须用 StashDB 英文名。JavStash 命中时，从它的 urls 里
+// 提取 StashDB UUID 精确反查（findPerformer），拿到标准英文名。
+func TestStashDBLookupByJavStashUUID(t *testing.T) {
+	const uuid = "00f5bcc6-f85e-444d-a6d8-7b1b52fb4717"
+	var gotQuery, gotID string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var req struct {
+			Query     string         `json:"query"`
+			Variables map[string]any `json:"variables"`
+		}
+		_ = json.NewDecoder(r.Body).Decode(&req)
+		gotQuery = req.Query
+		gotID, _ = req.Variables["id"].(string)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"data":{"findPerformer":{"id":"` + uuid + `","name":"Iori Ohashi","aliases":["大桥依织"],"gender":"FEMALE","urls":[]}}}`))
+	}))
+	defer srv.Close()
+
+	c := NewStashBoxClient("stashdb", srv.URL, "test-key")
+	p, err := c.Search(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("按 UUID 查询失败: %v", err)
+	}
+	if p.Name != "Iori Ohashi" {
+		t.Fatalf("英文名错误: %q", p.Name)
+	}
+	if !strings.Contains(gotQuery, "findPerformer") || gotID != uuid {
+		t.Fatalf("应走 findPerformer(id) 路径，query=%q id=%q", gotQuery, gotID)
+	}
+	// 反查到的英文名必须能被 tpdbTerms 排到第一位
+	terms := tpdbTerms([]string{"大桥依织"}, nil, "大桥依织", nil, p)
+	if len(terms) == 0 || terms[0] != "Iori Ohashi" {
+		t.Fatalf("StashDB 英文名应排 TPDB 搜索词第一，得到 %v", terms)
+	}
+}
+
+// dramaface slug 实测规则：全名拼接（两种词序）+ 末段兜底，大小写保留。
+func TestDramaSlugs(t *testing.T) {
+	cases := []struct {
+		in   string
+		want []string
+	}{
+		{"Kana Momonogi", []string{"KanaMomonogi", "MomonogiKana", "Momonogi"}},
+		{"Aika Yamagishi", []string{"AikaYamagishi", "YamagishiAika", "Yamagishi"}},
+		{"aika", []string{"aika"}},
+		{"", nil},
+	}
+	for _, c := range cases {
+		got := dramaSlugs(c.in)
+		if strings.Join(got, ",") != strings.Join(c.want, ",") {
+			t.Errorf("dramaSlugs(%q) = %v, want %v", c.in, got, c.want)
+		}
+	}
+}
+
+// dramaface 简介：meta description 里取正文，剥掉开头属性串；未命中页返回空。
+func TestDramaFaceFetchBio(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		switch r.URL.Path {
+		case "/model/MomonogiKana":
+			_, _ = w.Write([]byte(`<html><head><title>桃乃木香奈 (桃乃木かな,Kana Momonogi) 角色解析</title><meta name="description" content="桃乃木かな（日文名：桃乃木 かな，出生于1996年12月24日）是日本知名的AV女优、歌手，隶属于事务所。她来自东京都，2015年进入AV行业并于同年10月出道，随后崭露头角获得多项大奖。"></head></html>`))
+		case "/model/YuaMikami":
+			// 开头带属性串，需剥掉后才是正文
+			_, _ = w.Write([]byte(`<html><head><title>三上悠亚</title><meta name="description" content="身高: 155cm 罩杯: D 胸围: 84cm 三上悠亚，原名鬼头桃菜，1993年出生于日本爱知县名古屋市，是前女子偶像团体SKE48的成员，后成为AV演员，演艺经历丰富。"></head></html>`))
+		case "/model/Kana":
+			_, _ = w.Write([]byte(`<html><head><title>提示信息 -  9K星图</title><meta name="description" content=",9K星图"></head></html>`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+	c := &DramaFaceClient{HTTP: srv.Client(), Base: srv.URL + "/model/"}
+
+	// 正常简介：meta description 直接返回
+	bio := c.FetchBio(context.Background(), []string{"Kana Momonogi"})
+	if !strings.HasPrefix(bio, "桃乃木かな") {
+		t.Fatalf("应取到桃乃木简介，得到 %q", bio)
+	}
+
+	// 属性串开头：剥掉前缀后返回正文
+	bio = c.FetchBio(context.Background(), []string{"Yua Mikami"})
+	if !strings.HasPrefix(bio, "三上悠亚") {
+		t.Fatalf("应剥掉属性串返回正文，得到 %q", bio)
+	}
+	if strings.Contains(bio, "身高: 155cm") {
+		t.Fatalf("属性串不应残留：%q", bio)
+	}
+
+	// 未命中页（提示信息）跳过，最后一个不存在的 slug 返回空
+	bio = c.FetchBio(context.Background(), []string{"Kana"})
+	if bio != "" {
+		t.Fatalf("未命中页应返回空，得到 %q", bio)
+	}
+
+	// 直接验证属性串剥离函数
+	desc := "身高: 155cm 罩杯: D 胸围: 84cm 三上悠亚，原名鬼头桃菜，1993年出生于日本爱知县名古屋市，是前女子偶像团体SKE48的成员，后成为AV演员。"
+	if ValidBio(desc) {
+		t.Fatal("以属性串开头的文本不应通过 ValidBio")
+	}
+	cleaned := stripDramaFields(desc)
+	if !ValidBio(cleaned) || !strings.HasPrefix(cleaned, "三上悠亚") {
+		t.Fatalf("剥离属性串后应是正文，得到 %q", cleaned)
 	}
 }

@@ -725,6 +725,9 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 			logger.Printf("gfriends 索引：%d 张图", g.Size())
 		}
 	}
+	if cfg.DramaFace {
+		fetcher.DramaFace = actorsync.NewDramaFaceClient(hc)
+	}
 	if cfg.TheActorBase {
 		fetcher.TheActorBase = actorsync.NewTheActorBaseClient(hc)
 	}
