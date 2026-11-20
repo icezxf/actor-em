@@ -16,7 +16,10 @@
 | **TPDB** | 三围（英寸）、体重、长简介、出道年、图 | 三围 46% / 体重 13% / 长简介 27% | 三围**兜底**：第一段可能是「下胸围+杯」，不能直接当胸围 |
 | **中文维基** | 中文简介 | 命中率一般，但质量最高 | 简介第 1 顺位，需带 `WIKI_EMAIL` 防风控 |
 | **dramaface**（剧面） | 中文简介（整段，质量高） | 静态 HTML，slug = `罗马字名去空格拼接`（如 `MomonogiKana`），大小写不敏感 | 简介第 2 顺位，默认开启（`DRAMAFACE=0` 关），需浏览器 UA |
-| **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 简介第 3 顺位，可兜底 OU 的缺口 |
+| **yinrenlu**（映人录） | 中文简介（2 段）、中文艺名、罗马字、生日、出道年、出生地 | `/search?q=` → `/people/<id>`，样本 10 查 9 中 | 默认开启（`YINRENLU=0` 关）；卡片原名 + 详情原名双重对账 |
+| **cinewho**（影中人） | 中文简介（长）、生日、身高、三围、中文名、英文名 | `/search.php?q=` → `/cine/<slug>`，JSON-LD `Person` 结构 | 默认开启（`CINEWHO=0` 关）；详情页原名/英文名对账 |
+| **jav-idol-db** | 16 份中文简介、日文原名 / `name_zh` / 罗马字 / 生日 / 三围 / 出道 | GitHub raw 的 `data/actresses/<日文名>/profile.json`，共 114 份 | 默认开启（`IDOLDB=0` 关）；目录名即原名，按名取档几乎不串人 |
+| **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 中文简介链末端，需 `THEACTORBASE=1` 开 |
 | **gfriends** | 头像图库（51 分类 / 107,720 条 / 10GB，每日更新） | 一个演员可能多张 | **头像首选**，同时给国内镜像 |
 | ~~Ouxiang~~ | ~~中文简介~~ | 站点已挂 | 只保留 `provider_ids.Ouxiang` 存档 |
 
@@ -39,9 +42,9 @@
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
-| `gender` | string? | JavStash → TPDB | `female` / `male` |
-| `birth_date` | string? | **JavStash → MDCx 兜底** | 见下方「生日的两级来源」 |
-| `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx`，空表示没有生日 |
+| `gender` | string? | JavStash → TPDB → cinewho | `female` / `male` |
+| `birth_date` | string? | **JavStash → MDCx 兜底 → 中文人物站兜底** | 见下方「生日的来源」 |
+| `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb`，空表示没有生日 |
 | `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
 | `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | 落到 Emby `ProductionLocations` |
 | `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
@@ -52,10 +55,11 @@
 |---|---|---|---|
 | JavStash | 40.9%（866 条实测） | — | 直接写，`birth_date_source=javstash` |
 | MDCx `birthday` | 65.2%（14,254 条） | 75.8%（178 条都有里 135 条一致） | 只在空位补，`birth_date_source=mdcx` |
+| yinrenlu / cinewho / jav-idol-db | 三站合计只补前两站剩下的空位 | 页面原名与候选名精确一致才采 | `birth_date_source` 写对应站名，便于单独剔除 |
 
-两者加起来把覆盖率从 40.9% 提到 **65.7%**（+215 条 / 866 条）。冲突的 24.2% 里 79% 连年份都不同，多发生在短名和常见名上（`AI`、`MINAMO`、`SOPHIA`、`かわいさとみ`），本质是 MDCx 按名字索引撞了同名异人。
+JavStash + MDCx 把覆盖率从 40.9% 提到 **65.7%**（+215 条 / 866 条）。冲突的 24.2% 里 79% 连年份都不同，多发生在短名和常见名上（`AI`、`MINAMO`、`SOPHIA`、`かわいさとみ`），本质是 MDCx 按名字索引撞了同名异人。
 
-**为什么不担心"引入错误数据"**：兜底只在 `birth_date` 为空时生效，JavStash 命中时这个分支根本走不到，所以对已有权威值零影响。对原本空着的记录来说，填一个 76% 概率正确的日期，仍然比空着更可用；下游若只要权威值，按 `birth_date_source == "javstash"` 过滤即可。
+**为什么不担心"引入错误数据"**：兜底只在 `birth_date` 为空时生效，JavStash 命中时这个分支根本走不到，所以对已有权威值零影响。新加的三个中文站还要先过原名对账，比 MDCx 的纯名字索引更严；下游若只要权威值，按 `birth_date_source == "javstash"` 过滤即可。
 
 ### 2.3 身体
 
@@ -117,7 +121,7 @@ band   = (下胸围 + 11cm) / 2.54，取最近偶数   （→ 36）
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
-| `bio` | string? | 中文维基 → dramaface → theactorbase（短简介才升级，谁长用谁） | **不取英文简介，不调 DeepL** |
+| `bio` | string? | 中文维基 → dramaface（短简介才升级）→ yinrenlu → cinewho → jav-idol-db → theactorbase，**谁长用谁** | **不取英文简介，不调 DeepL** |
 | `bio_lang` | string? | `zh` / `ja` | 中文维基常返回繁中 |
 
 维基是**按标题查**而不是按人查，短名字会命中同名物，且看起来完全合法。实测
@@ -142,9 +146,15 @@ David → 大衛王是公元前10世紀以色列聯合王國的第二任國王
 实测 `Mio Fukada` 的简介写着「161cm 出生于 1995-11-12」，而 JavStash 给的是
 `153cm / 1998-12-27` —— 抓到的是同名的另一个人。
 
-**不做名字匹配校验**：`志田明里` 的简介讲「あいだ飛鳥」、`橘日菜` 讲「立花日菜」，
+**猜 slug 的源不做名字匹配校验**：`志田明里` 的简介讲「あいだ飛鸟」、`橘日菜` 讲「立花日菜」，
 看着像错配，其实是同一人的艺名变更和汉字/假名写法（aliases 里都有）。按名字卡
 会大量误杀。
+
+**先搜后读详情的源反过来必须精确对账**：yinrenlu / cinewho / jav-idol-db 都会把
+页面上的显示名、原名（`person-native` / JSON-LD `name`）、罗马字、其他艺名与候选名
+逐个归一化后比对，任一个完全一致才采信；搜索结果里同姓/同名但名字不一致的人直接跳过。
+这类源因为身份已确认，简介不必再含 AV 圈关键词也能通过 `validCNBio()`
+（jav-idol-db 的「2019年以MOODYZ专属身份出道…」就是这种情况）。
 
 > 结果是简介覆盖率从「60%（含 82% 垃圾）」降到 **约 8%（纯净）**。空着比写着
 > 「桃是蔷薇科植物」好 —— Overview 里那行元数据头已经把身高/罩杯/三围/出道年

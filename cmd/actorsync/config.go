@@ -24,6 +24,9 @@ type Config struct {
 	GfriendsIndex string // GFRIENDS_INDEX：本地 Filetree.json，填了就不联网拉
 	TheActorBase  bool   // THEACTORBASE=1：启用 theactorbase 中文简介兜底
 	DramaFace     bool   // DRAMAFACE=0 关闭；默认开启，中文简介优先补充源
+	Yinrenlu      bool   // YINRENLU=0 关闭；映人录中文简介+生日/出道年
+	Cinewho       bool   // CINEWHO=0 关闭；影中人中文简介+生日/身高/三围
+	IdolDB        bool   // IDOLDB=0 关闭；MagicBude/jav-idol-db 档案补充
 
 	// alist（仅 --scan-nfo 读 nfo 用；头像不转存）
 	AlistURL  string
@@ -106,8 +109,11 @@ func applyEnv(c *Config) {
 	set(&c.GfriendsIndex, "GFRIENDS_INDEX")
 	c.Gfriends = os.Getenv("GFRIENDS") == "1" || strings.EqualFold(os.Getenv("GFRIENDS"), "true")
 	c.TheActorBase = os.Getenv("THEACTORBASE") == "1" || strings.EqualFold(os.Getenv("THEACTORBASE"), "true")
-	// dramaface 默认开启（DRAMAFACE=0 可关）：中文简介补充，无 Key 需求
+	// 以下中文人物站默认开启（对应 =0 可关）：无 Key 需求，身份靠原名对账。
 	c.DramaFace = !(os.Getenv("DRAMAFACE") == "0" || strings.EqualFold(os.Getenv("DRAMAFACE"), "false"))
+	c.Yinrenlu = !(os.Getenv("YINRENLU") == "0" || strings.EqualFold(os.Getenv("YINRENLU"), "false"))
+	c.Cinewho = !(os.Getenv("CINEWHO") == "0" || strings.EqualFold(os.Getenv("CINEWHO"), "false"))
+	c.IdolDB = !(os.Getenv("IDOLDB") == "0" || strings.EqualFold(os.Getenv("IDOLDB"), "false"))
 	set(&c.AlistURL, "ALIST_URL")
 	set(&c.AlistUser, "ALIST_USER")
 	set(&c.AlistPass, "ALIST_PASS")

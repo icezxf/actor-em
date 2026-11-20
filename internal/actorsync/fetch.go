@@ -22,7 +22,8 @@ var ErrNotFound = errors.New("not found")
 // 字段来源见 docs/actor-fields.md，这里只强调四条硬规则：
 //   - 生日以 JavStash 为准，它缺席时才用 MDCx（并标 BirthDateSource=mdcx）
 //   - 三围 MDCx 打底（厘米反推成「底围+杯」英寸写法），TPDB 兜底
-//   - 简介只要中文：wiki → dramaface → theactorbase，不取英文、不机翻
+//   - 简介只要中文：wiki → dramaface → yinrenlu → cinewho → jav-idol-db → theactorbase，不取英文、不机翻
+//   - 中文人物站能按原名精确对账，除简介外还补生日/身高/出道年（只填空位）
 //   - 搜 TPDB 必须用 StashDB 英文名（英文站），从 JavStash 的 stashdb 链接 UUID 反查
 type FetchResult struct {
 	NameOriginal string
@@ -65,6 +66,9 @@ type Fetcher struct {
 	StashDB      *StashBoxClient
 	TheActorBase *TheActorBaseClient
 	DramaFace    *DramaFaceClient
+	Yinrenlu     *YinrenluClient
+	Cinewho      *CinewhoClient
+	IdolDB       *IdolDBClient
 	Gfriends     *Gfriends
 	MDCx         *MDCxDB
 	Dict         *Dict
@@ -235,23 +239,24 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		}
 	}
 
-	// ---------- 7. 中文简介补充：dramaface → theactorbase ----------
-	// 维基往往只有一句话（「XXX是一位日本AV女优。」），另外两个站给的是整段经历。
-	// 两者的英文站 slug 都只认罗马字，MDCx 的 romanization 覆盖 93.9%，放最前面。
-	// 拿到短简介时继续往下问，谁长用谁；dramaface 中文质量更高，排在前面。
-	if len([]rune(res.Bio)) < bioUpgradeRunes {
-		terms := candidates
-		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
-			terms = prependUnique(terms, p.Romaji)
-		}
-		// 数据源返回的标准英文名也是可靠 slug（如 StashDB 的 "Kana Momonogi"）
-		if js != nil && js.Name != "" {
-			terms = prependUnique(terms, js.Name)
-		}
-		if sd != nil && sd.Name != "" {
-			terms = prependUnique(terms, sd.Name)
-		}
+	// ---------- 7. 中文简介补充 ----------
+	// 维基往往只有一句话（「XXX是一位日本AV女优。」），下面几站给的是整段经历。
+	// 猜 slug 的站（dramaface / theactorbase）只认罗马字，MDCx 覆盖 93.9% 放最前面；
+	// 按名字搜详情页的中文站（yinrenlu / cinewho / jav-idol-db）也在同一组词里找。
+	// 数据返回的标准英文名也是可靠 slug（如 StashDB 的 "Kana Momonogi"）。
+	terms := candidates
+	if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
+		terms = prependUnique(terms, p.Romaji)
+	}
+	if js != nil && js.Name != "" {
+		terms = prependUnique(terms, js.Name)
+	}
+	if sd != nil && sd.Name != "" {
+		terms = prependUnique(terms, sd.Name)
+	}
 
+	// 短简介才去猜 slug：这些站没有身份对账能力，命中同名别人的代价高。
+	if len([]rune(res.Bio)) < bioUpgradeRunes {
 		if f.DramaFace != nil {
 			if bio := f.DramaFace.FetchBio(ctx, terms); bio != "" && ValidBio(bio) {
 				f.mark(res, "dramaface", true)
@@ -276,7 +281,11 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		}
 	}
 
-	// 简介到 theactorbase 为止。MDCx 那个「身高: 166cm | 罩杯: D | 三围: 84/60/86」
+	// 中文人物站无论简介长短都跑：它们能用页面上的原名精确对账，
+	// 除了更长的中文简介，还能补生日/身高/出道年这些结构性空位。
+	f.fetchCNProfiles(ctx, res, terms)
+
+	// 简介到中文人物站为止。MDCx 那个「身高: 166cm | 罩杯: D | 三围: 84/60/86」
 	// 是字段串不是文章，塞进 Overview 只会跟头部那行五项重复，宁可空着。
 
 	res.Bio = strings.TrimSpace(res.Bio)
@@ -299,6 +308,84 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	res.HomePageURL = buildHomePageURL(res.ProviderIDs)
 
 	return res
+}
+
+// fetchCNProfiles 跑三个「先搜索/按名取档、再读详情」的中文人物站。
+// 每个源单独 12 秒超时，任何一个挂掉都不拖累其他源，也不影响已抓到的字段。
+func (f *Fetcher) fetchCNProfiles(ctx context.Context, res *FetchResult, terms []string) {
+	type cnSource struct {
+		name  string
+		fetch func(context.Context, []string) (*CNProfile, string)
+	}
+	var sources []cnSource
+	if f.Yinrenlu != nil {
+		sources = append(sources, cnSource{"yinrenlu", f.Yinrenlu.Fetch})
+	}
+	if f.Cinewho != nil {
+		sources = append(sources, cnSource{"cinewho", f.Cinewho.Fetch})
+	}
+	if f.IdolDB != nil {
+		sources = append(sources, cnSource{"idoldb", f.IdolDB.Fetch})
+	}
+	for _, s := range sources {
+		cctx, cancel := context.WithTimeout(ctx, 12*time.Second)
+		p, matched := s.fetch(cctx, terms)
+		cancel()
+		if p == nil || !p.hasContent() {
+			f.mark(res, s.name, false)
+			continue
+		}
+		f.mark(res, s.name, true)
+		f.logf("[%s] %s 命中：%s（简介 %d 字）", res.NameOriginal, s.name,
+			matched, len([]rune(p.Bio)))
+		f.applyCNProfile(res, s.name, p)
+	}
+}
+
+// applyCNProfile 只填空位；简介谁长用谁。
+// 生日例外：这三站能按原名对账，JavStash/MDCx 都没给时它们的值可用，
+// 但要在 BirthDateSource 上标出来，别冒充 JavStash 权威值。
+func (f *Fetcher) applyCNProfile(res *FetchResult, source string, p *CNProfile) {
+	if bio := strings.TrimSpace(p.Bio); validCNBio(bio) {
+		if res.Bio == "" || len([]rune(bio)) > len([]rune(res.Bio)) {
+			res.Bio = bio
+			res.BioLang = "zh"
+		}
+	}
+	if res.ChineseName == "" && p.ChineseName != "" {
+		res.ChineseName = p.ChineseName
+	}
+	if p.Romaji != "" {
+		res.Aliases = mergeStrings(res.Aliases, []string{p.Romaji})
+	}
+	if len(p.Aliases) > 0 {
+		res.Aliases = mergeStrings(res.Aliases, p.Aliases)
+	}
+	if res.BirthDate == "" && p.BirthDate != "" {
+		res.BirthDate = p.BirthDate
+		res.BirthDateSource = source
+	}
+	if res.HeightCm == 0 && p.HeightCm > 0 {
+		res.HeightCm = p.HeightCm
+	}
+	if res.Gender == "" && p.Gender != "" {
+		res.Gender = p.Gender
+	}
+	if res.BirthPlace == "" && p.BirthPlace != "" {
+		res.BirthPlace = p.BirthPlace
+	}
+	if res.CareerStart == 0 && p.CareerStart > 0 {
+		res.CareerStart = p.CareerStart
+	}
+	if res.Measurements == "" {
+		if s := MeasurementsInches(p.Bust, p.Waist, p.Hip, p.Cup); s != "" {
+			res.Measurements = s
+			res.MeasurementsUnit = "in"
+		}
+	}
+	if p.ImageURL != "" {
+		res.Images = mergeStrings(res.Images, []string{p.ImageURL})
+	}
 }
 
 // applyMDCx 把离线档案铺进结果。只填空位，不覆盖已有值。

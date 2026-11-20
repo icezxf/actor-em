@@ -13,7 +13,7 @@ type Actor struct {
 
 	Gender    *string `json:"gender"`
 	BirthDate *string `json:"birth_date"`
-	// BirthDateSource 只有两个值：javstash（权威）/ mdcx（兜底）。
+	// BirthDateSource：javstash（权威）/ mdcx / yinrenlu / cinewho / idoldb。
 	// 空表示还没有生日。下游若不信任二手生日，按这个字段过滤即可。
 	BirthDateSource *string `json:"birth_date_source"`
 	BirthPlace      *string `json:"birth_place"`

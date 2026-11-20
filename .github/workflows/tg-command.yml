@@ -62,6 +62,7 @@ jobs:
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
 
           # 离线档案 + 头像库 + 简介兜底源，必须和 actor-sync 一致
+          # dramaface / 映人录 / 影中人 / jav-idol-db 默认开启（=0 可关）
           MDCX_CSV: /tmp/mdcx_profiles.csv
           GFRIENDS: "1"
           THEACTORBASE: "1"

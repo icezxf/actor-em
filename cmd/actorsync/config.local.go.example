@@ -26,7 +26,12 @@ func applyLocalFile(c *Config) {
 	c.MDCxCSV = "/tmp/mdcx_profiles.csv"
 	c.Gfriends = true        // 头像首选库，启动要拉 6MB 索引
 	c.GfriendsIndex = ""     // 填本地 Filetree.json 就不联网拉，调试用
-	c.TheActorBase = true    // 中文简介第 2 顺位（抓网页，比 API 慢）
+	c.TheActorBase = true    // 中文简介链末端（抓网页，比 API 慢）
+	// 以下四个默认开启；本地调试想少发请求就设 false（CI 上用 =0 环境变量）
+	c.DramaFace = true   // 猜 slug 的中文简介源
+	c.Yinrenlu = true    // 映人录：搜索 → 详情，中文简介 + 生日/出道年
+	c.Cinewho = true     // 影中人：搜索 → JSON-LD，中文简介 + 生日/身高/三围
+	c.IdolDB = true      // MagicBude/jav-idol-db 的 114 份 profile.json
 
 	// ===== alist（仅 --scan-nfo 用；头像不转存）=====
 	c.AlistURL = "https://alist.example.com"

@@ -728,6 +728,15 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	if cfg.DramaFace {
 		fetcher.DramaFace = actorsync.NewDramaFaceClient(hc)
 	}
+	if cfg.Yinrenlu {
+		fetcher.Yinrenlu = actorsync.NewYinrenluClient(hc)
+	}
+	if cfg.Cinewho {
+		fetcher.Cinewho = actorsync.NewCinewhoClient(hc)
+	}
+	if cfg.IdolDB {
+		fetcher.IdolDB = actorsync.NewIdolDBClient(hc)
+	}
 	if cfg.TheActorBase {
 		fetcher.TheActorBase = actorsync.NewTheActorBaseClient(hc)
 	}
