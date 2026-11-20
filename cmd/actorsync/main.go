@@ -40,7 +40,9 @@ func main() {
 	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
 	flag.BoolVar(&noXlsx, "no-xlsx", false, "不导出 Excel")
 	flag.BoolVar(&scanNFO, "scan-nfo", false, "只扫描 alist 里的 nfo 生成演员清单，不刮削")
-	flag.BoolVar(&backfill, "backfill-birthday", false, "只用 MDCx 离线档案给空的生日补值，不联网、不需要 API Key")
+	flag.BoolVar(&backfill, "backfill", false, "只用 MDCx 离线档案补空字段（生日/三围/标签/身高/罩杯/出道年），不联网、不需要 API Key")
+	// 老名字保留，脚本里还在用
+	flag.BoolVar(&backfill, "backfill-birthday", false, "同 --backfill（旧名）")
 	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
 	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
@@ -73,8 +75,8 @@ func main() {
 
 	// 只做离线补值：不联网、不需要任何 API Key
 	if backfill {
-		if err := runBackfillBirthday(cfg, logger); err != nil {
-			logger.Fatalf("补生日失败: %v", err)
+		if err := runBackfill(cfg, logger); err != nil {
+			logger.Fatalf("离线补值失败: %v", err)
 		}
 		return
 	}
@@ -389,7 +391,15 @@ func main() {
 //   - 已有生日一律不动（JavStash 是权威）
 //   - 旧记录有生日但没标来源的，补标 javstash（那时候只有这一个来源）
 //   - 只给 ok/partial 的空生日补 MDCx 值，并标 mdcx
-func runBackfillBirthday(cfg *Config, logger *log.Logger) error {
+//
+// runBackfill 用 MDCx 离线档案给库里已有的记录补空字段。
+//
+// 为什么需要它：`BuildPlan` 只挑 new / failed / no_source / refresh，库里已经 ok 的
+// 两万条永远不会重抓，所以抓取侧新增的字段（生日兜底、三围）对存量数据不生效。
+// 而这些字段 MDCx 本地就有，重抓 21,293 人要 12 小时，离线补只要几秒。
+//
+// 只填空位，绝不覆盖：JavStash 的生日、TPDB 的三围都保留原值。
+func runBackfill(cfg *Config, logger *log.Logger) error {
 	if cfg.MDCxCSV == "" {
 		return fmt.Errorf("缺少 MDCX_CSV，先跑 scripts/export_profiles.py 导出档案")
 	}
@@ -406,19 +416,21 @@ func runBackfillBirthday(cfg *Config, logger *log.Logger) error {
 	}
 	logger.Printf("本地库 %d 条 / MDCx 档案 %d 人（%s）", len(db.Actors), mdcx.Size(), cfg.MDCxCSV)
 
-	var withDate, tagged, filled, noMatch int
+	var fakeDate, unitTag int
+	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch int
 	for _, a := range db.Actors {
 		if a == nil {
 			continue
 		}
-		if v := actorsync.StrVal(a.BirthDate); v != "" {
-			withDate++
-			// 老库没有 birth_date_source，那时候的生日只可能来自 JavStash
-			if actorsync.StrVal(a.BirthDateSource) == "" {
-				a.BirthDateSource = actorsync.StrPtr("javstash")
-				tagged++
-			}
-			continue
+		// 老库没有 measurements_unit：那时候有三围只可能来自 TPDB（英寸）
+		if actorsync.StrVal(a.Measurements) != "" && actorsync.StrVal(a.MeasurementsUnit) == "" {
+			a.MeasurementsUnit = actorsync.StrPtr("in")
+			unitTag++
+		}
+		// 老库没有 birth_date_source，那时候的生日只可能来自 JavStash
+		if actorsync.StrVal(a.BirthDate) != "" && actorsync.StrVal(a.BirthDateSource) == "" {
+			a.BirthDateSource = actorsync.StrPtr("javstash")
+			fakeDate++
 		}
 		// skipped / no_source / failed 不补：它们不进下游，补了也没人看
 		if !a.Exportable() {
@@ -432,27 +444,59 @@ func runBackfillBirthday(cfg *Config, logger *log.Logger) error {
 		}
 		names = append(names, a.Aliases...)
 
-		hit := false
+		var p *actorsync.MDCxProfile
 		for _, n := range names {
 			if strings.TrimSpace(n) == "" {
 				continue
 			}
-			if p := mdcx.Lookup(n); p != nil && p.Birthday != "" {
-				a.BirthDate = actorsync.StrPtr(p.Birthday)
-				a.BirthDateSource = actorsync.StrPtr("mdcx")
-				filled++
-				hit = true
+			if got := mdcx.Lookup(n); got != nil {
+				p = got
 				break
 			}
 		}
-		if !hit {
+		if p == nil {
 			noMatch++
+			continue
+		}
+
+		if actorsync.StrVal(a.BirthDate) == "" && p.Birthday != "" {
+			a.BirthDate = actorsync.StrPtr(p.Birthday)
+			a.BirthDateSource = actorsync.StrPtr("mdcx")
+			nBirth++
+		}
+		if actorsync.StrVal(a.Measurements) == "" && p.Bust > 0 && p.Waist > 0 && p.Hip > 0 {
+			a.Measurements = actorsync.StrPtr(fmt.Sprintf("%d-%d-%d", p.Bust, p.Waist, p.Hip))
+			a.MeasurementsUnit = actorsync.StrPtr("cm")
+			nMeas++
+		}
+		if len(a.Tags) == 0 && len(p.Tags) > 0 {
+			a.Tags = p.Tags
+			nTags++
+		}
+		if a.HeightCm == nil && p.Height > 0 {
+			a.HeightCm = actorsync.IntPtr(p.Height)
+			nHeight++
+		}
+		if actorsync.StrVal(a.CupSize) == "" && p.Cup != "" {
+			a.CupSize = actorsync.StrPtr(p.Cup)
+			nCup++
+		}
+		if a.CareerStart == nil && p.CareerStart > 0 {
+			a.CareerStart = actorsync.IntPtr(p.CareerStart)
+			nCareer++
+		}
+		if actorsync.StrVal(a.BirthPlace) == "" && p.BirthPlace != "" {
+			a.BirthPlace = actorsync.StrPtr(p.BirthPlace)
+			nPlace++
 		}
 	}
 
-	logger.Printf("已有生日 %d 条（补标来源 %d），空生日补上 %d 条，查不到仍空 %d 条",
-		withDate, tagged, filled, noMatch)
-	if filled == 0 && tagged == 0 {
+	logger.Printf("补标来源：三围单位 %d 条、生日来源 %d 条", unitTag, fakeDate)
+	logger.Printf("补空字段：生日 %d、三围 %d、标签 %d、身高 %d、罩杯 %d、出道年 %d、出生地 %d（MDCx 查不到 %d 条）",
+		nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch)
+
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + unitTag + fakeDate
+	if total == 0 {
 		logger.Printf("没有需要写回的改动")
 		return nil
 	}
