@@ -2,6 +2,10 @@ name: actor-tg-command
 
 # 由 Cloudflare Worker 通过 repository_dispatch 触发：
 # 每条 Telegram update 跑一次，处理完提交状态文件。
+#
+# 这条链路必须和 actor-sync 用同一套数据源（MDCx / gfriends / theactorbase），
+# 否则 Telegram 里发个名字刮出来的人是「残的」——没有出生地/罩杯/出道年/标签/头像。
+
 on:
   repository_dispatch:
     types: [actor-command]
@@ -9,7 +13,7 @@ on:
 permissions:
   contents: write
 
-# 与 actor-sync 共用同一个 group，避免两边同时写 actors.json
+# 与 actor-sync、base-db 共用同一个 group，避免同时写数据文件
 concurrency:
   group: actor-data
   cancel-in-progress: false
@@ -17,7 +21,7 @@ concurrency:
 jobs:
   handle:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +31,25 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Refresh dictionary
-        run: python3 scripts/gen_dict.py || echo "字典刷新失败，继续使用仓库内版本"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 字典由 base-db 工作流维护，这里不再现生成（旧脚本已删除）。
+      # 只校验存在，缺了就明确报错，别让人以为是「字典太旧」。
+      - name: Check dictionary
+        run: |
+          if [ ! -f actor_dict.csv ]; then
+            echo "::error::缺少 actor_dict.csv，请先手动跑一次 base-db 工作流"
+            exit 1
+          fi
+
+      # 33MB 的 sqlite 不入库，现下现导；失败不阻塞（退化成只有在线源）
+      - name: Export MDCx profiles
+        run: |
+          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv || {
+            echo "::warning::MDCx 档案导出失败，本次只用在线源"
+          }
 
       - name: Build
         run: go build -o /tmp/actorsync ./cmd/actorsync
@@ -38,11 +59,17 @@ jobs:
           TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
           JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
           STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
-          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+
+          # 离线档案 + 头像库 + 简介兜底源，必须和 actor-sync 一致
+          MDCX_CSV: /tmp/mdcx_profiles.csv
+          GFRIENDS: "1"
+          THEACTORBASE: "1"
 
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # webhook 与 getUpdates 互斥，这里发图就会 409
+          ACTORS_REVIEW_MAX: "0"
           ACTORS_VERBOSE: "1"
 
           # Worker 把整条 update 作为字符串放进 client_payload.update
@@ -58,8 +85,9 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 交互模式不一定生成 manifest / xlsx，逐个判断存在再 add
-          for f in actors.json actors.manifest.json actors.xlsx \
+          # actors.jsonl 是真源，必须提交；actors.json 是派生，一起带上免得下游读到旧版。
+          # 交互模式不一定生成 manifest，逐个判断存在再 add。xlsx 不入库（走 actor-sync 的 artifact）。
+          for f in actors.jsonl actors.json actors.manifest.json \
                    data/avatar_review.json data/avatar_choices.json; do
             [ -f "$f" ] && git add -- "$f" || true
           done

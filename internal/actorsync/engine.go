@@ -66,21 +66,26 @@ type ProcessResult struct {
 	Added      bool // 本次新入库
 }
 
-// Process 抓一个演员并写入内存中的 DB（是否落盘由调用方决定）。
-func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) (*ProcessResult, error) {
+// FetchPhase 只做网络抓取，不碰 DB，可以安全地在多个 goroutine 里并发跑。
+func (e *Engine) FetchPhase(ctx context.Context, name string) *FetchResult {
+	if e.Fetcher == nil {
+		return &FetchResult{NameOriginal: name, ProviderIDs: map[string]string{}, Sources: map[string]bool{}}
+	}
+	return e.Fetcher.Fetch(ctx, name)
+}
+
+// ApplyPhase 把抓取结果落成记录。它会读写 DB，**必须串行调用**。
+// 拆成两段是为了让批量同步能并发抓、串行写。
+func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, opts ProcessOptions) (*ProcessResult, error) {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return nil, fmt.Errorf("演员名为空")
-	}
-	if e.Fetcher == nil {
-		return nil, fmt.Errorf("未初始化数据源")
 	}
 	if e.DB == nil {
 		return nil, fmt.Errorf("未初始化数据库")
 	}
 
 	existing := e.DB.FindByName(name)
-	res := e.Fetcher.Fetch(ctx, name)
 
 	key := BuildKey(res.ProviderIDs, name)
 	if existing != nil {
@@ -119,7 +124,7 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 			out.Name = existing.Name
 			out.Kept = true
 			out.AvatarNote = "本次未抓到，保留原数据"
-			out.Candidates = OrderCandidates(res.Images, StrVal(existing.AvatarSource))
+			out.Candidates = OrderCandidates(res.Images, StrVal(existing.Avatar))
 			return out, nil
 		}
 	}
@@ -153,6 +158,16 @@ func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) 
 	return out, nil
 }
 
+// Process 抓一个演员并写入 DB，是 FetchPhase + ApplyPhase 的组合。
+// 交互式（Telegram）场景单人处理，用这个就行；批量同步要并发，走拆分后的两段。
+func (e *Engine) Process(ctx context.Context, name string, opts ProcessOptions) (*ProcessResult, error) {
+	if e.Fetcher == nil {
+		return nil, fmt.Errorf("未初始化数据源")
+	}
+	res := e.FetchPhase(ctx, name)
+	return e.ApplyPhase(ctx, name, res, opts)
+}
+
 // ApplyChoice 把用户选中的图片网络地址写进记录，就地更新。
 // 不下载、不转存：avatar 直接就是这张图的网络地址。
 // 返回更新后的记录与一句人类可读的说明。
@@ -179,16 +194,10 @@ func (e *Engine) Save() error {
 }
 
 // applyAvatarURL 把图片的网络地址直接写进头像字段，不经过任何转存。
-// avatar 与 avatar_source 都是这个地址；alist 时代的 path/dir/sha256/size/尺寸
-// 全部清空，避免旧记录残留已失效的 alist 直链信息。
+// avatar 是原图直链，avatar_cn 是它的国内镜像（只有 gfriends 的 raw 地址有镜像，
+// 其他源返回空串，下游按「没有镜像就用 avatar」处理）。
 func applyAvatarURL(actor *Actor, sourceURL, sourceSite string) {
 	actor.Avatar = StrPtr(sourceURL)
-	actor.AvatarSource = StrPtr(sourceURL)
 	actor.AvatarSourceSite = StrPtr(sourceSite)
-	actor.AvatarPath = nil
-	actor.AvatarDir = nil
-	actor.AvatarSHA256 = nil
-	actor.AvatarBytes = nil
-	actor.AvatarW = nil
-	actor.AvatarH = nil
+	actor.AvatarCN = StrPtr(MirrorCN(sourceURL))
 }

@@ -12,18 +12,20 @@ import (
 // 导出的列顺序，和下面的取值一一对应。
 var xlsxHeaders = []string{
 	"名字", "原名", "别名", "状态", "生日", "出生地", "身高cm", "体重kg",
-	"罩杯", "腰围cm", "臀围cm", "出道年", "简介", "头像直链", "头像路径",
+	"三围", "罩杯", "出道年", "标签", "简介", "头像", "头像镜像",
 	"来源", "外部ID", "最近抓取", "失败次数", "Key",
 }
 
 var xlsxWidths = map[string]float64{
 	"A": 18, "B": 18, "C": 24, "D": 10, "E": 12, "F": 10,
-	"G": 8, "H": 8, "I": 6, "J": 8, "K": 8, "L": 8,
-	"M": 60, "N": 34, "O": 30, "P": 22, "Q": 40, "R": 20, "S": 8, "T": 26,
+	"G": 8, "H": 8, "I": 14, "J": 6, "K": 8, "L": 24,
+	"M": 60, "N": 34, "O": 34, "P": 22, "Q": 40, "R": 20, "S": 8, "T": 26,
 }
 
+const xlsxAvatarCol = 14 // N 列，头像超链接
+
 // ExportXLSX 把演员库导成 Excel，方便手工查询/筛选。
-// 只读派生产物：改 Excel 不会回流，真源仍是 actors.json。
+// 只读派生产物：改 Excel 不会回流，真源仍是 actors.jsonl。
 func ExportXLSX(path string, db *Db) error {
 	f := excelize.NewFile()
 	const sheet = "演员库"
@@ -76,13 +78,13 @@ func ExportXLSX(path string, db *Db) error {
 			StrVal(a.BirthPlace),
 			intOrBlank(a.HeightCm),
 			intOrBlank(a.WeightKg),
+			StrVal(a.Measurements),
 			StrVal(a.CupSize),
-			intOrBlank(a.WaistCm),
-			intOrBlank(a.HipCm),
 			intOrBlank(a.CareerStart),
+			strings.Join(a.Tags, " / "),
 			trimForCell(StrVal(a.Bio), 32000),
 			StrVal(a.Avatar),
-			StrVal(a.AvatarPath),
+			StrVal(a.AvatarCN),
 			formatSources(a.Sources),
 			formatProviderIDs(a.ProviderIDs),
 			a.ScrapedAt,
@@ -96,7 +98,7 @@ func ExportXLSX(path string, db *Db) error {
 			}
 		}
 		if avatar := StrVal(a.Avatar); avatar != "" {
-			cell, _ := excelize.CoordinatesToCellName(14, row)
+			cell, _ := excelize.CoordinatesToCellName(xlsxAvatarCol, row)
 			if err := f.SetCellHyperLink(sheet, cell, avatar, "External"); err == nil {
 				_ = f.SetCellStyle(sheet, cell, cell, linkStyle)
 			}

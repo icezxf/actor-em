@@ -42,6 +42,7 @@ type tpdbDetail struct {
 		BirthplaceCode string `json:"birthplace_code"`
 		Height         string `json:"height"`
 		Weight         string `json:"weight"`
+		Measurements   string `json:"measurements"`
 		CupSize        string `json:"cupsize"`
 		Waist          string `json:"waist"`
 		Hips           string `json:"hips"`
@@ -113,7 +114,7 @@ func (c *TPDBClient) Search(ctx context.Context, term string) (*Performer, error
 
 	// 名字校验：防止短名/同名被错误匹配
 	if !isUUID {
-		if matchScore(NormalizeName(term), d.Name, d.Aliases) <= 0 {
+		if matchScore(term, d.Name, d.Aliases) <= 0 {
 			return nil, fmt.Errorf("%w: TPDB 返回了无关演员: %s", ErrNotFound, d.Name)
 		}
 	}
@@ -132,7 +133,12 @@ func (c *TPDBClient) Search(ctx context.Context, term string) (*Performer, error
 	}
 	p.Height = parseHeight(d.Extras.Height)
 	p.Weight = parseWeight(d.Extras.Weight)
-	p.CupSize = strings.TrimSpace(d.Extras.CupSize)
+	p.Measurements = strings.TrimSpace(d.Extras.Measurements)
+	// TPDB 的 cupsize 是 "34E"（band+cup），只留字母部分
+	p.CupSize = extractCupLetter(d.Extras.CupSize)
+	if p.CupSize == "" {
+		p.CupSize = cupFromMeasurements(p.Measurements)
+	}
 	p.Waist, _ = strconv.Atoi(strings.TrimSpace(d.Extras.Waist))
 	p.Hip, _ = strconv.Atoi(strings.TrimSpace(d.Extras.Hips))
 
@@ -222,6 +228,28 @@ func parseWeight(s string) int {
 	}
 	n, _ := strconv.Atoi(s)
 	return n
+}
+
+// extractCupLetter 从 "34E" / "E" 这类值里取出罩杯字母。
+// TPDB 的 cupsize 是「下胸围+罩杯」的写法，直接存会在库里出现 "34E"。
+func extractCupLetter(s string) string {
+	s = strings.ToUpper(strings.TrimSpace(s))
+	var b strings.Builder
+	for _, r := range s {
+		if r >= 'A' && r <= 'P' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// cupFromMeasurements 从 "34E-21-31" 里取第二段 E。
+func cupFromMeasurements(m string) string {
+	parts := strings.Split(strings.TrimSpace(m), "-")
+	if len(parts) < 2 {
+		return ""
+	}
+	return extractCupLetter(parts[1])
 }
 
 // normalizeDate 把 1996/5/10、1996-5-10、1996-05-10T00:00:00 统一成 1996-05-10。

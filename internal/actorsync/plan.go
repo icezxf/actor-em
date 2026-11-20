@@ -87,6 +87,10 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 	if IsUUID(name) && res.CanonicalName != "" {
 		displayName = res.CanonicalName
 	}
+	// 有中文名就用中文名，Emby 的 Name 是中文
+	if res.ChineseName != "" {
+		displayName = res.ChineseName
+	}
 
 	// name_original 存数据源返回的原始名（日文原名），和清单里的名字不同才有价值
 	origName := res.NameOriginal
@@ -105,12 +109,13 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 		Country:      StrPtr(res.Country),
 		HeightCm:     IntPtr(res.HeightCm),
 		WeightKg:     IntPtr(res.WeightKg),
+		Measurements: StrPtr(res.Measurements),
 		CupSize:      StrPtr(res.CupSize),
-		WaistCm:      IntPtr(res.WaistCm),
-		HipCm:        IntPtr(res.HipCm),
 		CareerStart:  IntPtr(res.CareerStart),
+		Tags:         res.Tags,
 		Bio:          StrPtr(res.Bio),
 		BioLang:      StrPtr(res.BioLang),
+		HomePageURL:  StrPtr(res.HomePageURL),
 		ProviderIDs:  res.ProviderIDs,
 		Status:       res.Outcome(),
 		Sources:      res.Sources,
@@ -119,6 +124,9 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 	}
 	if a.Aliases == nil {
 		a.Aliases = []string{}
+	}
+	if a.Tags == nil {
+		a.Tags = []string{}
 	}
 	if a.ProviderIDs == nil {
 		a.ProviderIDs = map[string]string{}
@@ -150,21 +158,16 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 		a.RetryAfter = nil
 	}
 
-	// 先保留旧头像字段：新图没抓到、或者下载/上传失败时，不要把已有直链擦掉
+	// 先保留旧头像：新图没抓到、或者处理失败时，不要把已有直链擦掉
 	if existing != nil {
 		a.Avatar = existing.Avatar
-		a.AvatarPath = existing.AvatarPath
-		a.AvatarDir = existing.AvatarDir
-		a.AvatarSource = existing.AvatarSource
+		a.AvatarCN = existing.AvatarCN
 		a.AvatarSourceSite = existing.AvatarSourceSite
-		a.AvatarSHA256 = existing.AvatarSHA256
-		a.AvatarBytes = existing.AvatarBytes
-		a.AvatarW = existing.AvatarW
-		a.AvatarH = existing.AvatarH
 	}
-	// 有新图时记录新图来源；上传成功后由调用方覆盖所有头像字段
+	// 有新图时记录新图来源；人工选图后会由调用方覆盖
 	if res.ImageURL != "" {
-		a.AvatarSource = StrPtr(res.ImageURL)
+		a.Avatar = StrPtr(res.ImageURL)
+		a.AvatarCN = StrPtr(MirrorCN(res.ImageURL))
 		a.AvatarSourceSite = StrPtr(res.ImageSite)
 	}
 

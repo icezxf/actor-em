@@ -3,12 +3,17 @@
 #   docker build -t actor-em .
 #   docker run -d --name actor-em --restart unless-stopped \
 #     --env-file secrets.env \
-#     -v "$PWD/actors.json:/app/actors.json" \
+#     -v "$PWD/actors.jsonl:/app/actors.jsonl" \
+#     -v "$PWD/actor_dict.csv:/app/actor_dict.csv:ro" \
 #     -v "$PWD/data:/app/data" \
 #     actor-em
 #
-# 挂载 actors.json 和 data/ 是必须的：bot 会往这两个地方写。
-# 反过来，宿主机改了 actors.json 需要重启容器才会被读到（启动时只加载一次）。
+# 挂载说明：
+#   actors.jsonl   真源，bot 会往里写（不挂就丢数据）
+#   data/          选图状态、手工补充字典，bot 也会写
+#   actor_dict.csv 只读，字典变了重启容器才会生效（启动时只加载一次）
+#
+# 注意：不要挂 actors.json —— 那是从 jsonl 派生的产物，挂了也不会被读。
 
 FROM golang:1.26-alpine AS build
 WORKDIR /src

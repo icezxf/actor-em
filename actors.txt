@@ -1,3 +1,7 @@
-# 待刮削演员清单，一行一个名字
-# 生成方式：./actorsync --scan-nfo --nfo-dir /media
-# 也可以直接在这里手工增删，改完提交即可
+# 手工补充清单：一行一个名字，`#` 开头是注释
+#
+# 主清单不在这里——它是 actor_dict.csv 里的全部演员（约 2.1 万），
+# 这个文件只用来临时追加字典里没有的人，留空也能正常跑。
+#
+# 从 alist 的 nfo 反查演员名（可选，需要本机配 ALIST_URL/ALIST_USER/ALIST_PASS）：
+#   ./bin/actorsync --scan-nfo --nfo-dir /media

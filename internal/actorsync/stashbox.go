@@ -7,30 +7,32 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 )
 
 // Performer 是各数据源归一化后的演员信息。
 type Performer struct {
-	Source      string // javstash / stashdb / tpdb
-	ID          string
-	Name        string
-	Aliases     []string
-	BirthDate   string
-	Country     string
-	Ethnicity   string
-	Gender      string
-	Height      int
-	Weight      int
-	CupSize     string
-	Waist       int
-	Hip         int
-	CareerStart int
-	Bio         string
-	ImageURL    string
-	Images      []string
-	URLs        []string // 外部链接，用于提取 provider ids
+	Source       string // javstash / stashdb / tpdb
+	ID           string
+	Name         string
+	Aliases      []string
+	BirthDate    string
+	Country      string
+	Ethnicity    string
+	Gender       string
+	Height       int
+	Weight       int
+	Measurements string // 仅 TPDB：原样英寸制串，如 "34E-21-31"，不换算
+	CupSize      string
+	Waist        int
+	Hip          int
+	CareerStart  int
+	Bio          string
+	ImageURL     string
+	Images       []string
+	URLs         []string // 外部链接，用于提取 provider ids
 }
 
 // StashBoxClient 同时适配 JavStash 和 StashDB（两者都是 stash-box GraphQL）。
@@ -163,11 +165,10 @@ func (c *StashBoxClient) Search(ctx context.Context, term string) (*Performer, e
 		}
 	} else {
 		// 严格匹配：名字或别名必须互相包含，且优先取完全相等的
-		sTerm := NormalizeName(term)
 		best := -1
 		for i := range envelope.Data.SearchPerformer {
 			p := &envelope.Data.SearchPerformer[i]
-			score := matchScore(sTerm, p.Name, p.Aliases)
+			score := matchScore(term, p.Name, p.Aliases)
 			if score > best {
 				best = score
 				hit = p
@@ -184,27 +185,49 @@ func (c *StashBoxClient) Search(ctx context.Context, term string) (*Performer, e
 	return toPerformer(c.Source, hit), nil
 }
 
-// matchScore: 100 完全相等，80 互相包含，0 不匹配。
+// matchScore: 100 完全相等，95 词序颠倒后相等，80 互相包含，0 不匹配。
+//
+// 「词序颠倒」这条不能省：日文名的罗马字常写成「姓 名」，而欧美库（TPDB）写「名 姓」，
+// 三上悠亜 就是 MDCx 给 "Mikami Yua"、TPDB 存 "Yua Mikami"，只比字符串会误判成两个人。
 func matchScore(term, name string, aliases []string) int {
-	if NormalizeName(name) == term {
+	nt := NormalizeName(term)
+	if NormalizeName(name) == nt {
 		return 100
 	}
 	for _, a := range aliases {
-		if NormalizeName(a) == term {
+		if NormalizeName(a) == nt {
 			return 95
 		}
 	}
+	if wordBag(name) != "" && wordBag(name) == wordBag(term) {
+		return 95
+	}
+	for _, a := range aliases {
+		if wordBag(a) != "" && wordBag(a) == wordBag(term) {
+			return 90
+		}
+	}
 	n := NormalizeName(name)
-	if strings.Contains(n, term) || strings.Contains(term, n) {
+	if strings.Contains(n, nt) || strings.Contains(nt, n) {
 		return 80
 	}
 	for _, a := range aliases {
 		an := NormalizeName(a)
-		if strings.Contains(an, term) || strings.Contains(term, an) {
+		if strings.Contains(an, nt) || strings.Contains(nt, an) {
 			return 70
 		}
 	}
 	return 0
+}
+
+// wordBag 把名字拆成单词后排序，用来做「不看词序」的比较。
+func wordBag(s string) string {
+	f := strings.Fields(strings.ToLower(strings.TrimSpace(s)))
+	if len(f) == 0 {
+		return ""
+	}
+	sort.Strings(f)
+	return strings.Join(f, " ")
 }
 
 func toPerformer(source string, p *stashPerformerJSON) *Performer {

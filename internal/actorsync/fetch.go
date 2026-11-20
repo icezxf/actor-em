@@ -15,7 +15,12 @@ import (
 // 用它区分「查无此人」（可标 no_source）和「网络/限流错误」（要重试）。
 var ErrNotFound = errors.New("not found")
 
-// FetchResult 是四源聚合后的中间结果，还没落成 Actor。
+// FetchResult 是多源聚合后的中间结果，还没落成 Actor。
+//
+// 字段来源见 docs/actor-fields.md，这里只强调三条硬规则：
+//   - 生日只认 JavStash（MDCx 的生日错值多，只做交叉校验，不写库）
+//   - 三围只认 TPDB，存原样字符串，不换算
+//   - 简介只要中文：wiki → theactorbase → MDCx 字段串，不取英文、不机翻
 type FetchResult struct {
 	NameOriginal string
 	Aliases      []string
@@ -25,14 +30,16 @@ type FetchResult struct {
 	Country      string
 	HeightCm     int
 	WeightKg     int
+	Measurements string // TPDB 原样，如 "34E-21-31"
 	CupSize      string
-	WaistCm      int
-	HipCm        int
 	CareerStart  int
+	Tags         []string
 	Bio          string
 	BioLang      string
 
 	CanonicalName string // 数据源返回的标准名（清单里写 UUID 时用它兜底）
+	ChineseName   string // 中文名，Emby 的 Name 用它；没有就退回清单名
+	HomePageURL   string // JavStash 演员页
 	ImageURL      string
 	ImageSite     string
 	Images        []string
@@ -43,14 +50,16 @@ type FetchResult struct {
 
 // Fetcher 编排所有数据源。任何一个源挂掉都不影响其他源。
 type Fetcher struct {
-	HTTP       *http.Client
-	TPDB       *TPDBClient
-	JavStash   *StashBoxClient
-	StashDB    *StashBoxClient
-	Translator *Translator
-	Dict       *Dict
-	WikiEmail  string
-	Verbose    bool
+	HTTP         *http.Client
+	TPDB         *TPDBClient
+	JavStash     *StashBoxClient
+	StashDB      *StashBoxClient
+	TheActorBase *TheActorBaseClient
+	Gfriends     *Gfriends
+	MDCx         *MDCxDB
+	Dict         *Dict
+	WikiEmail    string
+	Verbose      bool
 }
 
 func NewFetcher(hc *http.Client) *Fetcher {
@@ -74,7 +83,7 @@ var countryToChinese = map[string]string{
 	"BR": "巴西",
 }
 
-// Fetch 抓一个演员。name 用清单里的名字。
+// Fetch 抓一个演员。name 用清单里的名字（通常是日文名或中文名）。
 func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	res := &FetchResult{
 		NameOriginal: name,
@@ -83,89 +92,29 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	}
 	isUUID := IsUUID(name)
 
-	// ---------- 1. Ouxiang：中文简介的主要来源 ----------
-	var oux *OuxiangData
-	if !isUUID {
-		oxCtx, cancel := context.WithTimeout(ctx, 12*time.Second)
-		d, err := FetchOuxiang(oxCtx, f.HTTP, name)
-		cancel()
-		if err == nil {
-			oux = d
-			f.mark(res, "ouxiang", true)
-			if d.Bio != "" {
-				res.Bio = d.Bio
-			}
-			if d.Weight > 0 {
-				res.WeightKg = d.Weight
-			}
-			if d.URL != "" {
-				res.ProviderIDs["Ouxiang"] = d.URL
-			}
-			f.logf("[%s] ouxiang 命中：中文名=%s 日文名=%s", name, d.ZhName, d.JpName)
+	// ---------- 1. MDCx 离线档案：结构化字段的地基 ----------
+	// 它是本地库，不打网络，先铺一层；后面的在线源只填空位，不覆盖。
+	if f.MDCx != nil {
+		if p := f.MDCx.Lookup(name); p != nil {
+			f.mark(res, "mdcx", true)
+			f.applyMDCx(res, p)
+			f.logf("[%s] mdcx 命中：%s", name, p.Name)
 		} else {
-			// Ouxiang 只是附加源，挂了不算失败，否则会把整条记录误判成 failed
-			f.mark(res, "ouxiang", false)
-			f.logf("[%s] ouxiang 未命中: %v", name, err)
+			f.mark(res, "mdcx", false)
 		}
 	}
 
-	// ---------- 2. TPDB：生日、三围、体重、图 ----------
-	var tp *Performer
-	if f.TPDB != nil && f.TPDB.APIKey != "" {
-		p, err := f.TPDB.Search(ctx, name)
-		if err != nil {
-			f.mark(res, "tpdb", false)
-			f.countErr(res, err)
-		} else {
-			tp = p
-			f.mark(res, "tpdb", true)
-			f.applyPerformer(res, p, true)
-			f.logf("[%s] tpdb 命中：%s", name, p.Name)
-		}
-	}
-
-	// ---------- 3. 维基百科：补简介、拿日文名做搜索词 ----------
+	// ---------- 2. 候选名 ----------
 	candidates := []string{name}
 	lang := DetectLanguage(name)
 
-	switch lang {
-	case "zh":
-		wctx, wcancel := context.WithTimeout(ctx, 8*time.Second)
-		jaTitle, _, zhBio := FetchWiki(wctx, f.HTTP, "zh", name, "ja", f.WikiEmail)
-		wcancel()
-		if zhBio != "" {
-			f.mark(res, "wiki", true)
-			if res.Bio == "" {
-				res.Bio = zhBio
-			}
-		}
-		if jaTitle != "" {
-			candidates = prependUnique(candidates, jaTitle)
-			wctx2, wcancel2 := context.WithTimeout(ctx, 8*time.Second)
-			_, _, jaBio := FetchWiki(wctx2, f.HTTP, "ja", jaTitle, "", f.WikiEmail)
-			wcancel2()
-			if jaBio != "" && res.Bio == "" {
-				res.Bio = jaBio
-			}
-		}
-	case "ja":
-		wctx, wcancel := context.WithTimeout(ctx, 8*time.Second)
-		zhTitle, _, jaBio := FetchWiki(wctx, f.HTTP, "ja", name, "zh", f.WikiEmail)
-		wcancel()
-		if jaBio != "" {
-			f.mark(res, "wiki", true)
-			if res.Bio == "" {
-				res.Bio = jaBio
-			}
-		}
-		if zhTitle != "" {
-			candidates = prependUnique(candidates, zhTitle)
-			wctx2, wcancel2 := context.WithTimeout(ctx, 8*time.Second)
-			_, _, zhBio := FetchWiki(wctx2, f.HTTP, "zh", zhTitle, "", f.WikiEmail)
-			wcancel2()
-			if zhBio != "" && res.Bio == "" {
-				res.Bio = zhBio
-			}
+	// 字典里有「日文名 → 中文名」的话，中文名就是 Emby 的 Name
+	if f.Dict != nil {
+		if zh := f.Dict.ChineseName(name); zh != "" {
+			res.ChineseName = zh
+		} else if lang == "zh" {
+			// 清单里写的就是中文名，不用再翻
+			res.ChineseName = name
 		}
 	}
 
@@ -176,12 +125,22 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 			f.logf("[%s] 字典命中：%s → %s", name, name, jp)
 		}
 	}
-	// Ouxiang 查到的日文名也很可靠
-	if oux != nil && oux.JpName != "" {
-		candidates = prependUnique(candidates, oux.JpName)
+
+	// ---------- 3. 维基：中文简介第一顺位，顺带拿日文名做搜索词 ----------
+	wikiCtx, wcancel := context.WithTimeout(ctx, 10*time.Second)
+	jaTitle, zhBio := fetchWikiBoth(wikiCtx, f.HTTP, name, lang, f.WikiEmail)
+	wcancel()
+	if zhBio != "" {
+		f.mark(res, "wiki", true)
+		res.Bio = zhBio
+	} else {
+		f.mark(res, "wiki", false)
+	}
+	if jaTitle != "" {
+		candidates = prependUnique(candidates, jaTitle)
 	}
 
-	// ---------- 4. JavStash：日系演员的主力源 ----------
+	// ---------- 4. JavStash：日系演员主力源，生日唯一权威 ----------
 	var js *Performer
 	if f.JavStash != nil && f.JavStash.APIKey != "" {
 		js = f.searchCandidates(ctx, res, f.JavStash, candidates)
@@ -192,37 +151,90 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		f.searchCandidates(ctx, res, f.StashDB, candidates)
 	}
 
-	// ---------- 6. TPDB 二次补三围（JavStash 有更准的罗马字名） ----------
-	needExtra := res.HeightCm == 0 || res.WaistCm == 0 || res.HipCm == 0 || res.CupSize == ""
-	if needExtra && tp == nil && js != nil && js.Name != "" && f.TPDB != nil && f.TPDB.APIKey != "" {
-		if p, err := f.TPDB.Search(ctx, js.Name); err == nil {
-			f.mark(res, "tpdb", true)
-			f.applyPerformer(res, p, false)
+	// ---------- 6. TPDB：三围原样 + 体重 ----------
+	if f.TPDB != nil && f.TPDB.APIKey != "" {
+		// TPDB 是欧美库，只认罗马字。拿日文名去搜必定 not found，
+		// 所以把 MDCx 的 romanization（覆盖 93.9%）排到候选最前面。
+		terms := candidates
+		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
+			terms = prependUnique(terms, p.Romaji)
+		}
+		if js != nil && js.Name != "" {
+			terms = prependUnique(terms, js.Name)
+		}
+		if p := f.searchTPDB(ctx, res, terms); p != nil {
+			f.applyPerformer(res, p)
 		}
 	}
 
-	// 体重最后兜底
-	if res.WeightKg == 0 && oux != nil && oux.Weight > 0 {
-		res.WeightKg = oux.Weight
+	// ---------- 7. theactorbase：中文简介第二顺位 ----------
+	if res.Bio == "" && f.TheActorBase != nil {
+		terms := candidates
+		// 站点 slug 用罗马字拼，日文名拼不出来。MDCx 的 romanization 覆盖 93.9%，放最前面。
+		if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
+			terms = prependUnique(terms, p.Romaji)
+		}
+		if bio := f.TheActorBase.FetchBio(ctx, terms); bio != "" {
+			f.mark(res, "theactorbase", true)
+			res.Bio = bio
+		} else {
+			f.mark(res, "theactorbase", false)
+		}
 	}
 
-	// ---------- 7. 简介翻译 ----------
+	// ---------- 8. 简介最后兜底：MDCx 的字段串（不是文章，只算「有字」）----------
+	if res.Bio == "" {
+		if p := f.MDCx.Lookup(name); p != nil && p.BioRaw != "" {
+			res.Bio = p.BioRaw
+			f.logf("[%s] 简介回落到 MDCx 字段串", name)
+		}
+	}
 	res.Bio = strings.TrimSpace(res.Bio)
-	if LooksEnglish(res.Bio) && f.Translator != nil && f.Translator.APIKey != "" {
-		if zh, err := f.Translator.TranslateEN2ZH(ctx, res.Bio); err == nil && zh != "" {
-			res.Bio = zh
-			f.logf("[%s] 简介已翻译为中文", name)
-		}
-	}
 	if res.Bio != "" {
 		res.BioLang = DetectLanguage(res.Bio)
-		if res.BioLang == "unknown" {
-			res.BioLang = "zh"
+		if res.BioLang == "unknown" || res.BioLang == "en" {
+			// 只存中文；万一上游给的是日文，也留 ja 记明语种
+			res.BioLang = DetectLanguage(res.Bio)
 		}
 	}
 	res.Bio = TruncateUTF8(res.Bio, 6000)
 
+	// ---------- 9. 头像：gfriends 首选，退到各数据源 ----------
+	f.pickAvatar(ctx, res, candidates, isUUID)
+
+	// ---------- 10. 主页：JavStash 演员页 > TPDB 演员页 ----------
+	res.HomePageURL = buildHomePageURL(res.ProviderIDs)
+
 	return res
+}
+
+// applyMDCx 把离线档案铺进结果。只填空位，不覆盖已有值。
+// 注意：不写生日（只认 JavStash），不写简介（简介有单独的优先级链）。
+func (f *Fetcher) applyMDCx(res *FetchResult, p *MDCxProfile) {
+	if res.CanonicalName == "" && p.Name != "" {
+		res.CanonicalName = p.Name
+	}
+	if p.BirthPlace != "" && res.BirthPlace == "" {
+		res.BirthPlace = p.BirthPlace
+	}
+	if p.Country != "" && res.Country == "" {
+		res.Country = p.Country
+	}
+	if p.Height > 0 && res.HeightCm == 0 {
+		res.HeightCm = p.Height
+	}
+	if p.Cup != "" && res.CupSize == "" {
+		res.CupSize = p.Cup
+	}
+	if p.CareerStart > 0 && res.CareerStart == 0 {
+		res.CareerStart = p.CareerStart
+	}
+	if len(p.Tags) > 0 && len(res.Tags) == 0 {
+		res.Tags = p.Tags
+	}
+	if len(p.Aliases) > 0 {
+		res.Aliases = mergeStrings(res.Aliases, p.Aliases)
+	}
 }
 
 // searchCandidates 依次尝试候选名，命中即停。
@@ -239,8 +251,28 @@ func (f *Fetcher) searchCandidates(ctx context.Context, res *FetchResult, c *Sta
 			continue
 		}
 		f.mark(res, c.Source, true)
-		f.applyPerformer(res, p, true)
+		f.applyPerformer(res, p)
 		f.logf("[%s] %s 命中：%s", res.NameOriginal, c.Source, p.Name)
+		return p
+	}
+	return nil
+}
+
+// searchTPDB 依次尝试候选名，命中即停。
+func (f *Fetcher) searchTPDB(ctx context.Context, res *FetchResult, terms []string) *Performer {
+	for _, cand := range terms {
+		if strings.TrimSpace(cand) == "" {
+			continue
+		}
+		p, err := f.TPDB.Search(ctx, cand)
+		if err != nil {
+			f.mark(res, "tpdb", false)
+			f.countErr(res, err)
+			f.logf("[%s] tpdb 搜索 %q 未命中: %v", res.NameOriginal, cand, err)
+			continue
+		}
+		f.mark(res, "tpdb", true)
+		f.logf("[%s] tpdb 命中：%s", res.NameOriginal, p.Name)
 		return p
 	}
 	return nil
@@ -264,82 +296,106 @@ func (f *Fetcher) countErr(res *FetchResult, err error) {
 	res.SourceErrors++
 }
 
-// applyPerformer 把数据源结果合并进结果；override=true 表示这个源优先级更高。
-func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer, override bool) {
+// applyPerformer 把数据源结果合并进结果。只填空位——先到的源赢，
+// 所以调用顺序就是优先级（MDCx → JavStash → TPDB），生日是唯一例外。
+func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 	if p == nil {
 		return
 	}
 	if res.CanonicalName == "" && p.Name != "" {
 		res.CanonicalName = p.Name
 	}
-	if override || res.BirthDate == "" {
-		if p.BirthDate != "" {
-			res.BirthDate = p.BirthDate
-		}
+
+	// 生日只认 JavStash；其他源的生日一律丢弃（MDCx 错值多，TPDB 也偶有偏差）
+	if p.Source == "javstash" && p.BirthDate != "" {
+		res.BirthDate = p.BirthDate
 	}
-	if p.Country != "" && (override || res.Country == "") {
+
+	if p.Country != "" && res.Country == "" {
 		res.Country = p.Country
-		if cn, ok := countryToChinese[p.Country]; ok {
-			res.BirthPlace = cn
-		} else {
-			res.BirthPlace = p.Country
+		if res.BirthPlace == "" {
+			if cn, ok := countryToChinese[p.Country]; ok {
+				res.BirthPlace = cn
+			} else {
+				res.BirthPlace = p.Country
+			}
 		}
 	}
 	if p.Gender != "" && res.Gender == "" {
-		res.Gender = p.Gender
+		res.Gender = strings.ToLower(p.Gender) // StashBox 给的是 FEMALE
 	}
-	if p.Height > 0 && (override || res.HeightCm == 0) {
+	if p.Height > 0 && res.HeightCm == 0 {
 		res.HeightCm = p.Height
 	}
-	if p.Weight > 0 && (override || res.WeightKg == 0) {
+	if p.Weight > 0 && res.WeightKg == 0 {
 		res.WeightKg = p.Weight
 	}
-	if p.CupSize != "" && (res.CupSize == "" || override) {
+	if p.CupSize != "" && res.CupSize == "" {
 		res.CupSize = p.CupSize
 	}
-	if p.Waist > 0 && (res.WaistCm == 0 || override) {
-		res.WaistCm = p.Waist
-	}
-	if p.Hip > 0 && (res.HipCm == 0 || override) {
-		res.HipCm = p.Hip
+	// 三围只认 TPDB，原样存，不拆不换算
+	if p.Source == "tpdb" && p.Measurements != "" {
+		res.Measurements = p.Measurements
 	}
 	if p.CareerStart > 0 && res.CareerStart == 0 {
 		res.CareerStart = p.CareerStart
-	}
-	if p.Bio != "" && res.Bio == "" {
-		res.Bio = p.Bio
 	}
 	if len(p.Aliases) > 0 {
 		res.Aliases = mergeStrings(res.Aliases, p.Aliases)
 	}
 
-	// 图片：JavStash/StashDB 优先（日系演员的图通常更全），TPDB 兜底
-	if p.ImageURL != "" {
-		if res.ImageURL == "" || p.Source != "tpdb" {
-			res.ImageURL = p.ImageURL
-			res.ImageSite = p.Source
-		}
-	}
+	// 图片：这里只收集候选，最终用哪张由 pickAvatar 决定
 	for _, img := range p.Images {
 		res.Images = mergeStrings(res.Images, []string{img})
+	}
+	if p.ImageURL != "" && res.ImageURL == "" {
+		res.ImageURL = p.ImageURL
+		res.ImageSite = p.Source
 	}
 
 	// provider ids
 	ids := extractProviderIDs(p.URLs)
-	if p.Source == "javstash" && p.ID != "" {
-		ids["JavStash"] = p.ID
-	}
-	if p.Source == "stashdb" && p.ID != "" {
-		ids["StashDB"] = p.ID
-	}
-	if p.Source == "tpdb" && p.ID != "" {
-		ids["TPDB"] = p.ID
+	if p.ID != "" {
+		switch p.Source {
+		case "javstash":
+			ids["JavStash"] = p.ID
+		case "stashdb":
+			ids["StashDB"] = p.ID
+		case "tpdb":
+			ids["TPDB"] = p.ID
+		}
 	}
 	for k, v := range ids {
 		if v != "" {
 			res.ProviderIDs[k] = v
 		}
 	}
+}
+
+// pickAvatar 决定最终头像：gfriends 优先，没有就用前面数据源收集到的第一张。
+// gfriends 只按候选名精确匹配文件名（索引的 key→value 配对不可信，见 gfriends.go）。
+func (f *Fetcher) pickAvatar(ctx context.Context, res *FetchResult, candidates []string, isUUID bool) {
+	if f.Gfriends != nil && !isUUID {
+		if url := f.Gfriends.Pick(ctx, candidates, res.NameOriginal); url != "" {
+			res.ImageURL = url
+			res.ImageSite = "gfriends"
+			res.Images = mergeStrings([]string{url}, res.Images)
+			f.mark(res, "gfriends", true)
+			return
+		}
+		f.mark(res, "gfriends", false)
+	}
+}
+
+// buildHomePageURL 按 JavStash → TPDB 的顺序拼演员主页地址。
+func buildHomePageURL(ids map[string]string) string {
+	if v := strings.TrimSpace(ids["JavStash"]); v != "" {
+		return "https://javstash.org/performers/" + v
+	}
+	if v := strings.TrimSpace(ids["TPDB"]); v != "" {
+		return "https://theporndb.net/performers/" + v
+	}
+	return ""
 }
 
 // extractProviderIDs 从外部链接里提取各种 ID。
@@ -423,6 +479,14 @@ func (r *FetchResult) Summary() string {
 	if birth == "" {
 		birth = "-"
 	}
-	return fmt.Sprintf("生日=%s 身高=%d 简介=%d字 命中[%s] 未命中[%s]",
-		birth, r.HeightCm, len([]rune(r.Bio)), strings.Join(hits, ","), strings.Join(misses, ","))
+	return fmt.Sprintf("生日=%s 身高=%d 三围=%s 出道=%d 简介=%d字 命中[%s] 未命中[%s]",
+		birth, r.HeightCm, orDash(r.Measurements), r.CareerStart, len([]rune(r.Bio)),
+		strings.Join(hits, ","), strings.Join(misses, ","))
+}
+
+func orDash(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
 }

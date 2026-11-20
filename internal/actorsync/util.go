@@ -134,6 +134,29 @@ func BucketOf(name string) string {
 	return "_"
 }
 
+// ---------- 头像地址 ----------
+
+// rawToJSDelivr 把 gfriends 的 raw 直链换成 jsDelivr 镜像，国内访问更稳。
+const rawPrefix = "https://raw.githubusercontent.com/"
+const cdnPrefix = "https://cdn.jsdelivr.net/gh/"
+
+// MirrorCN 返回国内可访问的镜像地址；没有镜像时返回空串。
+// 目前只有 gfriends 的 raw.githubusercontent.com 地址有确定性的镜像映射。
+func MirrorCN(rawURL string) string {
+	u := strings.TrimSpace(rawURL)
+	if !strings.HasPrefix(u, rawPrefix) {
+		return ""
+	}
+	rest := strings.TrimPrefix(u, rawPrefix)
+	// raw 形式：owner/repo/branch/path → gh/owner/repo@branch/path
+	parts := strings.SplitN(rest, "/", 4)
+	if len(parts) != 4 {
+		return ""
+	}
+	owner, repo, branch, path := parts[0], parts[1], parts[2], parts[3]
+	return cdnPrefix + owner + "/" + repo + "@" + branch + "/" + path
+}
+
 // ---------- 文本 ----------
 
 var (

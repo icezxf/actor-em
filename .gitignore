@@ -3,7 +3,11 @@ cmd/actorsync/config.local.go
 
 # 构建产物
 bin/
+/actorsync
 *.exe
+
+# 派生的展示表格：2 万行的二进制日更会把仓库撑爆，改由 actor-sync 挂 artifact
+actors.xlsx
 
 # 临时文件
 *.tmp

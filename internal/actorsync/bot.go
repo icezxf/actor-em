@@ -218,7 +218,7 @@ func (b *Bot) processOne(ctx context.Context, name string) {
 		return
 	}
 	if err := b.Engine.Save(); err != nil {
-		b.logf("保存 actors.json 失败: %v", err)
+		b.logf("保存数据失败: %v", err)
 	}
 
 	head := b.headLine(res)
@@ -311,7 +311,7 @@ func (b *Bot) handleCallback(ctx context.Context, cq *tgCallback) {
 		return
 	}
 	if err := b.Engine.Save(); err != nil {
-		b.logf("保存 actors.json 失败: %v", err)
+		b.logf("保存数据失败: %v", err)
 	}
 
 	// 记进 choices：以后同步到这个人都直接用这张，不会再被自动抓的图覆盖

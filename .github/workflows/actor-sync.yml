@@ -1,5 +1,10 @@
 name: actor-sync
 
+# 工作流 2：演员数据库同步
+# 清单 = 工作流 1 产出的 actor_dict.csv 里的全部演员（actors.txt 只作手工追加）。
+# 只处理还没入库的人，产出根目录的 actors.jsonl（真源）+ actors.json（派生）。
+# 前置：先跑过 base-db，仓库里要有 actor_dict.csv。
+
 on:
   schedule:
     # 每天 04:00 UTC = 北京时间 12:00
@@ -7,20 +12,23 @@ on:
   workflow_dispatch:
     inputs:
       limit:
-        description: "本轮最多处理多少个演员（0 = 不限）"
+        description: "本轮最多处理多少个演员（0 = 不限，首铺建议 0）"
         default: "150"
+      concurrency:
+        description: "并发抓取数（首次全量建议 10）"
+        default: "6"
       dry_run:
         description: "只打印结果，不写文件"
         type: boolean
         default: false
       refresh:
-        description: "重抓指定演员，逗号分隔（留空则只抓清单里还没入库的）"
+        description: "重抓指定演员，逗号分隔（留空则只抓还没入库的）"
         default: ""
 
 permissions:
   contents: write
 
-# 与 tg-command 共用同一个 group，避免批量同步和交互命令同时写 actors.json
+# 与 base-db、tg-command 共用一个 group，避免同时写数据文件
 concurrency:
   group: actor-data
   cancel-in-progress: false
@@ -28,7 +36,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 350
 
     steps:
       - uses: actions/checkout@v4
@@ -38,29 +46,49 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Refresh dictionary
-        run: python3 scripts/gen_dict.py || echo "字典刷新失败，继续使用仓库内版本"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check dictionary
+        run: |
+          if [ ! -f actor_dict.csv ]; then
+            echo "::error::缺少 actor_dict.csv，请先手动跑一次 base-db 工作流"
+            exit 1
+          fi
+          echo "字典行数：$(wc -l < actor_dict.csv)"
+
+      # MDCx 的 actor-profile 是 33MB 的 sqlite，不入库，跑之前现下现导。
+      # 导出成 CSV 后 Go 侧直接读，省得为 sqlite 引一套驱动。
+      - name: Export MDCx profiles
+        run: |
+          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv || {
+            echo "::warning::MDCx 档案导出失败，本轮只用在线源"
+          }
 
       - name: Build
         run: go build -o /tmp/actorsync ./cmd/actorsync
 
       - name: Sync actors
         env:
-          # 清单唯一来源：actors.txt
           ACTORS_TXT: actors.txt
           ACTORS_XLSX: actors.xlsx
 
           TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
           JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
           STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
-          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
 
-          # Worker webhook 模式下必须设 0：webhook 与 getUpdates 互斥，
-          # 这里一旦调 getUpdates 就会拿到 409 Conflict，还会吃掉用户点击。
+          # 离线档案 + 头像库 + 简介兜底源
+          MDCX_CSV: /tmp/mdcx_profiles.csv
+          GFRIENDS: "1"
+          THEACTORBASE: "1"
+
+          # Worker webhook 模式下必须设 0：webhook 与 getUpdates 互斥
           ACTORS_REVIEW_MAX: "0"
 
           ACTORS_LIMIT: ${{ github.event.inputs.limit || '150' }}
+          ACTORS_CONCURRENCY: ${{ github.event.inputs.concurrency || '6' }}
           ACTORS_VERBOSE: "1"
           # 通过环境变量传用户输入，不要直接拼进 shell（防命令注入）
           REFRESH_INPUT: ${{ github.event.inputs.refresh }}
@@ -80,13 +108,35 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A actors.json actors.manifest.json data/actor_dict.csv \
+          # actors.xlsx 是纯展示派生物，日更的 2 万行二进制会把仓库撑爆，改走 artifact 上传。
+          git add actors.jsonl actors.json actors.manifest.json data/ \
             data/avatar_review.json data/avatar_choices.json
-          [ -f actors.xlsx ] && git add actors.xlsx || true
           if git diff --cached --quiet; then
             echo "本轮无变化，跳过提交"
             exit 0
           fi
-          git commit -m "chore(actors): sync $(date -u +%F)"
+          rows=$(wc -l < actors.jsonl 2>/dev/null || echo 0)
+          git commit -m "chore(actors): sync $(date -u +%F) (${rows} actors)"
           git pull --rebase --autostash origin main
           git push
+
+      # xlsx 是给人看的派生物，不入库；每次跑完挂成 artifact，保留 90 天可下载。
+      - name: Upload Excel
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: actors-xlsx
+          path: actors.xlsx
+          retention-days: 90
+          if-no-files-found: ignore
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### 演员库" >> "$GITHUB_STEP_SUMMARY"
+          for f in actors.jsonl actors.json actors.manifest.json; do
+            [ -f "$f" ] && echo "- $f：$(du -h "$f" | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          done
+          if [ -f actors.jsonl ]; then
+            echo "- 演员数：$(wc -l < actors.jsonl)" >> "$GITHUB_STEP_SUMMARY"
+          fi

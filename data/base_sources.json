@@ -1,0 +1,11 @@
+{
+  "amane": {
+    "etag": "\"d903730dee0dff6bc68c56271ddd58d91c90fb830b7a21fef3616824a5a4c5c1\"",
+    "sha256": "7681b71c7d38c45c1b9c6323a4b709b9d97ec5393c60293bea3b08612cdead04"
+  },
+  "mdcx_mapping": {
+    "sha256": "182391efa03adff42b96ecf9c87a6039bc4aa1c283619f97b2189a9eba061d5e",
+    "tag": "v0.1.0",
+    "updated_at": "2026-11-16T04:15:50Z"
+  }
+}

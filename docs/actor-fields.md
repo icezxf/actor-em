@@ -1,0 +1,291 @@
+# 演员字段来源与 Emby 映射
+
+本文是 `actors.jsonl` 的字段权威说明：每个字段从哪来、优先级怎么排、最终怎么落到 Emby 的 `person.nfo`。
+所有百分比都是对本地副本实测的结果，不是估算。
+
+---
+
+## 1. 数据源分工
+
+| 源 | 提供什么 | 覆盖 / 规模 | 备注 |
+|---|---|---|---|
+| **amane** `mapping_actor.xml` | 中日名映射（别名 → 日文原名） | 5,351 演员 / 15,941 别名 | 字典骨架，更新很慢（2026-08 后无提交） |
+| **MDCx** `actor-mapping.sqlite3` | 中文名（`zh_cn`）、别名、罗马字 | 22,209 演员，中文名 99.9% | 补字典用，接入后字典涨到 21,161 演员 / 64,319 别名 |
+| **MDCx** `actor-profile.sqlite3` | 演艺期间、身高、三围、出生地、别名、结构化简介 | 21,860 演员 | 结构化字段的主力，但中文简介是字段串不是文章 |
+| **JavStash** | 生日、出道年、三围、图、别名、外链 | 日系演员主力 | **生日唯一权威源** |
+| **TPDB** | 三围原样、体重、长简介、出道年、图 | 三围 90% / 体重 13% / 长简介 27% | **三围唯一来源**，存原样不换算 |
+| **中文维基** | 中文简介 | 命中率一般，但质量最高 | 简介第 1 顺位，需带 `WIKI_EMAIL` 防风控 |
+| **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 简介第 2 顺位，可兜底 OU 的缺口 |
+| **gfriends** | 头像图库（51 分类 / 107,720 条 / 10GB，每日更新） | 一个演员可能多张 | **头像首选**，同时给国内镜像 |
+| ~~Ouxiang~~ | ~~中文简介~~ | 站点已挂 | 只保留 `provider_ids.Ouxiang` 存档 |
+
+---
+
+## 2. `actors.jsonl` 字段表（schema v3）
+
+一行一个演员。空值写 `null`，不写空字符串。
+
+### 2.1 身份
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `key` | string | `javstash:` → `stashdb:` → `tpdb:` → `name:<sha1>` | 主键，降级取 |
+| `name` | string | 合并字典中文名 → MDCx `name_cn` → 日文原名 | **不翻译**，只用已有中文名 |
+| `name_original` | string | 字典日文名 → JavStash `name` → TPDB `name` | 日文原名 |
+| `aliases` | string[] | 字典别名 + MDCx `aliases` + JavStash `aliases` + TPDB `aliases` | 去重、去自身，保持原语言；**只供检索，不写 Overview** |
+
+### 2.2 基础属性
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `gender` | string? | JavStash → TPDB | `female` / `male` |
+| `birth_date` | string? | **只认 JavStash** | MDCx 的 `birthday`（65.2%）只做交叉校验，不写库 |
+| `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
+| `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | 落到 Emby `ProductionLocations` |
+| `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
+
+### 2.3 身体
+
+> **口径统一**：三围只用 TPDB 的 `measurements`，原样存字符串，不换算、不拆成厘米。
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `height_cm` | int? | MDCx `height`（75.5%）→ JavStash → TPDB | 纯数字 |
+| `weight_kg` | int? | TPDB（13%）→ JavStash 旧 schema | 覆盖低，缺就 `null` |
+| `measurements` | string? | **只认 TPDB** `extras.measurements` | 形如 `34E-21-31`（下胸围-罩杯-腰-臀），**原样** |
+| `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段 |
+
+已删除：`bust_cm` / `waist_cm` / `hip_cm`——旧版把 TPDB 的英寸值当厘米存，口径是错的。
+
+### 2.4 职业
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `career_start` | int? | MDCx `career_period` 首年 → JavStash `career_start_year` → TPDB `extras.career_start_year` → 中文简介正则 | **出道年份**，填 Emby `ProductionYear` |
+
+来源细节见第 3 节。
+
+### 2.5 简介
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `bio` | string? | 中文维基 → theactorbase → MDCx `minnano_bio` 字段串 | **不取英文简介，不调 DeepL** |
+| `bio_lang` | string? | 恒 `zh` | |
+
+MDCx 的 `minnano_bio` 覆盖 97.3%，但它是结构化字段串（中位 61 字符、93% 含 `|`、超过 200 字的只有 17 条），
+只能当最后兜底，不能当简介看。
+
+### 2.6 头像
+
+| 字段 | 类型 | 来源优先级 | 说明 |
+|---|---|---|---|
+| `avatar` | string? | **gfriends 首选**，一次只取 1 张 → JavStash → TPDB → theactorbase | 原始直链 |
+| `avatar_cn` | string? | 由 `avatar` 派生 jsdelivr 镜像 | 国内可访问地址，只有 gfriends 的图有 |
+| `avatar_source_site` | string? | `gfriends` / `javstash` / `tpdb` / `theactorbase` | 溯源 |
+
+gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分类>/<名>.jpg`，
+国内镜像 `cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/<分类>/<名>.jpg`。
+文件名可能带 `AI-Fix-` 前缀（AI 修图版），同一个人两版都在时优先原图。
+
+> **gfriends 索引里名字和文件的配对是坏的**，实测 36.8% 对不上：在
+> `Content/<分类>` 下，`Filetree.json` 的 key 和 value 会被打乱（例：key 是
+> `桃乃木かな.jpg`，value 却指向 `AI-Fix-松嶋真麻.jpg`；两张都下载肉眼确认过，
+> 文件名叫什么就是谁，错的是配对）。但同一目录里 key 集合和 value 集合**完全相同**——
+> 「有哪些文件」可信，「谁对应谁」不可信。所以实现上只拿 value 建「实际存在的文件名」
+> 集合，**完全不使用 key 做名字映射**，既不张冠李戴，也不会拼出 404。
+> `?t=<时间戳>` 只是缓存戳，取文件名时要剥掉。
+>
+> 另一层坑：索引顶层是 `{Content, Information}`，`Information` 里是数字
+> （`TotalNum`/`TotalSize`/`Timestamp`），不能整体按三层 map 反序列化。
+
+目录优先级（按实测分辨率与覆盖率排，见 `gfriendsDirOrder`）：
+`0-Hand-Storage`（1235×1851，仅 89 人）→ `y-Minnano`（覆盖 58%，1049×1372）
+→ `z-DMM(骑)`/`z-DMM(步)`/`y-AVDC`/`z-Derekhsu` → `9-Javrave`/`8-Warashi`（250×300 缩略图垫底）。
+未列出的目录按条目数降序排。
+
+**别名不参与 gfriends 匹配**：实测拿 MDCx 别名去补只多覆盖 0.6%（119/21,859），
+而且样例多是同名不同人（`ASAMI(ロケット)`→`堤まほ`、`AYUMI(HimeMix)`→`Aoi`），
+属于典型的「挂错人头像」，收益不值这个风险。
+
+
+### 2.7 链接与溯源
+
+| 字段 | 类型 | 来源 | 说明 |
+|---|---|---|---|
+| `homepage_url` | string? | JavStash `https://javstash.org/performers/<uuid>` → TPDB 演员页 | 填 Emby `HomePageUrl`，唯一的外链出口 |
+| `provider_ids` | object | JavStash / StashDB / TPDB / Tmdb / Imdb / Wikidata / Wikipedia | |
+| `status` `sources` `fail_count` `retry_after` `created_at` `scraped_at` | — | 程序自己维护 | 与 v2 一致 |
+
+### 2.8 标签
+
+| 字段 | 类型 | 来源 | 说明 |
+|---|---|---|---|
+| `tags` | string[] | MDCx `actor-mapping.bio` 里的「标签:」串（**11,387 / 15,840 = 71.8%**） | 填 Emby `Tags` |
+
+覆盖与分布（实测）：
+
+- 972 个不同标签值，头部是 `熟女 3626`、`巨乳 2920`、`美人 2067`、`巨尻 1217`、`美乳 1121`、`美少女 847`。
+- 人均 2.46 个，中位 2 个，最多 40 个；**≤8 个的占 99.1%**。
+- 分隔符是 `,` / `，` / `、`，个别条目混用。
+
+两条处理规则：
+
+1. **黑名单过滤**：剔除含 `未成年`、`幼児体型` 这类明确指向未成年人身体特征的词（原始数据里确有，不得进入媒体库元数据）。
+2. **推 Emby 时截断到 8 个**，按全局词频从高到低取——高频词（巨乳、美人、長身）更通用，长尾词是全站只出现一两次的（如某些组合名），留着只会污染标签栏。JSONL 里保留全量。
+
+---
+
+## 3. 出道年份：数据源里到底有没有
+
+**有，三个源都有字段，MDCx 覆盖最实在。**
+
+| 源 | 字段 | 实测覆盖 | 语义 |
+|---|---|---|---|
+| MDCx profile | `website_fields.career_period` | **14,232 / 21,860 = 65.1%** | `2019年 -` / `1999年 - 2004年`，首年即出道年 |
+| JavStash | `career_start_year: Int` | 字段存在（stash-box 标准 schema），填充率待首轮跑量确认 | 精确的出道年 |
+| TPDB | `extras.career_start_year` | 待跑量统计 | 精确的出道年 |
+| 中文维基 | 简介正文 `20XX年…出道` | 命中一部分 | 正则兜底 |
+
+MDCx 的取值很干净：`'2021年-'`、`'2009年 -'`、`'2011~'` 这类占绝大多数，直接 `re.search(r'(19|20)\d{2}')` 取首段即可；
+`'1999年 - 2004年'` 取 1999，正好是出道年。年份分布 1967–2025，没有脏值。
+
+按既定规则「MDCx 优先」，最终取 MDCx `career_period` 首年；MDCx 没有的再依次问 JavStash、TPDB、简介正则。
+
+---
+
+## 4. Emby `person.nfo` 映射
+
+Emby Person 的官方元数据字段一共 12 项（语义以 dev.emby.media 的 Item-Information 原文为准），逐项对账：
+
+| # | Emby 字段 | 官方语义 | 我们填什么 | 状态 |
+|---|---|---|---|---|
+| 1 | `Name` | 人物名 | `name`（中文名） | ✅ |
+| 2 | `PremiereDate` | *For persons this is **date of birth*** | `birth_date`（仅 JavStash） | ✅ |
+| 3 | `ProductionYear` | 年份 | `career_start`（**出道年份**） | ✅ |
+| 4 | `HomePageUrl` | 主页 | `homepage_url`（**JavStash 演员页**） | ✅ |
+| 5 | `Overview` | 简介 | 一行元数据头 + `bio` 正文 | ✅ |
+| 6 | `ProductionLocations` | *For Persons, this will have one entry and will contain their **place of birth*** | `birth_place` | ✅ |
+| 7 | `ProviderIds` | 外部 ID 字典 | `provider_ids` | ✅ |
+| 8 | `ImageTags` / 主图 | 主图 | `avatar` 落成 `folder.jpg` | ✅ |
+| 9 | `Tags` | 标签 | `tags`（MDCx 标签，过滤后取前 8 个） | ✅ |
+| 10 | `SortName` | 排序名 | 不写 | ➖ Emby 按 `Name` 排，中文正常 |
+| 11 | `EndDate` | *For Persons this represents **death date*** | 不写 | ➖ 忌日不要 |
+| 12 | `LockedFields` | 锁定字段 | 不写 | ➖ 留给你手改 |
+
+**结论：12 项里 9 项有值、3 项有意留空。没有「想填但没源」的字段。**
+
+### `Tags` 怎么用
+
+MDCx 的标签是站点分类词，不是维基那种规范标签，但它本身有用——`巨乳`、`長身`、`苗条`、`美臀`
+这类词在 Emby 里能直接当筛选条件用，比空着强。规则见 2.8 节：黑名单过滤 + 截断 8 个。
+
+两点提醒：
+
+1. 标签**简繁并存**，实测有 7 组同义冲突：`美乳輪 233 / 美乳轮 3`、`剛毛 224 / 刚毛 3`、
+   `貧乳 137 / 贫乳 3`、`SM女優 17 / SM女优 1`、`陰毛`、`東京熱`、`無`，合计约 400 条。
+   不归一会让同义词在 Emby 里裂成两个标签，用 amane 的 `zhcdict.json` 统一转简体即可（10242 条单字映射）。
+   （注意：`長身` 只有繁体一种写法，没有 `长身`，别被直觉带偏。）
+2. 标签只在 MDCx 有，**JavStash / TPDB 不提供**，所以 28% 的演员没有标签，这是数据源的边界，不是 bug。
+
+### 第 10–12 项之外，还有一批信息是无处安放的
+
+Emby Person **结构上就没有**身高、三围、罩杯、体重、别名字段。
+这些不是"Emby 的某个字段我们没填"，而是**根本没有那个字段**，所以只能进 `Overview`，见下一节。
+
+---
+
+## 5. Overview 头部格式
+
+```
+【三围 34E-21-31｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+
+（简介正文）
+```
+
+规则：
+
+1. **只有一行**，用 `｜` 分隔，五项固定顺序：三围 → 身高 → 体重 → 出道 → 出身。
+2. 任何一项缺值，整项不出现，不留 `身高 -` 这种占位。
+3. 五项全缺，就不写这一行，Overview 直接是纯简介。
+4. 头部与正文之间空一行；`bio` 为空时，Overview 只有这一行，不留空行。
+5. 不写别名、不写官网/社交——别名留在 JSONL，外链统一走 `HomePageUrl`。
+
+实际渲染（数据全）：
+
+```
+【三围 34E-21-31｜身高 153cm｜体重 51kg｜出道 2019｜出身 东京都】
+
+小湊よつ葉，日本女演员，1996年5月10日出生于东京都。2019年出道……
+```
+
+数据不全时：
+
+```
+【出道 2019｜出身 东京都】
+
+小湊よつ葉，日本女演员……
+```
+
+> `出身` 与 `ProductionLocations` 同值，保留在头部是因为 Emby 的人物页不一定会展示
+> `ProductionLocations`，而简介是必看的。若你嫌重复，删掉这一项即可，其他不受影响。
+
+---
+
+## 6. 明确不采集
+
+| 字段 | 数据源有没有 | 不采的原因 |
+|---|---|---|
+| 血型 `blood_type` | MDCx bio 28.5% 有 | 不需要 |
+| 星座 / 生肖 | theactorbase 有 | 不需要 |
+| 忌日 `EndDate` | 全都查不到 | 活人用不上 |
+| 英文简介 | TPDB 27% 有 | 只要中文，宁缺毋滥 |
+| DeepL 翻译 | — | 已移除，机翻简介不如没有 |
+| 事务所 `agency` | MDCx bio 的「事务所:」29.7%（4,699 条） | Emby 无字段，Overview 已精简到五项，塞不进去 |
+| 官网 / Twitter | MDCx 17.6% / 15.7% | `HomePageUrl` 只放一个，已给 JavStash |
+| 种族 `ethnicity`、眼色、发色、真假胸、纹身、穿孔、退役年、同名区分 | JavStash / TPDB 部分有 | Emby Person 无任何字段承载，纯增体积 |
+
+最后一行是对标 StashDB `Performer` 全字段看下来缺的 8 项。它们的共同点是：
+**Emby 侧没有任何出口**。要接的话得先有自定义展示层，现阶段不划算。
+
+---
+
+## 7. 已知缺口
+
+| 缺口 | 现状 | 影响 |
+|---|---|---|
+| 体重 | TPDB 仅 13% | 多数人 Overview 头部没有体重 |
+| 三围 | TPDB 90% | 日系演员覆盖尚可，欧美片源差 |
+| 中文简介 | 维基 + theactorbase 合计覆盖率待跑量统计 | MDCx 字段串只能算「有字」，不算简介 |
+| gfriends 索引错配 | key→value 配对 36.8% 错乱（集合本身完整） | 已绕开：不用 key 做映射，只取 value 里实际存在的文件名；代价是错配目录里那一版图被放弃，改由其他目录兜底 |
+| gfriends 覆盖率 | 任意目录命中 66.5%（14,188 / 21,322） | 剩下 33.5% 退到数据源原图（JavStash/TPDB），画质与稳定性差一些 |
+| JavStash 生日 / 出道年 | 字段存在，填充率未知 | 首轮跑量后统计；生日没有替代源，只能以 JavStash 为准 |
+| `birth_place` 简繁/废值 | profile 出生地 48 个取值，79.8% 是都道府县（统一繁体「東京都」），另有 `海外` 1,929 条是废值；bio 的「出身」是简繁混杂（`东京都 1574` / `東京都 326`） | 入库前必须简繁归一 + 剔「海外/国外」，否则同一个人会出现两种出生地 |
+| 出道年份 | MDCx 覆盖 65.1% | 剩下 35% 靠 JavStash/TPDB/正则补，仍有约两成查不到 |
+
+---
+
+## 8. 双向对账：JSONL 每个字段最后去了哪
+
+正着查（Emby 要什么）见第 4 节，反着查（每个字段有没有出口）：
+
+| JSONL 字段 | Emby 落点 |
+|---|---|
+| `name` | `Name` |
+| `birth_date` | `PremiereDate` |
+| `birth_place` | `ProductionLocations`（+ Overview 头部） |
+| `career_start` | `ProductionYear`（+ Overview 头部） |
+| `bio` | `Overview` 正文 |
+| `height_cm` / `weight_kg` / `measurements` | `Overview` 头部（Emby 无对应字段） |
+| `avatar` / `avatar_cn` | 主图，**必须落成 `folder.jpg`**，网络 URL 不能直接用 |
+| `homepage_url` | `HomePageUrl` |
+| `provider_ids` | `ProviderIds` |
+| `tags` | `Tags`（黑名单过滤 → 简繁归一 → 截断 8 个） |
+| `name_original` / `aliases` | 不落 Emby，只供检索（Overview 已定不要别名） |
+| `gender` / `country` | 不落 Emby（`country` 信息已含在 `birth_place`） |
+| `cup_size` | 不落 Emby（已含在 `measurements` 里） |
+| `key` / `status` / `sources` / `fail_count` / `retry_after` / `created_at` / `scraped_at` | 不落 Emby，内部记账 |
+
+一句话：**11 个 JSONL 字段喂满了 Emby Person 全部 9 个可用字段，进不去的都是 Emby 没有地方放。**
+
+唯一的实现前提是头像：Emby 的人物头像必须落地成 `metadata/people/<首字母>/<名>/folder.jpg` 或走 API 上传二进制，
+只用网络 URL 在人物页会显示为空——这和「头像只存地址不下载」的旧设计冲突，下游要单独补一步下载。

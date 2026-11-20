@@ -23,7 +23,7 @@ const ReviewStateVersion = 1
 // ReviewPending 是一次「已发出、还没被选择」的候选图消息。
 type ReviewPending struct {
 	ID       string   `json:"id"`       // 短 id，如 "r7"，用在 callback_data 里
-	Key      string   `json:"key"`      // actors.json 的主键
+	Key      string   `json:"key"`      // actors.jsonl 的主键
 	Name     string   `json:"name"`     //
 	Messages []int    `json:"messages"` // 发出的消息 id（相册是 1 条，逐张兜底时多条）
 	Images   []string `json:"images"`   // 候选图，顺序与按钮序号一致

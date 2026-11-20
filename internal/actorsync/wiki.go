@@ -67,3 +67,27 @@ func FetchWiki(ctx context.Context, hc *http.Client, lang, title, targetLang, em
 	}
 	return langTitle, actualTitle, bio
 }
+
+// fetchWikiBoth 一次拿到「日文标题 + 中文简介」。
+//
+// 目标是中文简介（英文/日文都不要），但同时需要日文标题去搜 JavStash：
+//   - 输入是中文：查中文维基，正文即简介，跨语言链接给日文标题
+//   - 输入是日文：查日文维基拿中文标题，再查中文维基拿简介
+func fetchWikiBoth(ctx context.Context, hc *http.Client, name, lang, email string) (jaTitle, zhBio string) {
+	switch lang {
+	case "zh":
+		ja, _, bio := FetchWiki(ctx, hc, "zh", name, "ja", email)
+		return ja, bio
+	case "ja":
+		zhTitle, _, _ := FetchWiki(ctx, hc, "ja", name, "zh", email)
+		if zhTitle != "" {
+			if _, _, bio := FetchWiki(ctx, hc, "zh", zhTitle, "", email); bio != "" {
+				return name, bio
+			}
+		}
+		return name, ""
+	default:
+		_, _, bio := FetchWiki(ctx, hc, "zh", name, "ja", email)
+		return "", bio
+	}
+}

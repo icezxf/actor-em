@@ -5,7 +5,7 @@
  *   1. 接 Telegram webhook，校验 secret_token
  *   2. 把 update 转成 GitHub repository_dispatch，让 Actions 跑 --tg-once
  *
- * 真正的刮削、alist 上传、choices 落盘都在 Actions 里完成。
+ * 真正的刮削、头像选取、choices 落盘都在 Actions 里完成（头像不转存 alist）。
  * Worker 不存任何状态，也不需要 KV / D1 / R2。
  */
 

@@ -13,15 +13,18 @@ import (
 	"time"
 )
 
-// TelegramClient 做四件事：发候选图、收按钮回调、回执、长轮询收消息。
+// TelegramClient 做四件事：发候选图、收按钮回调、回执、收消息。
 //
-// 两种运行方式共用这套客户端：
+// 三种运行方式共用这套客户端：
 //   - 批量同步（GitHub Actions）：进程活不过一轮，用 timeout=0 的
 //     "拉一次就走"，点击会留在 Telegram updates 队列（24h），下轮取回。
 //   - 交互服务（--tg-serve）：跑在常驻进程里，用 25 秒长轮询实时收消息。
 //     长轮询是客户端主动出站 HTTPS，不需要公网 IP，也不需要证书。
+//   - Worker webhook（--tg-once）：CF Worker 收 Telegram 推送并触发 Actions，
+//     进程只处理一条 update 就退出，完全不碰 getUpdates。
 //
-// webhook 与 getUpdates 互斥，本项目一律走 getUpdates。
+// webhook 与 getUpdates 互斥：启用 Worker 时，批量同步必须把
+// ACTORS_REVIEW_MAX 设成 0，否则那边的 PollPicks 会拿到 409 Conflict。
 type TelegramClient struct {
 	Token   string
 	ChatID  string

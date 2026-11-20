@@ -352,29 +352,47 @@ func TestLoadDbLegacyEmbyIDs(t *testing.T) {
 
 func TestBuildActorKeepsAvatarWhenNewImageFails(t *testing.T) {
 	old := &Actor{
-		Key:          "javstash:1",
-		Name:         "某人",
-		Avatar:       StrPtr("https://alist.example.com/d/old.jpg"),
-		AvatarPath:   StrPtr("/actors/某/某人.jpg"),
-		AvatarSource: StrPtr("https://cdn.example.com/old.jpg"),
+		Key:              "javstash:1",
+		Name:             "某人",
+		Avatar:           StrPtr("https://cdn.example.com/old.jpg"),
+		AvatarSourceSite: StrPtr("javstash"),
 	}
 	res := &FetchResult{
 		NameOriginal: "某人",
-		ImageURL:     "https://cdn.example.com/new.jpg",
-		ImageSite:    "javstash",
+		ImageURL:     "", // 这次没抓到图
 		ProviderIDs:  map[string]string{"JavStash": "1"},
 		Sources:      map[string]bool{"javstash": true},
 		BirthDate:    "1990-01-01",
 	}
 
 	a := BuildActor("某人", res, old)
-	if StrVal(a.Avatar) != "https://alist.example.com/d/old.jpg" {
-		t.Fatalf("新图下载失败时不应清空旧头像: %q", StrVal(a.Avatar))
+	if StrVal(a.Avatar) != "https://cdn.example.com/old.jpg" {
+		t.Fatalf("没抓到新图时不应清空旧头像: %q", StrVal(a.Avatar))
 	}
-	if StrVal(a.AvatarPath) != "/actors/某/某人.jpg" {
-		t.Fatalf("旧头像路径应保留: %q", StrVal(a.AvatarPath))
+	if StrVal(a.AvatarSourceSite) != "javstash" {
+		t.Fatalf("没抓到新图时来源应保持: %q", StrVal(a.AvatarSourceSite))
 	}
-	if StrVal(a.AvatarSource) != "https://cdn.example.com/new.jpg" {
-		t.Fatalf("avatar_source 应记录本次尝试的新图: %q", StrVal(a.AvatarSource))
+}
+
+func TestBuildActorUsesGfriendsAvatarAndMirror(t *testing.T) {
+	raw := "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/x.jpg"
+	res := &FetchResult{
+		NameOriginal: "某人",
+		ImageURL:     raw,
+		ImageSite:    "gfriends",
+		ProviderIDs:  map[string]string{"JavStash": "1"},
+		Sources:      map[string]bool{"javstash": true, "gfriends": true},
+	}
+
+	a := BuildActor("某人", res, nil)
+	if StrVal(a.Avatar) != raw {
+		t.Fatalf("avatar 应为 gfriends 原图: %q", StrVal(a.Avatar))
+	}
+	wantCN := "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/x.jpg"
+	if StrVal(a.AvatarCN) != wantCN {
+		t.Fatalf("avatar_cn 应为 jsdelivr 镜像: %q", StrVal(a.AvatarCN))
+	}
+	if StrVal(a.AvatarSourceSite) != "gfriends" {
+		t.Fatalf("来源应为 gfriends: %q", StrVal(a.AvatarSourceSite))
 	}
 }

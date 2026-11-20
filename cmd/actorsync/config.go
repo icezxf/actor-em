@@ -16,14 +16,18 @@ type Config struct {
 	TPDBEndpoint     string
 	JavStashEndpoint string
 	StashDBEndpoint  string
-	DeepLAPIKey      string
 	WikiEmail        string
 
-	// alist（仅 --scan-nfo 用；头像直接用网络地址，不转存）
-	AlistURL        string
-	AlistUser       string
-	AlistPass       string
-	AlistPublicBase string // nfo 直链前缀，留空 = AlistURL
+	// 离线数据源（工作流 1/2 之间传递）
+	MDCxCSV       string // MDCX_CSV：从 actor-profile.sqlite3 导出的演员档案
+	Gfriends      bool   // GFRIENDS=1：启用 gfriends 头像库（要拉 6MB 索引）
+	GfriendsIndex string // GFRIENDS_INDEX：本地 Filetree.json，填了就不联网拉
+	TheActorBase  bool   // THEACTORBASE=1：启用 theactorbase 中文简介兜底
+
+	// alist（仅 --scan-nfo 读 nfo 用；头像不转存）
+	AlistURL  string
+	AlistUser string
+	AlistPass string
 
 	// 演员清单（唯一来源，一行一个名字）
 	NamesFile string
@@ -48,9 +52,10 @@ type Config struct {
 	NFOMaxFiles int
 
 	// 行为
-	Limit   int
-	DryRun  bool
-	Verbose bool
+	Limit       int
+	Concurrency int // ACTORS_CONCURRENCY：并发抓取数，首铺时调到 10
+	DryRun      bool
+	Verbose     bool
 }
 
 func DefaultConfig() *Config {
@@ -58,9 +63,9 @@ func DefaultConfig() *Config {
 		TPDBEndpoint:     "https://api.theporndb.net/performers",
 		JavStashEndpoint: "https://javstash.org/graphql",
 		StashDBEndpoint:  "https://stashdb.org/graphql",
-		DataFile:         "actors.json",
+		DataFile:         "actors.jsonl",
 		ManifestFile:     "actors.manifest.json",
-		DictFile:         "data/actor_dict.csv",
+		DictFile:         "actor_dict.csv",
 		DictLocalFile:    "data/actor_dict.local.csv",
 		NamesFile:        "actors.txt",
 		XlsxFile:         "actors.xlsx",
@@ -68,6 +73,7 @@ func DefaultConfig() *Config {
 		ChoicesFile:      "data/avatar_choices.json",
 		ReviewMax:        6,
 		Limit:            0,
+		Concurrency:      1,
 	}
 }
 
@@ -94,12 +100,14 @@ func applyEnv(c *Config) {
 	set(&c.TPDBEndpoint, "TPDB_ENDPOINT")
 	set(&c.JavStashEndpoint, "JAVSTASH_ENDPOINT")
 	set(&c.StashDBEndpoint, "STASHDB_ENDPOINT")
-	set(&c.DeepLAPIKey, "DEEPL_API_KEY")
 	set(&c.WikiEmail, "WIKI_EMAIL")
+	set(&c.MDCxCSV, "MDCX_CSV")
+	set(&c.GfriendsIndex, "GFRIENDS_INDEX")
+	c.Gfriends = os.Getenv("GFRIENDS") == "1" || strings.EqualFold(os.Getenv("GFRIENDS"), "true")
+	c.TheActorBase = os.Getenv("THEACTORBASE") == "1" || strings.EqualFold(os.Getenv("THEACTORBASE"), "true")
 	set(&c.AlistURL, "ALIST_URL")
 	set(&c.AlistUser, "ALIST_USER")
 	set(&c.AlistPass, "ALIST_PASS")
-	set(&c.AlistPublicBase, "ALIST_PUBLIC_BASE")
 	set(&c.DataFile, "ACTORS_FILE")
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
 	set(&c.DictFile, "ACTOR_DICT")
@@ -126,6 +134,11 @@ func applyEnv(c *Config) {
 	if v := os.Getenv("ACTORS_LIMIT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
 			c.Limit = n
+		}
+	}
+	if v := os.Getenv("ACTORS_CONCURRENCY"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 {
+			c.Concurrency = n
 		}
 	}
 	if v := os.Getenv("ACTORS_DRY_RUN"); v == "1" || strings.EqualFold(v, "true") {

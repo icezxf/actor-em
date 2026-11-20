@@ -2,66 +2,12 @@ package actorsync
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"path/filepath"
-	"sort"
 	"time"
 )
 
-// LoadDb 读取 actors.json；文件不存在时返回一个空库。
-func LoadDb(path string) (*Db, error) {
-	db := &Db{SchemaVersion: SchemaVersion, Actors: []*Actor{}}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return db, nil
-		}
-		return nil, fmt.Errorf("读取 %s 失败: %w", path, err)
-	}
-	if len(data) == 0 {
-		return db, nil
-	}
-	if err := json.Unmarshal(data, db); err != nil {
-		return nil, fmt.Errorf("解析 %s 失败: %w", path, err)
-	}
-	if db.Actors == nil {
-		db.Actors = []*Actor{}
-	}
-	// 旧版本（1）升级到 2：emby_ids 会被忽略，保存时自然丢弃
-	if db.SchemaVersion < SchemaVersion {
-		db.SchemaVersion = SchemaVersion
-	}
-	return db, nil
-}
-
-// Save 按 key 排序后原子写盘（先写 .tmp 再 rename，避免中途崩溃写坏文件）。
-func (db *Db) Save(path string) error {
-	sort.Slice(db.Actors, func(i, j int) bool { return db.Actors[i].Key < db.Actors[j].Key })
-	db.Count = len(db.Actors)
-	db.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
-	if db.Actors == nil {
-		db.Actors = []*Actor{}
-	}
-
-	data, err := json.MarshalIndent(db, "", "  ")
-	if err != nil {
-		return err
-	}
-	data = append(data, '\n')
-
-	if dir := filepath.Dir(path); dir != "" && dir != "." {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return err
-		}
-	}
-	tmp := path + ".tmp"
-	if err := os.WriteFile(tmp, data, 0o644); err != nil {
-		return err
-	}
-	return os.Rename(tmp, path)
-}
+// 读写（LoadDb / Save / SaveJSONL / ExportJSON）都在 store_jsonl.go，
+// 因为真源是 actors.jsonl。这个文件只放内存索引和派生逻辑。
 
 // FindByKey 按主键查。
 func (db *Db) FindByKey(key string) *Actor {

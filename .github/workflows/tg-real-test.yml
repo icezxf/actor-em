@@ -1,6 +1,8 @@
 name: actor-tg-real-test
 
-# 一次性真实刮削自检：用真实数据源 key 处理一个演员名，验证 key 生效。
+# 一次性真实刮削自检：用真实数据源 key 处理一个演员名，验证 key 与整条链路是否生效。
+# 环境变量刻意与 actor-sync 保持一致（含 MDCx / gfriends / theactorbase），
+# 否则这里"通过"了、正式跑出来却是残缺的。
 on:
   workflow_dispatch:
     inputs:
@@ -12,13 +14,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Export MDCx profiles
+        run: |
+          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv || {
+            echo "::warning::MDCx 档案导出失败，本次只用在线源"
+          }
       - name: Build
         run: go build -o /tmp/actorsync ./cmd/actorsync
       - name: Scrape one actor (no DB write, verbose)
@@ -26,12 +36,16 @@ jobs:
           TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
           JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
           STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
-          DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
           WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+
+          MDCX_CSV: /tmp/mdcx_profiles.csv
+          GFRIENDS: "1"
+          THEACTORBASE: "1"
+
           ACTORS_VERBOSE: "1"
           TEST_NAME: ${{ inputs.name }}
         run: |
-          # 直接跑 dry-run，把演员名写进临时清单，看数据源命中情况
+          # dry-run 不写库，但会跑完整抓取，能看出每个源的命中情况
           printf '%s\n' "$TEST_NAME" > /tmp/test_actors.txt
           /tmp/actorsync --dry-run --verbose --names /tmp/test_actors.txt \
-            --data /tmp/test_actors.json --no-xlsx 2>&1 | tail -80
+            --data /tmp/test_actors.jsonl --no-xlsx 2>&1 | tail -80

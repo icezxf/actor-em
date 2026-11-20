@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -32,7 +33,7 @@ func main() {
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "打印每个数据源的命中情况")
 	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长）")
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
-	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "actors.json 路径")
+	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "数据文件路径，默认 actors.jsonl")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
 	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
@@ -88,9 +89,9 @@ func main() {
 		return
 	}
 
-	if _, err := os.Stat(cfg.NamesFile); err != nil {
-		logger.Fatalf("读不到演员清单 %s：%v（用 --names 指定，或先跑 --scan-nfo 生成）", cfg.NamesFile, err)
-	}
+	// ---------- 0. 准备抓取器（清单要读字典，字典在这里加载） ----------
+	hc := &http.Client{Timeout: 30 * time.Second}
+	fetcher := buildFetcher(cfg, hc, logger)
 
 	// ---------- 1. 读本地库 ----------
 	db, err := actorsync.LoadDb(cfg.DataFile)
@@ -99,8 +100,10 @@ func main() {
 	}
 	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
 
-	// ---------- 2. 读待抓清单（只有 actors.txt） ----------
-	names, err := actorsync.LoadNamesFile(cfg.NamesFile)
+	// ---------- 2. 读待抓清单 ----------
+	// 清单主体来自工作流 1 产出的字典（它才是演员总表），
+	// actors.txt 只作为手工追加通道，可以是空文件或不存在。
+	names, err := collectNames(fetcher.Dict, cfg.NamesFile, logger)
 	if err != nil {
 		logger.Fatalf("读取演员清单失败: %v", err)
 	}
@@ -193,10 +196,7 @@ func main() {
 	}
 	logger.Printf("本轮待处理 %d 个（新增 %d / 重试 %d / 刷新 %d）", len(plan), newCount, retryCount, refreshCount)
 
-	// ---------- 4. 准备抓取器 ----------
-	hc := &http.Client{Timeout: 30 * time.Second}
-	fetcher := buildFetcher(cfg, hc, logger)
-
+	// ---------- 4. 组装 Engine ----------
 	// 抓取 → 生成记录 → 用网络头像 这条链路统一走 Engine，
 	// 和 --tg-serve 交互服务共用，避免两边行为漂移。
 	engine := &actorsync.Engine{
@@ -220,34 +220,75 @@ func main() {
 	}
 	var reviewQueue []reviewCand
 
-	for i, item := range plan {
-		prefix := fmt.Sprintf("[%d/%d] %s（%s）", i+1, len(plan), item.Name, item.Reason)
+	// 并发抓取、串行落库：
+	// 网络请求是瓶颈（每个演员要串 5~6 个源），所以抓取开 N 个 worker；
+	// 写库和计数留在主 goroutine，避免给 DB 加锁、也保证 review 队列有序。
+	concurrency := cfg.Concurrency
+	if concurrency < 1 {
+		concurrency = 1
+	}
+	if concurrency > len(plan) {
+		concurrency = len(plan)
+	}
+	logger.Printf("并发抓取：%d", concurrency)
 
-		res, perr := engine.Process(ctx, item.Name, actorsync.ProcessOptions{NoDBWrite: cfg.DryRun})
+	idxQueue := make(chan int, len(plan))
+	for i := range plan {
+		idxQueue <- i
+	}
+	close(idxQueue)
+
+	type fetched struct {
+		idx  int
+		item actorsync.PlanItem
+		res  *actorsync.FetchResult
+	}
+	results := make(chan fetched, concurrency*2)
+
+	var wg sync.WaitGroup
+	for w := 0; w < concurrency; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for idx := range idxQueue {
+				results <- fetched{idx: idx, item: plan[idx], res: engine.FetchPhase(ctx, plan[idx].Name)}
+			}
+		}()
+	}
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	done := 0
+	for f := range results {
+		prefix := fmt.Sprintf("[%d/%d] %s（%s）", f.idx+1, len(plan), f.item.Name, f.item.Reason)
+
+		out, perr := engine.ApplyPhase(ctx, f.item.Name, f.res, actorsync.ProcessOptions{NoDBWrite: cfg.DryRun})
 		if perr != nil {
 			logger.Printf("%s → 处理失败: %v", prefix, perr)
 			failed++
 			continue
 		}
-		actor := res.Actor
+		actor := out.Actor
 
 		// 只对「新演员」和「还没有头像的」发候选图；至少 2 张才值得问
-		if reviewOn && !cfg.DryRun && !res.Manual &&
+		if reviewOn && !cfg.DryRun && !out.Manual &&
 			len(reviewQueue) < cfg.ReviewMax &&
-			len(res.Candidates) >= 2 &&
-			(item.Reason == "new" || actor.Avatar == nil) &&
-			!reviewState.HasKey(res.Key) {
-			reviewQueue = append(reviewQueue, reviewCand{Key: res.Key, Name: actor.Name, Images: res.Candidates})
+			len(out.Candidates) >= 2 &&
+			(f.item.Reason == "new" || actor.Avatar == nil) &&
+			!reviewState.HasKey(out.Key) {
+			reviewQueue = append(reviewQueue, reviewCand{Key: out.Key, Name: actor.Name, Images: out.Candidates})
 		}
 
-		countSources(srcStats, res.Res.Sources)
+		countSources(srcStats, f.res.Sources)
 
 		if cfg.DryRun {
-			logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Res.Summary(), res.AvatarNote)
+			logger.Printf("%s → %s | %s | %s", prefix, actor.Status, f.res.Summary(), out.AvatarNote)
 			continue
 		}
 
-		if res.Added {
+		if out.Added {
 			added++
 		} else {
 			updated++
@@ -256,16 +297,15 @@ func main() {
 			failed++
 		}
 
-		logger.Printf("%s → %s | %s | %s", prefix, actor.Status, res.Res.Summary(), res.AvatarNote)
+		logger.Printf("%s → %s | %s | %s", prefix, actor.Status, f.res.Summary(), out.AvatarNote)
 
 		// 每 20 个落盘一次，中途挂掉也不丢进度
-		if (i+1)%20 == 0 {
+		done++
+		if done%20 == 0 {
 			if err := db.Save(cfg.DataFile); err != nil {
 				logger.Printf("⚠️  中途保存失败: %v", err)
 			}
 		}
-
-		time.Sleep(200 * time.Millisecond) // 对数据源友好一点
 	}
 
 	stats.Added = added
@@ -306,7 +346,16 @@ func main() {
 		return
 	}
 	if err := db.Save(cfg.DataFile); err != nil {
-		logger.Fatalf("保存 actors.json 失败: %v", err)
+		logger.Fatalf("保存 %s 失败: %v", cfg.DataFile, err)
+	}
+	// jsonl 是真源，再派生一份 actors.json 给不认 jsonl 的下游
+	if actorsync.IsJSONLPath(cfg.DataFile) {
+		jsonPath := strings.TrimSuffix(cfg.DataFile, ".jsonl") + ".json"
+		if err := db.ExportJSON(jsonPath); err != nil {
+			logger.Printf("⚠️  派生 %s 失败: %v", jsonPath, err)
+		} else {
+			logger.Printf("已派生 %s", jsonPath)
+		}
 	}
 	writeManifest(logger, cfg, db, stats, srcStats, start)
 	if !noXlsx {
@@ -329,7 +378,7 @@ func runScanNFO(ctx context.Context, cfg *Config, logger *log.Logger) error {
 		return fmt.Errorf("缺少 nfo 目录：设置 ALIST_NFO_DIR 或传 --nfo-dir")
 	}
 
-	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistPublicBase, cfg.AlistUser, cfg.AlistPass)
+	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistUser, cfg.AlistPass)
 	if err := alist.Login(ctx); err != nil {
 		return fmt.Errorf("alist 登录失败: %w", err)
 	}
@@ -367,6 +416,58 @@ func newTelegram(cfg *Config) *actorsync.TelegramClient {
 	return tg
 }
 
+// collectNames 组装本轮待抓清单。
+//
+// 主体是工作流 1 产出的字典（actor_dict.csv 里的全部日文名，也就是演员总表），
+// actors.txt 只作手工追加通道——留空、甚至文件不存在都不影响。
+func collectNames(dict *actorsync.Dict, txtPath string, logger *log.Logger) ([]string, error) {
+	var names []string
+	seen := map[string]bool{}
+	add := func(n string) {
+		n = strings.TrimSpace(n)
+		if n == "" {
+			return
+		}
+		k := actorsync.NormalizeName(n)
+		if seen[k] {
+			return
+		}
+		seen[k] = true
+		names = append(names, n)
+	}
+
+	fromDict := 0
+	if dict != nil {
+		for _, jp := range dict.Actors() {
+			before := len(names)
+			add(jp)
+			if len(names) > before {
+				fromDict++
+			}
+		}
+	}
+	fromTxt := 0
+	if txtPath != "" {
+		if manual, err := actorsync.LoadNamesFile(txtPath); err == nil {
+			for _, n := range manual {
+				before := len(names)
+				add(n)
+				if len(names) > before {
+					fromTxt++
+				}
+			}
+		} else if !os.IsNotExist(err) {
+			logger.Printf("⚠️  读取 %s 失败（忽略）: %v", txtPath, err)
+		}
+	}
+	logger.Printf("清单来源：字典 %d 个 + 手工 %d 个", fromDict, fromTxt)
+
+	if len(names) == 0 {
+		return nil, fmt.Errorf("清单为空：字典和 %s 都没有内容", txtPath)
+	}
+	return names, nil
+}
+
 // buildFetcher 组装所有数据源，没配 Key 的源直接不挂上，Fetch 会自动跳过。
 func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.Fetcher {
 	fetcher := actorsync.NewFetcher(hc)
@@ -381,7 +482,36 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	if cfg.StashDBAPIKey != "" {
 		fetcher.StashDB = actorsync.NewStashBoxClient("stashdb", cfg.StashDBEndpoint, cfg.StashDBAPIKey)
 	}
-	fetcher.Translator = actorsync.NewTranslator(cfg.DeepLAPIKey, hc)
+	// 离线档案：结构化字段的地基（MDCx）
+	if cfg.MDCxCSV != "" {
+		if db, err := actorsync.LoadMDCxCSV(cfg.MDCxCSV); err != nil {
+			logger.Printf("⚠️  读取 MDCx 档案失败（不影响主流程）: %v", err)
+		} else if db.Size() > 0 {
+			fetcher.MDCx = db
+			logger.Printf("MDCx 档案：%d 人（%s）", db.Size(), cfg.MDCxCSV)
+		}
+	}
+	// 头像库：6MB 索引，只在显式开启时拉
+	if cfg.Gfriends {
+		var (
+			g   *actorsync.Gfriends
+			err error
+		)
+		if cfg.GfriendsIndex != "" {
+			g, err = actorsync.LoadGfriendsFile(cfg.GfriendsIndex)
+		} else {
+			g, err = actorsync.LoadGfriends(context.Background(), hc)
+		}
+		if err != nil {
+			logger.Printf("⚠️  gfriends 索引加载失败，头像退到数据源原图: %v", err)
+		} else {
+			fetcher.Gfriends = g
+			logger.Printf("gfriends 索引：%d 张图", g.Size())
+		}
+	}
+	if cfg.TheActorBase {
+		fetcher.TheActorBase = actorsync.NewTheActorBaseClient(hc)
+	}
 
 	dict, err := actorsync.LoadDict(cfg.DictFile)
 	if err != nil {
@@ -507,7 +637,7 @@ func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw s
 	}
 	// Bot 内部已经存过，这里再兜一次底：回调分支和异常路径都要落盘
 	if err := engine.Save(); err != nil {
-		return fmt.Errorf("保存 actors.json 失败: %w", err)
+		return fmt.Errorf("保存数据失败: %w", err)
 	}
 	if err := state.Save(""); err != nil {
 		logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)

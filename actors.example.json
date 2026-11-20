@@ -1,62 +1,57 @@
 {
-  "schema_version": 2,
-  "generated_at": "2026-11-17T04:12:33Z",
+  "schema_version": 3,
+  "generated_at": "2026-11-20T04:12:33Z",
   "count": 2,
   "actors": [
     {
       "key": "javstash:8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",
-      "name": "小凑四叶",
+      "name": "小湊よつ葉",
       "name_original": "小湊よつ葉",
-      "aliases": ["こみなとよつば", "小湊よつ葉"],
+      "aliases": ["こみなとよつば", "小凑四叶"],
 
       "gender": "female",
       "birth_date": "1996-05-10",
-      "death_date": null,
-      "birth_place": "日本",
+      "birth_place": "东京都",
       "country": "JP",
 
       "height_cm": 160,
       "weight_kg": 45,
-      "cup_size": "D",
-      "waist_cm": 58,
-      "hip_cm": 85,
+      "measurements": "34E-21-31",
+      "cup_size": "E",
 
       "career_start": 2019,
+      "tags": ["单体", "清纯系", "短发"],
 
-      "bio": "小湊よつ葉，日本女演员，1996年5月10日出生于日本。2019年出道，所属事务所……（此处为中文简介，长度通常 100~800 字）",
+      "bio": "小湊よつ葉，日本女演员，1996年5月10日出生于东京都。2019年出道……（中文简介，通常 100~900 字，优先维基，其次 theactorbase）",
       "bio_lang": "zh",
 
-      "avatar": "https://cdndata.javstash.com/media/performers/8f2c1e0a/original.jpg",
-      "avatar_path": null,
-      "avatar_dir": null,
-      "avatar_source": "https://cdndata.javstash.com/media/performers/8f2c1e0a/original.jpg",
-      "avatar_source_site": "javstash",
-      "avatar_sha256": null,
-      "avatar_bytes": null,
-      "avatar_w": null,
-      "avatar_h": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%B0%8F%E6%B9%8A%E3%82%88%E3%81%A4%E8%91%89.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%B0%8F%E6%B9%8A%E3%82%88%E3%81%A4%E8%91%89.jpg",
+      "avatar_source_site": "gfriends",
+
+      "homepage_url": "https://javstash.org/performers/8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",
 
       "provider_ids": {
         "JavStash": "8f2c1e0a-4b7d-4f2e-9c31-6a5d8e0b1f27",
         "StashDB": "7a1b2c3d-4e5f-6789-abcd-ef0123456789",
-        "TPDB": "performer-88213",
-        "Ouxiang": "https://www.ouxiangdanganku.com/idol/xxxx",
-        "Wikipedia": "小湊よつ葉"
+        "TPDB": "performer-88213"
       },
 
       "status": "ok",
       "sources": {
-        "javstash": true,
-        "tpdb": true,
-        "stashdb": true,
+        "mdcx": true,
         "wiki": true,
-        "ouxiang": true
+        "javstash": true,
+        "stashdb": true,
+        "tpdb": true,
+        "theactorbase": true,
+        "gfriends": true
       },
       "fail_count": 0,
       "retry_after": null,
 
       "created_at": "2026-11-16T04:10:11Z",
-      "scraped_at": "2026-11-17T04:10:52Z"
+      "scraped_at": "2026-11-20T04:10:52Z"
     },
     {
       "key": "name:5e8d7c6b9a1f3e2d4c5b6a7988f7e6d5c4b3a291",
@@ -66,40 +61,37 @@
 
       "gender": "male",
       "birth_date": null,
-      "death_date": null,
       "birth_place": null,
       "country": null,
 
       "height_cm": null,
       "weight_kg": null,
+      "measurements": null,
       "cup_size": null,
-      "waist_cm": null,
-      "hip_cm": null,
 
       "career_start": null,
+      "tags": [],
 
       "bio": null,
       "bio_lang": null,
 
       "avatar": null,
-      "avatar_path": null,
-      "avatar_dir": null,
-      "avatar_source": null,
+      "avatar_cn": null,
       "avatar_source_site": null,
-      "avatar_sha256": null,
-      "avatar_bytes": null,
-      "avatar_w": null,
-      "avatar_h": null,
+
+      "homepage_url": null,
 
       "provider_ids": {},
 
       "status": "no_source",
       "sources": {
-        "javstash": false,
-        "tpdb": false,
-        "stashdb": false,
+        "mdcx": false,
         "wiki": false,
-        "ouxiang": false
+        "javstash": false,
+        "stashdb": false,
+        "tpdb": false,
+        "theactorbase": false,
+        "gfriends": false
       },
       "fail_count": 0,
       "retry_after": "2027-05-16T00:00:00Z",

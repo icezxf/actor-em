@@ -154,11 +154,8 @@ func TestBotEndToEnd(t *testing.T) {
 	if StrVal(actor.Avatar) != wantURL {
 		t.Fatalf("头像应是第 2 张的网络地址，实际 %q", StrVal(actor.Avatar))
 	}
-	if StrVal(actor.AvatarSource) != wantURL {
-		t.Fatalf("头像来源应为第 2 张，实际 %q", StrVal(actor.AvatarSource))
-	}
-	if actor.AvatarPath != nil {
-		t.Fatal("不该残留 alist 路径")
+	if StrVal(actor.AvatarSourceSite) != "manual" {
+		t.Fatalf("人工选图来源应标 manual，实际 %q", StrVal(actor.AvatarSourceSite))
 	}
 
 	url, ok := choices.Get(actor.Key)

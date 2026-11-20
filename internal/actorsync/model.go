@@ -1,40 +1,35 @@
 package actorsync
 
-// Actor 是 actors.json 里的一条记录。
+// Actor 是 actors.jsonl 里的一行（一个演员）。
 // 字段全部扁平，空值一律 null（用指针表达），不写空字符串。
+// 数组字段空时写 []，不写 null。
 type Actor struct {
 	Key          string   `json:"key"`
-	Name         string   `json:"name"`
+	Name         string   `json:"name"` // 中文名，Emby 的 Name
 	NameOriginal *string  `json:"name_original"`
 	Aliases      []string `json:"aliases"`
 
 	Gender     *string `json:"gender"`
-	BirthDate  *string `json:"birth_date"`
-	DeathDate  *string `json:"death_date"`
+	BirthDate  *string `json:"birth_date"` // 只认 JavStash
 	BirthPlace *string `json:"birth_place"`
 	Country    *string `json:"country"`
 
-	HeightCm *int    `json:"height_cm"`
-	WeightKg *int    `json:"weight_kg"`
-	CupSize  *string `json:"cup_size"`
-	WaistCm  *int    `json:"waist_cm"`
-	HipCm    *int    `json:"hip_cm"`
+	HeightCm     *int    `json:"height_cm"`
+	WeightKg     *int    `json:"weight_kg"`    // 只有 TPDB 有，覆盖很低
+	Measurements *string `json:"measurements"` // 原样字符串，如 "34E-21-31"，来自 TPDB
+	CupSize      *string `json:"cup_size"`
 
-	CareerStart *int `json:"career_start"`
+	CareerStart *int     `json:"career_start"` // 出道年，Emby 的 ProductionYear
+	Tags        []string `json:"tags"`
 
 	Bio     *string `json:"bio"`
 	BioLang *string `json:"bio_lang"`
 
-	Avatar           *string `json:"avatar"`
-	AvatarPath       *string `json:"avatar_path"`
-	AvatarDir        *string `json:"avatar_dir"`
-	AvatarSource     *string `json:"avatar_source"`
-	AvatarSourceSite *string `json:"avatar_source_site"`
-	AvatarSHA256     *string `json:"avatar_sha256"`
-	AvatarBytes      *int64  `json:"avatar_bytes"`
-	AvatarW          *int    `json:"avatar_w"`
-	AvatarH          *int    `json:"avatar_h"`
+	Avatar           *string `json:"avatar"`             // 原图直链
+	AvatarCN         *string `json:"avatar_cn"`          // 国内可访问镜像（jsdelivr）
+	AvatarSourceSite *string `json:"avatar_source_site"` // gfriends / javstash / tpdb / theactorbase
 
+	HomePageURL *string           `json:"homepage_url"` // Emby 的 HomePageUrl
 	ProviderIDs map[string]string `json:"provider_ids"`
 
 	Status     string          `json:"status"`
@@ -46,7 +41,7 @@ type Actor struct {
 	ScrapedAt string `json:"scraped_at"`
 }
 
-// Db 是 actors.json 的顶层结构。
+// Db 是内存中的全量演员表。落盘是一行一条的 JSONL，这个结构只用于进程内。
 type Db struct {
 	SchemaVersion int      `json:"schema_version"`
 	GeneratedAt   string   `json:"generated_at"`
@@ -54,8 +49,11 @@ type Db struct {
 	Actors        []*Actor `json:"actors"`
 }
 
-// SchemaVersion 2：移除了 emby_ids，清单只来自 actors.txt。
-const SchemaVersion = 2
+// SchemaVersion 3：对齐 docs/actor-fields.md
+//   - 删 death_date / waist_cm / hip_cm（忌日不要；三围改成原样字符串)
+//   - 删 alist 时代的 avatar_path/dir/sha256/bytes/w/h 和冗余的 avatar_source
+//   - 增 measurements / tags / avatar_cn / homepage_url
+const SchemaVersion = 3
 
 // 记录状态
 const (
@@ -82,6 +80,6 @@ type RunStats struct {
 	Added       int    `json:"added"`
 	Updated     int    `json:"updated"`
 	Failed      int    `json:"failed"`
-	Source      string `json:"source"`       // 固定为 txt
+	Source      string `json:"source"`       // 固定为 dict（清单来自 actor_dict.csv）
 	SourceCount int    `json:"source_count"` // 待抓清单里的演员总数
 }
