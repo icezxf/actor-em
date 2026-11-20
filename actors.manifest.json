@@ -1,52 +1,52 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-20T10:07:59Z",
-  "count": 19151,
+  "generated_at": "2026-11-20T12:25:24Z",
+  "count": 19154,
   "by_status": {
     "failed": 328,
-    "no_source": 2252,
-    "ok": 7219,
-    "partial": 9158,
-    "skipped": 194
+    "no_source": 2253,
+    "ok": 7231,
+    "partial": 9149,
+    "skipped": 193
   },
   "last_run": {
-    "started_at": "2026-11-20T07:59:41Z",
-    "duration_sec": 7698,
-    "picked": 21293,
-    "added": 19151,
-    "updated": 2142,
-    "failed": 328,
+    "started_at": "2026-11-20T12:22:31Z",
+    "duration_sec": 172,
+    "picked": 150,
+    "added": 3,
+    "updated": 147,
+    "failed": 0,
     "source": "txt",
-    "source_count": 21293
+    "source_count": 21283
   },
   "sources": {
     "gfriends": {
-      "miss": 7055,
-      "ok": 14238
+      "miss": 80,
+      "ok": 70
     },
     "javstash": {
-      "miss": 6757,
-      "ok": 14536
+      "miss": 15,
+      "ok": 135
     },
     "mdcx": {
-      "miss": 7069,
-      "ok": 14224
+      "miss": 85,
+      "ok": 65
     },
     "stashdb": {
-      "miss": 6439,
-      "ok": 318
+      "miss": 4,
+      "ok": 11
     },
     "theactorbase": {
-      "miss": 19595,
-      "ok": 1638
+      "miss": 143,
+      "ok": 7
     },
     "tpdb": {
-      "miss": 13632,
-      "ok": 7661
+      "miss": 106,
+      "ok": 44
     },
     "wiki": {
-      "miss": 20547,
-      "ok": 746
+      "miss": 146,
+      "ok": 4
     }
   }
 }
