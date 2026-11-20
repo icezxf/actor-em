@@ -515,17 +515,20 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 
 	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + unitTag + fakeDate + upgraded
 	if total == 0 {
-		logger.Printf("没有需要写回的改动")
-		return nil
+		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}
 	if cfg.DryRun {
 		logger.Printf("dry-run：不写文件")
 		return nil
 	}
-	if err := db.Save(cfg.DataFile); err != nil {
-		return fmt.Errorf("保存 %s 失败: %w", cfg.DataFile, err)
+	// 即使字段一个没补，也要重新派生 json：Exportable() 的过滤规则可能变了
+	// （比如把老字典的下划线名字挡在下游），只在 jsonl 有变化时才写它。
+	if total > 0 {
+		if err := db.Save(cfg.DataFile); err != nil {
+			return fmt.Errorf("保存 %s 失败: %w", cfg.DataFile, err)
+		}
+		logger.Printf("已写回 %s", cfg.DataFile)
 	}
-	logger.Printf("已写回 %s", cfg.DataFile)
 	if actorsync.IsJSONLPath(cfg.DataFile) {
 		jsonPath := strings.TrimSuffix(cfg.DataFile, ".jsonl") + ".json"
 		if err := db.ExportJSON(jsonPath); err != nil {
