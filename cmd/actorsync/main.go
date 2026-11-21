@@ -349,9 +349,12 @@ func main() {
 		actor := out.Actor
 		// 补字段模式：记下「这轮试过了」，--fill-min-age 靠它把队列往后推。
 		// 只给 ok/partial 打标记——failed/no_source 的 retry_after 有自己的退避语义。
+		// 注意 Upsert 是值拷贝（*old = *a），改 out.Actor 不会落到库里，必须按 key 取一次。
 		if fillMissing && fillMinAge > 0 && !cfg.DryRun && actor != nil &&
 			(actor.Status == actorsync.StatusOK || actor.Status == actorsync.StatusPartial) {
-			actor.RetryAfter = actorsync.StrPtr(time.Now().UTC().AddDate(0, 0, fillMinAge).Format(time.RFC3339))
+			if cur := db.FindByKey(actor.Key); cur != nil {
+				cur.RetryAfter = actorsync.StrPtr(time.Now().UTC().AddDate(0, 0, fillMinAge).Format(time.RFC3339))
+			}
 		}
 		extra := ""
 		if len(out.Filled) > 0 {
