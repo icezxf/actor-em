@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<title>演员库 · actor-em</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="mark"></span>
+    <h1>演员库</h1>
+    <span id="count" class="count">加载中…</span>
+  </div>
+  <div class="search">
+    <input id="q" type="search" placeholder="搜名字 / 别名 / 标签，如 三上、桥本有菜、E罩杯" autocomplete="off" spellcheck="false">
+  </div>
+  <button id="theme" class="icon-btn" title="切换深浅色" aria-label="切换深浅色">◐</button>
+</header>
+
+<div class="toolbar">
+  <select id="cup" aria-label="罩杯">
+    <option value="">全部罩杯</option>
+  </select>
+  <select id="height" aria-label="身高">
+    <option value="">全部身高</option>
+    <option value="-150">150cm 以下</option>
+    <option value="150-155">150–155cm</option>
+    <option value="155-160">155–160cm</option>
+    <option value="160-165">160–165cm</option>
+    <option value="165-170">165–170cm</option>
+    <option value="170-">170cm 以上</option>
+  </select>
+  <select id="sort" aria-label="排序">
+    <option value="name">按名字</option>
+    <option value="birth">按出生年（新→旧）</option>
+    <option value="height">按身高（高→低）</option>
+    <option value="cup">按罩杯（大→小）</option>
+    <option value="debut">按出道年（新→旧）</option>
+  </select>
+  <label class="chk"><input type="checkbox" id="onlyAvatar"> 只看有图</label>
+  <div id="tagbar" class="tagbar"></div>
+</div>
+
+<main>
+  <div id="grid" class="grid"></div>
+  <div id="sentinel" class="sentinel"></div>
+  <p id="empty" class="empty" hidden>没有匹配的演员，换个关键词试试。</p>
+</main>
+
+<footer class="foot">
+  数据来自 actor-em 每日同步 · <span id="generated"></span>
+</footer>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-name">
+    <button id="m-close" class="icon-btn close" aria-label="关闭">✕</button>
+    <div class="m-head">
+      <div class="m-thumb"><img id="m-img" alt=""><span id="m-initial" class="initial"></span></div>
+      <div class="m-title">
+        <h2 id="m-name"></h2>
+        <p id="m-orig" class="sub"></p>
+        <div id="m-facts" class="facts"></div>
+      </div>
+    </div>
+    <div id="m-tags" class="chips"></div>
+    <div class="m-section">
+      <h3>别名</h3>
+      <p id="m-aliases" class="muted"></p>
+    </div>
+    <div class="m-section">
+      <h3>简介</h3>
+      <p id="m-bio" class="bio"></p>
+    </div>
+    <div id="m-links" class="m-links"></div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

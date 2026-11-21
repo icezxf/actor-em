@@ -312,6 +312,11 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	// 统一成「日本·东京都」；本来就只有国家（「日本」）的原样留着。
 	res.finalizeBirthPlace()
 
+	// ---------- 12. 罩杯定稿 + 进标签 ----------
+	// 没有 cup_size 的从三围首段反推（34E-24-35 → E），再补成「E罩杯」标签，
+	// Emby 的标签栏能直接按罩杯筛人。
+	res.finalizeCup()
+
 	return res
 }
 
@@ -530,6 +535,14 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 		res.CupSize = p.CupSize
 	}
 	// 三围：MDCx 已在第 1 步填过，这里只补空位。
+	// JavStash/StashDB 给的是「底围+杯 + 腰 + 臀」（英寸，band_size/cup_size/waist/hip），
+	// 正好是下游要的 34E-24-35 写法，排在 TPDB 的原文之前。
+	if res.Measurements == "" {
+		if s := bandCupMeasurements(p.Band, p.CupSize, p.Waist, p.Hip); s != "" {
+			res.Measurements = s
+			res.MeasurementsUnit = "in"
+		}
+	}
 	// TPDB 的第一段可能是胸围（34-24-35），也可能是「底围+杯」（34E-24-35），
 	// 两种都原样留着——后者正是欧美标准写法。
 	if p.Source == "tpdb" && res.Measurements == "" {

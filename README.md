@@ -32,6 +32,7 @@
 | `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping` 成中文字典；并把 MDCx 两个库导成档案宽表 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`mdcx_profiles.csv`、`data/base_sources.json` |
 | `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`refresh_all`/`fill_missing`/`fill_fields`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
 | `tg-command.yml` | 处理一条 Telegram update：刮削 → 发候选图 → 换图 → 提交状态 | Cloudflare Worker 派发 | 同上（按需） |
+| `pages.yml` | 把 `actors.jsonl` 派生成静态站并发 GitHub Pages | 模板/脚本改动、`actor-sync` 跑完、手动 | Pages（`site/` 不入库） |
 
 `base-db` 是**前置条件**：它没跑过，`actor-sync` 和 `tg-command` 都会在「Check dictionary」那步直接失败。
 
@@ -65,6 +66,24 @@
 | `data/avatar_review.json` | 选图交互状态（发过的消息 id、getUpdates 游标） | bot |
 
 单条记录的完整示例见 [`actors.example.json`](actors.example.json)。
+
+### 静态站（GitHub Pages）
+
+`scripts/build_site.py` 把 `actors.jsonl` 派生成一个纯静态的搜索页，`pages.yml` 负责生成与发布；
+模板在 `site_src/`（`index.html` + `assets/app.js` + `assets/style.css`），生成物 `site/` 不入库。
+
+```bash
+python3 scripts/build_site.py actors.jsonl   # 本地生成，产物在 site/
+python3 -m http.server -d site 8000          # 打开 http://localhost:8000
+```
+
+页面能做的：按名字/别名/标签搜（含 `E罩杯`）、按罩杯和身高筛、按名字/出生年/身高/罩杯/出道年排序、
+只看有图、点开看三围/生日/出身/别名/简介/外链。
+
+体积上的取舍：主索引 `site/data/actors.json` 1.6 万条约 3.3MB（gzip 后约 1MB），
+字段压成定长数组、头像域名缩写（`~g/` gfriends、`~t/` thepodb、`~j/` javstash、`~s/` stashdb）
+由前端展开；简介和主页链接只有约 9% 的人有，拆成 16 个 `data/detail/<i>.json` 分片，
+点开详情才拉对应那一片。
 
 ## 快速开始（本地）
 

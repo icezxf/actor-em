@@ -12,7 +12,8 @@
 | **amane** `mapping_actor.xml` | 中日名映射（别名 → 日文原名） | 5,351 演员 / 15,941 别名 | 字典骨架，更新很慢（2026-08 后无提交） |
 | **MDCx** `actor-mapping.sqlite3` | 中文名（`zh_cn`）、别名、罗马字 | 22,209 演员，中文名 99.9% | 补字典用，接入后字典涨到 21,161 演员 / 64,319 别名 |
 | **MDCx** `actor-profile.sqlite3` | 演艺期间、身高、**三围分项（bust/waist/hip，80%）**、罩杯、出生地、别名、结构化简介 | 21,860 演员 | 结构化字段的主力；三围是厘米，读入时换算成英寸 |
-| **JavStash** | 生日、出道年、图、别名、外链 | 日系演员主力 | **生日唯一权威源** |
+| **JavStash** | 生日、出道年、身高、**三围（band/cup/waist/hip）**、图、别名、外链 | 日系演员主力 | **生日唯一权威源**；三围排 TPDB 之前 |
+| **StashDB** | 生日、身高、三围（同上，字段一致）、图、外链 | 欧美兜底 | 与 JavStash 同一套 schema，共用一套查询字段 |
 | **TPDB** | 三围（英寸）、体重、长简介、出道年、图 | 三围 46% / 体重 13% / 长简介 27% | 三围**兜底**：第一段可能是「下胸围+杯」，不能直接当胸围 |
 | **中文维基** | 中文简介 | 命中率一般，但质量最高 | 简介第 1 顺位，需带 `WIKI_EMAIL` 防风控 |
 | **dramaface**（剧面） | 中文简介（整段，质量高） | 静态 HTML，slug = `罗马字名去空格拼接`（如 `MomonogiKana`），大小写不敏感 | 简介第 2 顺位，默认开启（`DRAMAFACE=0` 关），需浏览器 UA |
@@ -75,10 +76,16 @@ JavStash + MDCx 把覆盖率从 40.9% 提到 **65.7%**（+215 条 / 866 条）�
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
 | `height_cm` | int? | MDCx `height`（75.5%）→ JavStash → TPDB | 纯数字 |
-| `weight_kg` | int? | JavStash `weight` → TPDB `extras.weight` | 只有这两个源有，MDCx 完全没有 |
-| `measurements` | string? | MDCx `bust/waist/hip/cup`（**80% 齐备**）→ TPDB 原文 | `36J-25-39`（底围+杯-腰-臀）或 `44-25-39`（无罩杯时首段是胸围） |
+| `weight_kg` | int? | 只有 TPDB `extras.weight`（JavStash / StashDB 的 Performer **没有 weight 字段**，查了会整条 schema 校验失败） | 覆盖很低 |
+| `measurements` | string? | MDCx `bust/waist/hip/cup`（**80% 齐备**）→ JavStash / StashDB `band_size + cup_size + waist_size + hip_size` → TPDB 原文 | `36J-25-39`（底围+杯-腰-臀）或 `44-25-39`（无罩杯时首段是胸围） |
 | `measurements_unit` | string? | 跟着 `measurements` 走 | 目前恒为 `in`；空表示没有三围 |
-| `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash `cup_size` | 独立字段，同时参与首段拼装 |
+| `cup_size` | string? | MDCx profile `cup`（**73.1%**，纯字母 A–T）→ TPDB `measurements` 第二段 → JavStash / StashDB `cup_size` | 独立字段，同时参与首段拼装，并转成 `E罩杯` 标签 |
+
+**JavStash 三围兜底**：JavStash 的演员页会直接显示 `34E-24-35`，对应 GraphQL 的四个扁平字段
+`band_size`(Int) / `cup_size`(String) / `waist_size`(Int) / `hip_size`(Int)——分项都在，
+所以能原样拼成我们要的「底围+杯-腰-臀」，比 TPDB 那段要二次判断的原文更可靠，
+排在 TPDB 之前。两个站是同一套 stash-box schema（旧的嵌套 `measurements` 和 `weight` 都已删除，
+查询里带上会让**整条请求**校验失败，所以字段清单只能写扁平的这四项 + `breast_type`）。
 
 **为什么 MDCx 排前面**：MDCx 的 `bust`/`waist`/`hip` 是分项字段，17,494 人三项齐备
 （80.0%）；TPDB 是欧美库，只命中 46%。旧版只认 TPDB，等于白白扔掉 80% 的数据。
@@ -262,6 +269,16 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 
 1. **黑名单过滤**：剔除含 `未成年`、`幼児体型` 这类明确指向未成年人身体特征的词（原始数据里确有，不得进入媒体库元数据）。
 2. **推 Emby 时截断到 8 个**，按全局词频从高到低取——高频词（巨乳、美人、長身）更通用，长尾词是全站只出现一两次的（如某些组合名），留着只会污染标签栏。JSONL 里保留全量。
+
+**罩杯也进标签**（`E罩杯` / `J罩杯`）：
+
+- 每个有罩杯的人都补一个 `X罩杯`，不管 MDCx 有没有给标签。没有 `cup_size`
+  就从 `measurements` 首段反推（`34E-24-35` → `E`），反推不出来才留空。
+- 放在标签列表**最前面**：第 2 条规则会按个数截断，罩杯放末尾会被切掉；
+  放首位即使只剩 1 个标签也能保住。
+- 幂等，大小写/空格不敏感（已有 `e罩杯` 就不再追加）；每轮收尾对全库跑一次，
+  老记录不必等重抓也会补上。
+- 线上 16,376 条导出记录里 11,625 条（71%）有罩杯，会全部带上这个标签。
 
 ---
 

@@ -409,16 +409,22 @@ func main() {
 		logger.Printf("dry-run 结束：处理 %d 个，未写本地文件", len(plan))
 		return
 	}
-	// 存量出生地自愈：老记录只存了「东京都」，这里统一改写成「日本·东京都」。
-	// 幂等、纯离线，放在每轮收尾，老库不必专门跑一次 backfill 也能对齐口径。
-	placeFixed := 0
+	// 存量自愈：出生地补国家、罩杯进标签。两件都是幂等纯离线操作，
+	// 放在每轮收尾，老库不必专门跑一次 backfill 也能对齐口径。
+	placeFixed, cupFixed := 0, 0
 	for _, a := range db.Actors {
 		if actorsync.QualifyActorBirthPlace(a) {
 			placeFixed++
 		}
+		if actorsync.EnsureActorCupTag(a) {
+			cupFixed++
+		}
 	}
 	if placeFixed > 0 {
 		logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", placeFixed)
+	}
+	if cupFixed > 0 {
+		logger.Printf("罩杯进标签：%d 条（如「E罩杯」）", cupFixed)
 	}
 	if err := db.Save(cfg.DataFile); err != nil {
 		logger.Fatalf("保存 %s 失败: %v", cfg.DataFile, err)
@@ -500,7 +506,7 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	logger.Printf("字典 %d 条别名（%s）", dict.Size(), cfg.DictFile)
 
 	var fakeDate, unitTag, upgraded int
-	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, nAlias, noMatch int
+	var nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, nAlias, noMatch, nCupTag int
 	for _, a := range db.Actors {
 		if a == nil {
 			continue
@@ -526,6 +532,13 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 		// skipped / no_source / failed 不补：它们不进下游，补了也没人看
 		if !a.Exportable() {
 			continue
+		}
+
+		// 罩杯进标签。不依赖 MDCx——cup_size 和三围库里本来就有，
+		// 没罩杯的从「34E-24-35」首段反推。放在 MDCx 查库之前，
+		// 免得 MDCx 撞不上的人被 continue 掉、漏掉标签。
+		if actorsync.EnsureActorCupTag(a) {
+			nCupTag++
 		}
 
 		// 中文名 → 日文原名 → 别名，逐个试（MDCx 索引里三种都可能有）
@@ -643,8 +656,9 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 		nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch)
 	logger.Printf("补中文别名：%d 条（字典里的旧名/异名，让 Emby 按旧名也能命中）", nAlias)
 	logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", nPlaceFix)
+	logger.Printf("罩杯进标签：%d 条（如「E罩杯」）", nCupTag)
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix + nCupTag
 	if total == 0 {
 		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}

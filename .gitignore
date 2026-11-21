@@ -11,6 +11,9 @@ __pycache__/
 # 派生的展示表格：2 万行的二进制日更会把仓库撑爆，改由 actor-sync 挂 artifact
 actors.xlsx
 
+# 静态站生成物（由 scripts/build_site.py 从 actors.jsonl 派生，pages.yml 里现场再生成）
+site/
+
 # 临时文件
 *.tmp
 *.log

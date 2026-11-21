@@ -26,6 +26,7 @@ type Performer struct {
 	Weight       int
 	Measurements string // 仅 TPDB：英寸串，第一段可能是胸围也可能是「下胸围+杯」
 	CupSize      string
+	Band         int // 下胸围（英寸），JavStash 有，用来拼 34E-24-35
 	Waist        int
 	Hip          int
 	CareerStart  int
@@ -52,20 +53,16 @@ func NewStashBoxClient(source, endpoint, apiKey string) *StashBoxClient {
 	}
 }
 
-// JavStash 沿用旧版 stash-box schema（带 weight / measurements）。
-// JavStash 和 StashDB 共用同一套 stash-box schema，都已移除 weight/measurements，
-// 改成扁平的 cup_size/band_size/waist_size/hip_size。
-// 查询里带上任何不存在的字段都会整体校验失败，所以只能用当前 schema 的字段。
+// JavStash 和 StashDB 现在是同一套 stash-box schema：三围都是扁平字段
+// cup_size(String) / band_size(Int) / waist_size(Int) / hip_size(Int)，
+// 旧的嵌套 measurements 和 weight 两个站都已经删了。
+// GraphQL 查询里带上任何不存在的字段会整体校验失败，所以只能写当前 schema 的字段。
 const stashGraphQLFields = `
 	id name aliases birth_date country ethnicity height gender career_start_year
 	cup_size waist_size hip_size band_size breast_type
 	images { url }
 	urls { url }
 `
-
-func fieldsFor(source string) string {
-	return stashGraphQLFields
-}
 
 type stashPerformerJSON struct {
 	ID          string   `json:"id"`
@@ -78,24 +75,30 @@ type stashPerformerJSON struct {
 	Weight      int      `json:"weight"`
 	Gender      string   `json:"gender"`
 	CareerStart int      `json:"career_start_year"`
-	// StashDB 新 schema 的扁平字段
+	// 三围：两个站都是扁平字段（JavStash 页面上的「34E-24-35」就来自这四项）
 	CupSize    string `json:"cup_size"`
 	WaistSize  int    `json:"waist_size"`
 	HipSize    int    `json:"hip_size"`
-	BandSize   int    `json:"band_size"` // StashDB: Int（不是字符串）
+	BandSize   int    `json:"band_size"`
 	BreastType string `json:"breast_type"`
-	// JavStash 旧 schema 的嵌套字段
-	Measurements struct {
-		CupSize string `json:"cup_size"`
-		Waist   int    `json:"waist"`
-		Hip     int    `json:"hip"`
-	} `json:"measurements"`
-	Images []struct {
+	Images     []struct {
 		URL string `json:"url"`
 	} `json:"images"`
 	URLs []struct {
 		URL string `json:"url"`
 	} `json:"urls"`
+}
+
+// queryFor 按关键词拼 GraphQL 语句：UUID 直查，名字走 searchPerformer。
+// 单独拆出来是为了能离线断言字段清单（带错字段会让整条查询失败）。
+func (c *StashBoxClient) queryFor(term string) (string, map[string]any) {
+	vars := map[string]any{}
+	if IsUUID(term) {
+		vars["id"] = term
+		return fmt.Sprintf(`query Find($id: ID!) { findPerformer(id: $id) { %s } }`, stashGraphQLFields), vars
+	}
+	vars["term"] = term
+	return fmt.Sprintf(`query Search($term: String!) { searchPerformer(term: $term) { %s } }`, stashGraphQLFields), vars
 }
 
 // Search 按名字或 UUID 查询；名字查询时做严格匹配，避免短名误配。
@@ -108,18 +111,7 @@ func (c *StashBoxClient) Search(ctx context.Context, term string) (*Performer, e
 		return nil, fmt.Errorf("%s: 空关键词", c.Source)
 	}
 
-	isUUID := IsUUID(term)
-	var query string
-	vars := map[string]any{}
-
-	fields := fieldsFor(c.Source)
-	if isUUID {
-		query = fmt.Sprintf(`query Find($id: ID!) { findPerformer(id: $id) { %s } }`, fields)
-		vars["id"] = term
-	} else {
-		query = fmt.Sprintf(`query Search($term: String!) { searchPerformer(term: $term) { %s } }`, fields)
-		vars["term"] = term
-	}
+	query, vars := c.queryFor(term)
 
 	body, _ := json.Marshal(map[string]any{"query": query, "variables": vars})
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.Endpoint, bytes.NewReader(body))
@@ -158,7 +150,7 @@ func (c *StashBoxClient) Search(ctx context.Context, term string) (*Performer, e
 	}
 
 	var hit *stashPerformerJSON
-	if isUUID {
+	if IsUUID(term) {
 		hit = envelope.Data.FindPerformer
 		if hit == nil {
 			return nil, fmt.Errorf("%w: %s 未找到该 ID", ErrNotFound, c.Source)
@@ -242,20 +234,11 @@ func toPerformer(source string, p *stashPerformerJSON) *Performer {
 		Gender:      p.Gender,
 		Height:      p.Height,
 		Weight:      p.Weight,
-		CupSize:     p.Measurements.CupSize,
-		Waist:       p.Measurements.Waist,
-		Hip:         p.Measurements.Hip,
+		CupSize:     p.CupSize,
+		Band:        p.BandSize,
+		Waist:       p.WaistSize,
+		Hip:         p.HipSize,
 		CareerStart: p.CareerStart,
-	}
-	// StashDB 新 schema：扁平字段兜底（旧 schema 下这些为空，不影响）
-	if out.CupSize == "" {
-		out.CupSize = p.CupSize
-	}
-	if out.Waist == 0 {
-		out.Waist = p.WaistSize
-	}
-	if out.Hip == 0 {
-		out.Hip = p.HipSize
 	}
 	for _, img := range p.Images {
 		out.Images = append(out.Images, img.URL)
