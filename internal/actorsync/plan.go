@@ -154,6 +154,17 @@ func fillPriority(a *Actor) int {
 	return score
 }
 
+// CountFillBackoff 数一数库里有几条记录还在补字段退避期里（排查用）。
+func CountFillBackoff(actors []*Actor, now time.Time) int {
+	n := 0
+	for _, a := range actors {
+		if a != nil && fillBackoffActive(a, now) {
+			n++
+		}
+	}
+	return n
+}
+
 // fillBackoffActive 判断「这个人上轮补字段刚试过、还没到再试的时候」。
 //
 // 判据是 retry_after，不是 scraped_at：scraped_at 会被全量刷新顺手更新

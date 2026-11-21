@@ -221,6 +221,10 @@ func main() {
 		}
 	}
 	plan := actorsync.BuildPlanWithFillOrder(db, names, refreshNames, refreshAll, fillFieldList, fillOrd, fillMinAge)
+	if fillMissing && fillMinAge > 0 {
+		logger.Printf("补字段退避：清单 %d 个里跳过 %d 个（%d 天内试过的，库里共 %d 条带退避）",
+			len(names), len(names)-len(plan), fillMinAge, actorsync.CountFillBackoff(db.Actors, time.Now().UTC()))
+	}
 
 	stats := actorsync.RunStats{
 		StartedAt:   start.UTC().Format(time.RFC3339),
