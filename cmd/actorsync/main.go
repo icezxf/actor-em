@@ -409,6 +409,17 @@ func main() {
 		logger.Printf("dry-run 结束：处理 %d 个，未写本地文件", len(plan))
 		return
 	}
+	// 存量出生地自愈：老记录只存了「东京都」，这里统一改写成「日本·东京都」。
+	// 幂等、纯离线，放在每轮收尾，老库不必专门跑一次 backfill 也能对齐口径。
+	placeFixed := 0
+	for _, a := range db.Actors {
+		if actorsync.QualifyActorBirthPlace(a) {
+			placeFixed++
+		}
+	}
+	if placeFixed > 0 {
+		logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", placeFixed)
+	}
 	if err := db.Save(cfg.DataFile); err != nil {
 		logger.Fatalf("保存 %s 失败: %v", cfg.DataFile, err)
 	}
