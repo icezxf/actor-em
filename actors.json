@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T04:35:03Z",
+  "generated_at": "2026-11-21T05:13:14Z",
   "count": 16649,
   "actors": [
     {
@@ -1653,7 +1653,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -3327,16 +3329,18 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "30E-22-33",
+      "measurements_unit": "in",
+      "cup_size": "E",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BD%90%E5%80%89%E7%BE%8E%E4%BD%90.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%BD%90%E5%80%89%E7%BE%8E%E4%BD%90.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/0127ded2-b318-47c8-8b77-17caeb3ad83c",
       "provider_ids": {
         "JavStash": "0127ded2-b318-47c8-8b77-17caeb3ad83c"
@@ -3345,10 +3349,10 @@
       "sources": {
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -3357,7 +3361,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:20:31Z",
-      "scraped_at": "2026-11-21T02:00:10Z"
+      "scraped_at": "2026-11-21T05:07:36Z"
     },
     {
       "key": "javstash:01293616-abed-4951-9105-7cc4eb8e5cff",
@@ -5304,8 +5308,8 @@
       "country": "JP",
       "height_cm": 153,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30E-22-33",
+      "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2026,
       "tags": [
@@ -5318,25 +5322,28 @@
       "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/019f6964-d534-7f11-8a83-8b483e39cdb2",
       "provider_ids": {
-        "JavStash": "019f6964-d534-7f11-8a83-8b483e39cdb2"
+        "JavStash": "019f6964-d534-7f11-8a83-8b483e39cdb2",
+        "StashDB": "867cad60-abe9-4769-a64b-baff54a75a28",
+        "TPDB": "a8fb853b-55fc-4a08-ae07-cb6e5e06a46c"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:25:12Z",
-      "scraped_at": "2026-11-21T02:06:52Z"
+      "scraped_at": "2026-11-21T05:02:36Z"
     },
     {
       "key": "javstash:019f8770-138d-7270-816a-6cc579ed878b",
@@ -5573,6 +5580,7 @@
       "cup_size": "H",
       "career_start": 2018,
       "tags": [
+        "H罩杯",
         "美人",
         "巨乳",
         "美乳",
@@ -7054,6 +7062,7 @@
       "cup_size": "D",
       "career_start": null,
       "tags": [
+        "D罩杯",
         "黑辣妹",
         "肛门",
         "女同性恋",
@@ -9938,7 +9947,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2017,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -11284,7 +11295,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2008,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -12299,11 +12312,13 @@
       "country": "JP",
       "height_cm": 165,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "32C-25-35",
+      "measurements_unit": "in",
+      "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A5%88%E7%B7%92%E7%BE%8E.jpg",
@@ -12311,7 +12326,9 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a146b2-8c8a-772b-bc7f-444b795a8abf",
       "provider_ids": {
-        "JavStash": "01a146b2-8c8a-772b-bc7f-444b795a8abf"
+        "JavStash": "01a146b2-8c8a-772b-bc7f-444b795a8abf",
+        "StashDB": "40573aff-07f1-4664-b7b8-a5990146a383",
+        "TPDB": "2f23c4c8-f6c5-4c9b-9728-fa787333c992"
       },
       "status": "partial",
       "sources": {
@@ -12320,16 +12337,17 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:37:13Z",
-      "scraped_at": "2026-11-21T01:24:17Z"
+      "scraped_at": "2026-11-21T05:06:30Z"
     },
     {
       "key": "javstash:01a146ec-f5ac-7056-9a54-ebefe704d889",
@@ -12508,7 +12526,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -14074,37 +14094,44 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "30B-24-33",
+      "measurements_unit": "in",
+      "cup_size": "B",
       "career_start": 1992,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9F%B4%E7%94%9F%E3%81%BF%E3%81%93.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9F%B4%E7%94%9F%E3%81%BF%E3%81%93.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a1d791-2b92-796c-a52f-f7b760ee02fe",
       "provider_ids": {
-        "JavStash": "01a1d791-2b92-796c-a52f-f7b760ee02fe"
+        "JavStash": "01a1d791-2b92-796c-a52f-f7b760ee02fe",
+        "StashDB": "5ae5f6e9-d568-4350-9075-b7218ac134b8",
+        "TPDB": "ae5970b7-e1d1-4445-b195-a923f79158d3",
+        "Wikidata": "Q23949031",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E5%9F%B4%E7%94%9F%E3%81%BF%E3%81%93"
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
-        "gfriends": false,
+        "cinewho": true,
+        "dramaface": true,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
-        "theactorbase": false,
-        "tpdb": false,
+        "mdcx": true,
+        "stashdb": true,
+        "theactorbase": true,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:54:25Z",
-      "scraped_at": "2026-11-21T03:53:26Z"
+      "scraped_at": "2026-11-21T05:09:36Z"
     },
     {
       "key": "javstash:01a1e0d3-a3ea-7930-b5ac-ccc116b1399f",
@@ -19296,7 +19323,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -20510,6 +20539,7 @@
       "cup_size": "B",
       "career_start": 2002,
       "tags": [
+        "B罩杯",
         "萝莉",
         "低身长",
         "獣姦",
@@ -20647,6 +20677,7 @@
       "cup_size": "D",
       "career_start": 2008,
       "tags": [
+        "D罩杯",
         "."
       ],
       "bio": null,
@@ -36920,11 +36951,12 @@
       "country": "JP",
       "height_cm": 158,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "32B-23-37",
+      "measurements_unit": "in",
+      "cup_size": "B",
       "career_start": null,
       "tags": [
+        "B罩杯",
         "少女偶像",
         "写真偶像"
       ],
@@ -36935,11 +36967,12 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/09aa6bf7-9f0f-42ee-abaa-32ef5bbd5eb1",
       "provider_ids": {
-        "JavStash": "09aa6bf7-9f0f-42ee-abaa-32ef5bbd5eb1"
+        "JavStash": "09aa6bf7-9f0f-42ee-abaa-32ef5bbd5eb1",
+        "Wikipedia": "ja.wikipedia.org/wiki/中西南"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": true,
         "gfriends": true,
         "idoldb": false,
@@ -36953,7 +36986,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:24:45Z",
-      "scraped_at": "2026-11-21T03:15:06Z"
+      "scraped_at": "2026-11-21T05:06:25Z"
     },
     {
       "key": "javstash:09b78fdc-3561-47a8-9436-5a7f6286a71b",
@@ -39117,7 +39150,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": "Tiny 胎尼（1994年2月19日—），是台灣的日本AV女優，2024年用藝名「田井虹」第一次在日本AV界出道，但作品最後下架，2025年用原本的藝名「Tiny」第二次出道。\n胎尼於2014年代開始在台灣擔任模特兒並拍攝照片、影片，亦參與了多部音樂錄影帶（MV）出演與廣告代言，也曾參與台灣公視電影《拍射吧！廷方！》的演出。\n胎尼同時也是一名網路詩人，以靡靡作為筆名，目前著有《愛之病》（2019）與《我們走上的全是歧途》（2020）兩本詩集。",
       "bio_lang": "zh",
       "avatar": "https://javstash.org/images/4a006557-f512-479b-830c-49509e105b24",
@@ -41115,6 +41150,7 @@
       "cup_size": "D",
       "career_start": 1984,
       "tags": [
+        "D罩杯",
         "巨乳",
         "饱满乳晕",
         "巨尻",
@@ -41393,8 +41429,8 @@
       "country": null,
       "height_cm": 180,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30D-23-33",
+      "measurements_unit": "in",
       "cup_size": "G",
       "career_start": null,
       "tags": [
@@ -41408,7 +41444,8 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/0b052e58-df75-47a1-a4c5-273975e19226",
       "provider_ids": {
-        "JavStash": "0b052e58-df75-47a1-a4c5-273975e19226"
+        "JavStash": "0b052e58-df75-47a1-a4c5-273975e19226",
+        "TPDB": "55607e4a-b40c-4eb3-a879-2268437669e8"
       },
       "status": "partial",
       "sources": {
@@ -41419,14 +41456,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:14:25Z",
-      "scraped_at": "2026-11-21T01:52:25Z"
+      "scraped_at": "2026-11-21T05:02:27Z"
     },
     {
       "key": "javstash:0b140cab-b0d5-46bc-9690-24aeec17c8fd",
@@ -41847,7 +41884,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%AB%B9%E5%86%85%E3%81%B2%E3%81%AA%E3%81%9F.jpg",
@@ -46491,11 +46530,13 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "33C-23-32",
+      "measurements_unit": "in",
+      "cup_size": "C",
       "career_start": 2010,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E6%98%9F%E9%87%8E%E3%81%B2%E3%81%AA.jpg",
@@ -46508,7 +46549,7 @@
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
@@ -46522,7 +46563,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:01:42Z",
-      "scraped_at": "2026-11-21T02:44:53Z"
+      "scraped_at": "2026-11-21T05:02:29Z"
     },
     {
       "key": "javstash:0c8758c1-bc9e-4ce6-a080-1a59d28c6e70",
@@ -51383,7 +51424,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -58197,7 +58240,9 @@
       "measurements_unit": "in",
       "cup_size": "A",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "A罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A7%AB%E5%B6%8B%E3%81%8F%E3%82%8B%E3%81%BF.jpg",
@@ -60147,6 +60192,7 @@
       "cup_size": "E",
       "career_start": 2005,
       "tags": [
+        "E罩杯",
         "美尻",
         "姐姐",
         "美乳",
@@ -64946,7 +64992,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E8%8F%8A%E6%B1%A0%E6%9C%B1%E9%87%8C.jpg",
@@ -71573,7 +71621,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -73128,8 +73178,8 @@
       "country": "JP",
       "height_cm": 155,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "32A-25-35",
+      "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2015,
       "tags": [
@@ -73142,7 +73192,10 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/1696036f-1b0c-4d6e-99e3-6ca535f0209a",
       "provider_ids": {
-        "JavStash": "1696036f-1b0c-4d6e-99e3-6ca535f0209a"
+        "JavStash": "1696036f-1b0c-4d6e-99e3-6ca535f0209a",
+        "StashDB": "38cb8fc2-bc28-489a-8f4c-b0d0e7a5b0e9",
+        "TPDB": "918c5397-246b-4aa0-9fb9-50312063fe25",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E3%82%A2%E3%83%B3%E3%83%8A_(AV%E5%A5%B3%E5%84%AA)"
       },
       "status": "ok",
       "sources": {
@@ -73152,15 +73205,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:47:40Z",
-      "scraped_at": "2026-11-21T02:31:22Z"
+      "scraped_at": "2026-11-21T05:02:45Z"
     },
     {
       "key": "javstash:16a4a1ec-18cd-4ae2-aaee-10f4183cab52",
@@ -76332,7 +76386,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%96%89%E8%97%A4%E3%81%82%E3%82%84%E3%82%81.jpg",
@@ -79260,6 +79316,7 @@
       "cup_size": "B",
       "career_start": 2015,
       "tags": [
+        "B罩杯",
         "苗条",
         "美女",
         "巨乳",
@@ -79421,11 +79478,13 @@
       "country": null,
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "30E-24-34",
+      "measurements_unit": "in",
+      "cup_size": "E",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%BC%93%E5%89%8A%E4%BA%9C%E5%BC%93.jpg",
@@ -79433,25 +79492,30 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/18c95027-80b0-42ea-a526-f8da6ec86255",
       "provider_ids": {
-        "JavStash": "18c95027-80b0-42ea-a526-f8da6ec86255"
+        "JavStash": "18c95027-80b0-42ea-a526-f8da6ec86255",
+        "StashDB": "6c2395b2-000f-4bff-8819-8b5db4be83fa",
+        "TPDB": "d40aeaa6-5958-4422-bdcb-6e5c72c48b7b",
+        "Wikidata": "Q103820484",
+        "Wikipedia": "ja.wikipedia.org/wiki/槙いずな"
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
+        "cinewho": true,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
-        "tpdb": false,
+        "stashdb": true,
+        "theactorbase": true,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:53:10Z",
-      "scraped_at": "2026-11-21T02:37:03Z"
+      "scraped_at": "2026-11-21T05:02:37Z"
     },
     {
       "key": "javstash:18ccee43-83d7-4a9e-acd0-b724da720c12",
@@ -79561,7 +79625,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%B2%B3%E6%9C%AC%E6%84%9B.jpg",
@@ -82431,7 +82497,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2014,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": "白咲花（しろさき はな）是日本的前AV女优，曾隶属于NAX Promotion。\n\n简历・人物\n2019年4月，以「蒼井ひなの（あおい ひなの）」的艺名出道。\n之后更名为「白咲花」。\n成为Platinum制作公司的专属女优。\n于2020年引退",
       "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/a1/98/ce/5767ac317ea59f3a325578cebd629e8/poster/01KWWSWG3RT1VH0KVS8M5EXF80.jpg",
@@ -82593,6 +82661,7 @@
       "cup_size": "D",
       "career_start": 2022,
       "tags": [
+        "D罩杯",
         "熟女",
         "长身",
         "巨尻"
@@ -87481,7 +87550,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2022,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -90013,7 +90084,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%98%9F%E6%B2%A2%E3%81%B2%E3%81%AA%E3%81%AE.jpg",
@@ -92784,7 +92857,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -93198,7 +93273,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2010,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%AD%E8%A5%BF%E9%A6%99%E7%B9%94.jpg",
@@ -98948,7 +99025,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2011,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E6%9C%88%E4%B9%83%E3%83%AB%E3%83%8A.jpg",
@@ -105262,7 +105341,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E8%97%8D%E3%82%86%E3%81%86%E3%81%8D.jpg",
@@ -107146,8 +107227,8 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "32-23-33",
+      "measurements_unit": "in",
       "cup_size": null,
       "career_start": 2017,
       "tags": [],
@@ -107162,7 +107243,7 @@
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
@@ -107171,12 +107252,12 @@
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:29:01Z",
-      "scraped_at": "2026-11-21T03:27:54Z"
+      "scraped_at": "2026-11-21T05:09:13Z"
     },
     {
       "key": "javstash:224c744d-2455-408a-8a2d-a0485ce2dcb1",
@@ -109780,7 +109861,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": "聖 (AV女優)（聖），出生于 1985 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 聖、Sei 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": null,
@@ -110044,7 +110127,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%9D%BE%E6%9C%AC%E7%90%86%E9%A6%99.jpg",
@@ -111235,8 +111320,8 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "28G-22-35",
+      "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2015,
       "tags": [
@@ -111252,7 +111337,9 @@
       "homepage_url": "https://javstash.org/performers/24086789-63c8-46dd-bef5-36f650893238",
       "provider_ids": {
         "JavStash": "24086789-63c8-46dd-bef5-36f650893238",
-        "TPDB": "8e32452d-84f0-4fe9-bb15-2717324f1761"
+        "StashDB": "08d121a1-0409-41ef-82dc-e9cc73263b14",
+        "TPDB": "8e32452d-84f0-4fe9-bb15-2717324f1761",
+        "Wikipedia": "ja.wikipedia.org/wiki/八ッ橋さい子"
       },
       "status": "ok",
       "sources": {
@@ -111262,6 +111349,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -111270,7 +111358,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T10:03:05Z",
-      "scraped_at": "2026-11-21T04:04:24Z"
+      "scraped_at": "2026-11-21T05:07:59Z"
     },
     {
       "key": "javstash:240894cc-1f6b-4601-a869-7ab94515a2a3",
@@ -112994,11 +113082,13 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "32C-23-34",
+      "measurements_unit": "in",
+      "cup_size": "C",
       "career_start": 2018,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%B7%9D%E7%9B%B8%E7%BE%8E%E6%9C%88.jpg",
@@ -113006,25 +113096,30 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/24b04fa4-b729-46fd-be8e-d220efee3be5",
       "provider_ids": {
-        "JavStash": "24b04fa4-b729-46fd-be8e-d220efee3be5"
+        "JavStash": "24b04fa4-b729-46fd-be8e-d220efee3be5",
+        "StashDB": "4274c1f2-9a9d-4182-bf46-31208d502299",
+        "TPDB": "2ca40aa8-2aaf-42c4-bc79-1e563d8b3b04",
+        "Wikidata": "Q106479197",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E5%A4%A9%E7%84%B6%E7%BE%8E%E6%9C%88"
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
-        "wiki": false,
-        "yinrenlu": false
+        "tpdb": true,
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:50:10Z",
-      "scraped_at": "2026-11-21T02:34:20Z"
+      "scraped_at": "2026-11-21T05:10:17Z"
     },
     {
       "key": "javstash:24b07a97-988a-431b-ba50-d10399126390",
@@ -126880,7 +126975,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/1468c90f-b4be-41fc-b573-aa95eebe6342",
@@ -130360,6 +130457,7 @@
       "cup_size": "E",
       "career_start": 2011,
       "tags": [
+        "E罩杯",
         "辣妹"
       ],
       "bio": null,
@@ -131863,7 +131961,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2022,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": "並木爱奈（Namiki Aina）是一位日本AV女优，所属于LINX事务所。\n\n经历\n她于2022年10月以E-BODY的专属演员身份出道，随后在2023年7月转为Madonna的专属演员，并参与了三部作品的拍摄。之后，她脱离了专属身份，成为了一名单体演员。截至2023年11月，社交媒体账号已被删除，事务所官网也已移除了她的个人资料。\n\n个人生活\n她来自神奈川县。在高中二年级时，她与同班的足球队男友开始了她的初次亲密接触。两人都是第一次。短期大学毕业后，她很快就结了婚，婚前一共有过三位伴侣，包括她的丈夫。",
       "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%A6%E6%9C%A8%E3%81%82%E3%81%84%E3%81%AA.jpg",
@@ -133507,6 +133607,7 @@
       "cup_size": "C",
       "career_start": 2013,
       "tags": [
+        "C罩杯",
         "微乳",
         "美少女",
         "无毛"
@@ -143763,7 +143864,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2020,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -146831,7 +146934,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -147397,7 +147502,9 @@
       "measurements_unit": "in",
       "cup_size": "I",
       "career_start": 2003,
-      "tags": [],
+      "tags": [
+        "I罩杯"
+      ],
       "bio": "あいり，公开出生年份待补充。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Airi 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%AD%E5%8E%9F%E3%82%8A%E3%81%95%E3%81%93.jpg",
@@ -154457,6 +154564,7 @@
       "cup_size": "G",
       "career_start": 2015,
       "tags": [
+        "G罩杯",
         "美巨乳",
         "长身"
       ],
@@ -155491,6 +155599,7 @@
       "cup_size": "E",
       "career_start": null,
       "tags": [
+        "E罩杯",
         "短发"
       ],
       "bio": null,
@@ -161824,7 +161933,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 1991,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%94%B0%E4%B8%AD%E3%81%BE%E3%81%99%E3%81%BF.jpg",
@@ -169021,7 +169132,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2005,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "森田水繪（森田水絵），出生于 1965 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 森田水絵、Mizue Morita 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A3%AE%E7%94%B0%E6%B0%B4%E7%B5%B5.jpg",
@@ -169311,8 +169424,8 @@
       "country": "JP",
       "height_cm": 155,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30A-22-31",
+      "measurements_unit": "in",
       "cup_size": "A",
       "career_start": null,
       "tags": [
@@ -169337,6 +169450,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -169345,7 +169459,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:09Z",
-      "scraped_at": "2026-11-21T01:33:48Z"
+      "scraped_at": "2026-11-21T05:02:29Z"
     },
     {
       "key": "javstash:395dd620-3b7d-4a44-8f59-77940151a6cf",
@@ -169375,7 +169489,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2002,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "蓮美，出生于 1988 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Hasumi 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E8%93%AE%E7%BE%8E.jpg",
@@ -171459,6 +171575,7 @@
       "cup_size": "B",
       "career_start": 2015,
       "tags": [
+        "B罩杯",
         "微乳"
       ],
       "bio": null,
@@ -174546,7 +174663,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2006,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/0-Hand-Storage/Hitomi.jpg",
@@ -179410,7 +179529,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2012,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8D%83%E7%B5%B5.jpg",
@@ -182228,7 +182349,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2008,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "長月ラム(Nagatsuki lum)，身高153cm，出生于1987-10-28，她是一名日本女优。",
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E9%95%B7%E6%9C%88%E3%83%A9%E3%83%A0.jpg",
@@ -186312,7 +186435,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2019,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%98%9F%E7%BE%85.jpg",
@@ -187390,6 +187515,7 @@
       "cup_size": "C",
       "career_start": 2014,
       "tags": [
+        "C罩杯",
         "美少女",
         "长身",
         "微乳"
@@ -193299,7 +193425,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2012,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -195911,6 +196039,7 @@
       "cup_size": "G",
       "career_start": 2013,
       "tags": [
+        "G罩杯",
         "巨乳",
         "无毛"
       ],
@@ -199626,7 +199755,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -203185,6 +203316,7 @@
       "cup_size": "F",
       "career_start": 2022,
       "tags": [
+        "F罩杯",
         "美少女",
         "偶像",
         "艺人",
@@ -204278,7 +204410,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2006,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -209441,7 +209575,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2006,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E6%B9%AF%E6%9C%AC%E5%8D%83%E5%A4%8F.jpg",
@@ -210475,8 +210611,8 @@
       "country": "JP",
       "height_cm": 170,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30D-24-39",
+      "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2015,
       "tags": [
@@ -210491,6 +210627,7 @@
       "homepage_url": "https://javstash.org/performers/48b20b91-e5c1-4a34-b979-3d18209885ce",
       "provider_ids": {
         "JavStash": "48b20b91-e5c1-4a34-b979-3d18209885ce",
+        "TPDB": "7c1eaa45-cc55-4827-b4a0-c7bdbe02f68d",
         "Wikidata": "Q110763437",
         "Wikipedia": "ja.wikipedia.org/wiki/五月凛"
       },
@@ -210503,14 +210640,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:17:51Z",
-      "scraped_at": "2026-11-21T03:04:10Z"
+      "scraped_at": "2026-11-21T05:07:09Z"
     },
     {
       "key": "javstash:48b6138c-ba4d-46d8-80f8-c213250b1ded",
@@ -217505,6 +217642,7 @@
       "cup_size": "D",
       "career_start": 1997,
       "tags": [
+        "D罩杯",
         "熟女"
       ],
       "bio": null,
@@ -218728,7 +218866,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2012,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A1%9C%E4%BA%95%E6%84%9B%E7%BE%8E.jpg",
@@ -222722,6 +222862,7 @@
       "cup_size": "D",
       "career_start": 2010,
       "tags": [
+        "D罩杯",
         "熟女",
         "刚毛",
         "爆乳"
@@ -224217,7 +224358,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E9%87%8E%E7%94%B0%E5%8D%83%E5%B0%8B.jpg",
@@ -226740,8 +226883,8 @@
       "country": "JP",
       "height_cm": 165,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "33B-26-35",
+      "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2019,
       "tags": [
@@ -226766,6 +226909,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -226774,7 +226918,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:29:57Z",
-      "scraped_at": "2026-11-21T02:11:54Z"
+      "scraped_at": "2026-11-21T05:09:19Z"
     },
     {
       "key": "javstash:4e8e1f4f-9d13-4e10-90ad-6425849e1462",
@@ -235601,6 +235745,7 @@
       "cup_size": "E",
       "career_start": 2012,
       "tags": [
+        "E罩杯",
         "巨乳",
         "巨尻"
       ],
@@ -238659,7 +238804,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2018,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -239055,7 +239202,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2002,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -243029,7 +243178,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -246915,7 +247066,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2018,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -249850,7 +250003,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%83%E7%80%AC%E3%81%8F%E3%82%8B%E3%81%BF.jpg",
@@ -250958,7 +251113,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2016,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -254499,7 +254656,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2005,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "心愛，出生于 1985 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Kokoa 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": null,
@@ -258038,7 +258197,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2016,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -262409,8 +262570,8 @@
       "country": "JP",
       "height_cm": 165,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "32E-24-36",
+      "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2025,
       "tags": [
@@ -262434,7 +262595,8 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -262443,7 +262605,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:25:03Z",
-      "scraped_at": "2026-11-21T02:06:45Z"
+      "scraped_at": "2026-11-21T05:08:36Z"
     },
     {
       "key": "javstash:5b345179-2c79-42c4-ae4c-b3ae533d1709",
@@ -263203,7 +263365,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2018,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -269305,6 +269469,7 @@
       "cup_size": "F",
       "career_start": 2009,
       "tags": [
+        "F罩杯",
         "巨乳",
         "美人",
         "女同性恋",
@@ -285646,6 +285811,7 @@
       "cup_size": "F",
       "career_start": null,
       "tags": [
+        "F罩杯",
         "巨乳",
         "佐助"
       ],
@@ -286903,6 +287069,7 @@
       "cup_size": "D",
       "career_start": 2016,
       "tags": [
+        "D罩杯",
         "货真价实的素人姑娘"
       ],
       "bio": null,
@@ -290180,7 +290347,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2016,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-Derekhsu/%E7%A0%82%E7%94%B0%E3%82%8B%E3%81%8B.jpg",
@@ -290532,7 +290701,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -295849,6 +296020,7 @@
       "cup_size": "G",
       "career_start": 2024,
       "tags": [
+        "G罩杯",
         "长身",
         "巨乳",
         "巨尻",
@@ -305440,11 +305612,12 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "30D-24-33",
+      "measurements_unit": "in",
+      "cup_size": "D",
       "career_start": 2009,
       "tags": [
+        "D罩杯",
         "巨乳"
       ],
       "bio": null,
@@ -305455,25 +305628,29 @@
       "homepage_url": "https://javstash.org/performers/6b67c246-6fc8-4a23-b9d9-6e2789f5dd1e",
       "provider_ids": {
         "JavStash": "6b67c246-6fc8-4a23-b9d9-6e2789f5dd1e",
-        "TPDB": "c58d374c-2895-4ef3-87da-7d023522794d"
+        "StashDB": "0088a4b9-f1ca-41d1-8c64-925f83b6211e",
+        "TPDB": "c58d374c-2895-4ef3-87da-7d023522794d",
+        "Wikidata": "Q28687779",
+        "Wikipedia": "ja.wikipedia.org/wiki/小出亜衣子"
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
+        "cinewho": true,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:57:33Z",
-      "scraped_at": "2026-11-21T02:40:53Z"
+      "scraped_at": "2026-11-21T05:11:10Z"
     },
     {
       "key": "javstash:6b6c9bae-6e98-49bc-bde4-dce896a542a8",
@@ -315956,7 +316133,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%8E%89%E6%9C%A8%E3%81%BF%E3%81%A1%E3%82%8B.jpg",
@@ -331155,6 +331334,7 @@
       "cup_size": "E",
       "career_start": null,
       "tags": [
+        "E罩杯",
         "萝莉",
         "美少女",
         "无毛宣言"
@@ -332632,8 +332812,8 @@
       "country": "JP",
       "height_cm": 152,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "34F-23-35",
+      "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2025,
       "tags": [
@@ -332658,6 +332838,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -332666,7 +332847,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:33:20Z",
-      "scraped_at": "2026-11-21T02:16:04Z"
+      "scraped_at": "2026-11-21T05:09:48Z"
     },
     {
       "key": "javstash:7401017d-4361-4ca6-a62a-5a491413d688",
@@ -338263,7 +338444,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -350982,7 +351165,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%9C%88%E8%8A%B1.jpg",
@@ -359128,7 +359313,9 @@
       "measurements_unit": "in",
       "cup_size": "A",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "A罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/6cbb4b84-3628-48ec-b707-5c2c8a4bf8d6",
@@ -359543,6 +359730,7 @@
       "cup_size": "F",
       "career_start": 2019,
       "tags": [
+        "F罩杯",
         "人妖",
         "微乳",
         "纹身"
@@ -361048,6 +361236,7 @@
       "cup_size": "E",
       "career_start": 2005,
       "tags": [
+        "E罩杯",
         "美尻",
         "姐姐",
         "美乳",
@@ -362804,7 +362993,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2008,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "藤井雪莉（藤井シェリー），出生于 1990 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 藤井シェリー、Shelly Fujii 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-AVDC/%E3%82%B7%E3%82%A7%E3%83%AA%E3%83%BC.jpg",
@@ -369621,6 +369812,7 @@
       "cup_size": "B",
       "career_start": 2009,
       "tags": [
+        "B罩杯",
         "萝莉"
       ],
       "bio": null,
@@ -370385,7 +370577,9 @@
       "measurements_unit": "in",
       "cup_size": "J",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "J罩杯"
+      ],
       "bio": "希咲亚里子是一位来自日本静冈县的AV女优。她以其惊人的身材而闻名，同时也因其害羞的个性和不擅长与他人交谈而备受关注。\n\n希咲亚里子对自己的身材非常自信，并希望通过AV出演来展现自己的魅力。出色表现让她在AV界迅速崭露头角。作为一位年轻有潜力的AV女优，无论是她的外貌还是身材，希咲亚里子都展现出了与众不同的魅力。",
       "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%B8%8C%E5%92%B2%E3%82%A2%E3%83%AA%E3%82%B9.jpg",
@@ -383887,7 +384081,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2011,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -387633,7 +387829,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2011,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E8%90%A9%E5%8E%9F%E3%81%BF%E3%81%AA.jpg",
@@ -391435,7 +391633,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%BD%90%E7%94%B0%E3%81%AE%E3%81%9E%E3%81%BF.jpg",
@@ -391851,7 +392051,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E5%A1%9A%E3%81%82%E3%82%86.jpg",
@@ -397956,7 +398158,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2008,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -409789,8 +409993,8 @@
       "country": "JP",
       "height_cm": 151,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30D-24-34",
+      "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2020,
       "tags": [
@@ -409823,7 +410027,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:24:22Z",
-      "scraped_at": "2026-11-21T03:07:30Z"
+      "scraped_at": "2026-11-21T05:08:30Z"
     },
     {
       "key": "javstash:8e56f827-1576-47d6-82c5-b39082402200",
@@ -415632,7 +415836,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E3%81%AE%E3%81%82%E3%81%86%E3%81%84%E3%81%8B.jpg",
@@ -417649,7 +417855,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "Shijimi initially performed in Japanese Adult Video (as Akane Mochida), but transitioned to work as an actress in softcore productions and mainstream films.",
       "bio_lang": "unknown",
       "avatar": "https://javstash.org/images/43a6c86f-0d04-4ddb-a4d2-0e22f6560842",
@@ -427190,7 +427398,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2010,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "藤森雪奈（日语：藤森 ゆき奈）是日本的女性声优，主要从事成人游戏的配音工作。\n\n12月1日出生，出身于青森县，爱好散步和绘画。\n\n2017年12月28日，藤森雪奈于推特上声明将于12月31日引退，并于引退当天注销推特。",
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%81%93%E3%81%AE%E3%81%AF.jpg",
@@ -435693,6 +435903,7 @@
       "cup_size": "F",
       "career_start": 1986,
       "tags": [
+        "F罩杯",
         "长身",
         "美巨乳",
         "菲律宾系",
@@ -437416,7 +437627,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%89%E6%B5%A6%E3%83%8F%E3%83%AB%E3%82%AB.jpg",
@@ -440395,7 +440608,9 @@
       "measurements_unit": "in",
       "cup_size": "I",
       "career_start": 2010,
-      "tags": [],
+      "tags": [
+        "I罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A5%A5%E4%BA%95%E3%83%AC%E3%83%8A.jpg",
@@ -440839,7 +441054,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -444786,6 +445003,7 @@
       "cup_size": "F",
       "career_start": null,
       "tags": [
+        "F罩杯",
         "肛门"
       ],
       "bio": null,
@@ -446143,8 +446361,8 @@
       "country": "JP",
       "height_cm": 165,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "34A-24-34",
+      "measurements_unit": "in",
       "cup_size": "A",
       "career_start": 2021,
       "tags": [
@@ -446169,6 +446387,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": false,
         "wiki": false,
@@ -446177,7 +446396,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:45:35Z",
-      "scraped_at": "2026-11-21T02:28:55Z"
+      "scraped_at": "2026-11-21T05:11:44Z"
     },
     {
       "key": "javstash:9aedd728-3699-4c33-87a5-8af7f902dc7c",
@@ -453762,6 +453981,7 @@
       "cup_size": "B",
       "career_start": 2004,
       "tags": [
+        "B罩杯",
         "美乳",
         "无毛",
         "萝莉",
@@ -462464,7 +462684,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/67c1d5fc-b7f5-43ac-abfa-a934d6e285b5",
@@ -464837,7 +465059,9 @@
       "measurements_unit": null,
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/03943243-0688-4068-9c24-08585b088e19",
@@ -479625,7 +479849,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -483196,7 +483422,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -488181,6 +488409,7 @@
       "cup_size": "G",
       "career_start": 2007,
       "tags": [
+        "G罩杯",
         "萝莉",
         "巨乳"
       ],
@@ -490181,7 +490410,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2006,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E9%AB%99%E9%87%8E%E7%9E%B3.jpg",
@@ -499104,6 +499335,7 @@
       "cup_size": "D",
       "career_start": 2012,
       "tags": [
+        "D罩杯",
         "长身",
         "肉感"
       ],
@@ -503104,7 +503336,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A7%AB%E6%9D%A1%E3%82%86%E3%81%8D.jpg",
@@ -511959,7 +512193,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%AB%B9%E5%86%85%E3%81%B2%E3%81%AA%E3%81%9F.jpg",
@@ -517711,7 +517947,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2024,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/d65bf256-a48b-4932-a679-3e2698e19c4a",
@@ -518078,7 +518316,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2001,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": "詩音，出生于 1989 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Shion 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E8%A9%A9%E9%9F%B3%E9%87%8C.jpg",
@@ -519949,6 +520189,7 @@
       "cup_size": "H",
       "career_start": null,
       "tags": [
+        "H罩杯",
         "巨乳",
         "爆乳",
         "美人"
@@ -520012,7 +520253,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/a2e43afa-10eb-4b5a-8592-e9e1a2e926f5",
@@ -522970,7 +523213,9 @@
       "measurements_unit": "in",
       "cup_size": "A",
       "career_start": 2019,
-      "tags": [],
+      "tags": [
+        "A罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E7%94%B0%E4%B8%AD%E3%82%86%E3%81%86%E3%81%AE.jpg",
@@ -527662,7 +527907,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/5c68f2f8-9f7a-4df4-9690-43cce16eed05",
@@ -541931,7 +542178,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BA%94%E5%8D%81%E5%B5%90%E7%BE%8E%E6%9C%88.jpg",
@@ -545789,7 +546038,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2014,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -558767,7 +559018,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -562696,11 +562949,12 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "30E-26-35",
+      "measurements_unit": "in",
+      "cup_size": "E",
       "career_start": null,
       "tags": [
+        "E罩杯",
         "熟女",
         "四分之一混血",
         "欧洲系"
@@ -562731,7 +562985,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:41:17Z",
-      "scraped_at": "2026-11-21T03:52:40Z"
+      "scraped_at": "2026-11-21T05:10:59Z"
     },
     {
       "key": "javstash:c58c5f8d-1cf9-45c7-a4bd-3c16f32f6dc6",
@@ -563885,6 +564139,7 @@
       "cup_size": "C",
       "career_start": null,
       "tags": [
+        "C罩杯",
         "熟女"
       ],
       "bio": null,
@@ -564920,7 +565175,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -567851,7 +568108,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%AE%88%E6%9C%AA%E6%AD%A9%E5%AD%90.jpg",
@@ -567916,7 +568175,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2003,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -570282,7 +570543,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2019,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": "圆松雪(円さゆき,Madoka Sayuki),在情趣旅馆自拍照片上传到社交媒体后，吸引了众多网友围观，火了之后正式出道！白皙肌肤，在斑驳的眼中仿佛透明。",
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%86%86%E3%81%95%E3%82%86%E3%81%8D.jpg",
@@ -576720,6 +576983,7 @@
       "cup_size": "C",
       "career_start": 2013,
       "tags": [
+        "C罩杯",
         "货真价实的素人姑娘",
         "黝黑",
         "异形阴部",
@@ -577440,7 +577704,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -594010,6 +594276,7 @@
       "cup_size": "H",
       "career_start": 2015,
       "tags": [
+        "H罩杯",
         "巨乳",
         "美乳轮",
         "美巨乳",
@@ -595021,7 +595288,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2017,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E3%81%82%E3%81%95%E3%81%B2%E7%BE%8E%E7%8E%B2.jpg",
@@ -597439,7 +597708,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%B7%B4%E5%8D%97.jpg",
@@ -609295,7 +609566,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -619344,6 +619617,7 @@
       "cup_size": "F",
       "career_start": 2008,
       "tags": [
+        "F罩杯",
         "熟女"
       ],
       "bio": null,
@@ -622451,6 +622725,7 @@
       "cup_size": "D",
       "career_start": 2007,
       "tags": [
+        "D罩杯",
         "美人",
         "獣姦",
         "美乳轮",
@@ -631240,7 +631515,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2017,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -642591,6 +642868,7 @@
       "cup_size": "C",
       "career_start": null,
       "tags": [
+        "C罩杯",
         "熟女",
         "五十路"
       ],
@@ -646115,7 +646393,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2008,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -658795,6 +659075,7 @@
       "cup_size": "D",
       "career_start": 2003,
       "tags": [
+        "D罩杯",
         "獣姦",
         "粪尿",
         "肛门"
@@ -665426,6 +665707,7 @@
       "cup_size": "C",
       "career_start": 2014,
       "tags": [
+        "C罩杯",
         "萝莉",
         "低身长",
         "150cm未満"
@@ -667511,7 +667793,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://javstash.org/images/16c7b5ad-0e6e-49ce-95a7-a2f9a66e9e89",
@@ -669936,7 +670220,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2020,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E6%9D%8F%E8%8A%B1%E3%83%AC%E3%82%A4%E3%83%9F.jpg",
@@ -675348,7 +675634,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2012,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E9%9B%AA%E7%A5%88.jpg",
@@ -678584,7 +678872,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -681065,7 +681355,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -681346,7 +681638,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2020,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E9%AB%98%E6%A9%8B%E7%80%AC%E9%87%8C%E5%A5%88.jpg",
@@ -682330,7 +682624,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -688842,7 +689138,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A1%9C%E4%BA%95%E3%81%82%E3%82%84.jpg",
@@ -691889,7 +692187,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2015,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E8%B2%AB%E3%81%82%E3%81%9A%E3%81%95.jpg",
@@ -697842,6 +698142,7 @@
       "cup_size": "I",
       "career_start": 2020,
       "tags": [
+        "I罩杯",
         "巨乳"
       ],
       "bio": "望月理沙（望月りさ），出生于 1993 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 望月りさ、Risa Mochizuki 等公开写法，可用于对照不同语言的人物条目。",
@@ -702580,7 +702881,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -705599,7 +705902,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -718476,7 +718781,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A1%9C%E3%81%9F%E3%81%BE%E3%81%8D.jpg",
@@ -719933,7 +720240,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2014,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "玉城麻衣（玉城マイ），出生于 1992 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 玉城マイ、Mai Tamaki 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "ja",
       "avatar": null,
@@ -728624,7 +728933,9 @@
       "measurements_unit": null,
       "cup_size": "B",
       "career_start": 2019,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": "Akane Sanada (born March 25) is a Japanese voice actress affiliated with Yellow Tail. She uses the aliases Akane Ueda and Kanan for adult games and anime.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -729003,7 +729314,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2022,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%82%B7%E3%83%A2%E3%83%B3.jpg",
@@ -729330,7 +729643,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2022,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "坂井成羽(坂井なるは,Sakai Naruha)，很简单、简单的发型、性格单纯的乡村风女孩，经过打磨后闪闪发光，美美的妆容……精致的五官像极了偶像。2022年S1出道。",
       "bio_lang": "ja",
       "avatar": null,
@@ -730264,7 +730579,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2012,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%B7%9D%E5%8F%A3%E7%9C%9F%E4%BB%A3.jpg",
@@ -739761,7 +740078,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2011,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E7%99%BD%E7%9F%B3%E5%A5%88%E3%80%85%E5%AD%90.jpg",
@@ -746275,7 +746594,9 @@
       "measurements_unit": "in",
       "cup_size": "L",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "L罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%8F%A0%E5%B7%B1.jpg",
@@ -750193,7 +750514,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -757842,7 +758165,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "織笠るみ（おりかさ るみ，1989年6月3日出生）是一名日本AV女優。\n\n经历：\n2017年2月，以IdeaPocket的专属女优\u0026quot;雫（しずく）\u0026quot;身份进行AV出道，参演了11部作品后暂时停止活动。\n\n2018年8月，以KANBi的专属女优\u0026quot;織笠るみ\u0026quot;重新出道。\n\n从2019年7月开始成为Attackers的专属女优。\n\n然而，从2020年2月起就没有新作品发布。\n\n个人：\n出生于东京都。\n\n她的兴趣和特长包括料理和运动。\n\n在与朋友一起玩的时候，她被邂逅者搭讪，后来结识并介绍了她成为AV女优这个职业。虽然一开始并不太感兴趣，但她意识到生命只有一次，年轻时机会有限，也对闪耀的感觉产生了憧憬，因此决定成为AV女优。然而，她不想被人发现，所以她希望成为\u0026quot;企划女优\u0026quot;而不是\u0026quot;独立女优\u0026quot;。值得一提的是，当时与她一起被邂逅者搭讪的朋友也成为了AV女优（企划女优）。",
       "bio_lang": "ja",
       "avatar": null,
@@ -760113,7 +760438,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 2009,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": "小泽爱丽丝 Alice Ozawa\n\n性别: 女\n\n星座: 天秤座\n\n出生日期: 1991年10月20日\n\n出生地: 日本\n\n职业: 演员\n\n更多外文名: 小沢アリス\n\nimdb编号: nm4925170",
       "bio_lang": "ja",
       "avatar": null,
@@ -764709,7 +765036,9 @@
       "measurements_unit": "in",
       "cup_size": "H",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "H罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -766107,7 +766436,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2006,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "Abe Youko, born Deecember 3.rd,  is a voice actress (seiyuu), singer, and radio personality from Tokyo, Japan, previously affiliated with TAB Production and works now as a freelancer.\n\nHoshino Miku is an alias used by Abe Youko when voice acting in adult anime.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -768417,6 +768748,7 @@
       "cup_size": "E",
       "career_start": 2008,
       "tags": [
+        "E罩杯",
         "肛门",
         "辣妹",
         "美人",
@@ -768559,6 +768891,7 @@
       "cup_size": "F",
       "career_start": 2009,
       "tags": [
+        "F罩杯",
         "美巨乳"
       ],
       "bio": null,
@@ -770402,6 +770735,7 @@
       "cup_size": "F",
       "career_start": null,
       "tags": [
+        "F罩杯",
         "美巨乳",
         "肛门",
         "獣姦"
@@ -771809,7 +772143,9 @@
       "measurements_unit": "in",
       "cup_size": "G",
       "career_start": 1994,
-      "tags": [],
+      "tags": [
+        "G罩杯"
+      ],
       "bio": "七瀬理香，出生于 1975 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Rika Nanase 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": null,
@@ -773365,7 +773701,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": "Reina Aoyama (青山 玲菜, Aoyama Reina, born April 22nd) is a Japanese voice actress.",
       "bio_lang": "zh",
       "avatar": null,
@@ -774484,7 +774822,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2021,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E9%87%9C%E4%BA%95%E7%A5%90%E6%9C%AA.jpg",
@@ -776091,6 +776431,7 @@
       "cup_size": "C",
       "career_start": 2013,
       "tags": [
+        "C罩杯",
         "熟女"
       ],
       "bio": null,
@@ -776944,7 +777285,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A3%AE%E4%B8%AD%E6%99%BA%E6%81%B5%E7%BE%8E.jpg",
@@ -783313,7 +783656,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": "渡边美佐是日本女性配音员，现属青二Production。桐朋学园艺术短期大学演剧学科卒业，过去曾属Production baobab。",
       "bio_lang": "zh",
       "avatar": null,
@@ -789900,7 +790245,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E9%95%B7%E8%B0%B7%E5%B7%9D%E3%81%BE%E3%81%AA%E3%81%8B.jpg",
@@ -792663,7 +793010,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2015,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": "山口由里子，1965年11月21日出生于大阪府，日本女性声优。本名山口百里子（やまぐち ゆりこ）。代表作品有《 海贼王》，《 新世纪福音战士》。",
       "bio_lang": "ja",
       "avatar": null,
@@ -795498,6 +795847,7 @@
       "cup_size": "C",
       "career_start": 2010,
       "tags": [
+        "C罩杯",
         "美乳",
         "美人",
         "韩国系",
@@ -805390,6 +805740,7 @@
       "cup_size": "E",
       "career_start": 2019,
       "tags": [
+        "E罩杯",
         "熟女",
         "五十路",
         "大乳头",
@@ -808252,7 +808603,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "Kayoko Sugi is a Japanese actress known for her appearances in pink films during the 1970s and 80s. In 1982, she won the Best Supporting Actress Award at the 3rd Zoom-Up Film Festival .",
       "bio_lang": "unknown",
       "avatar": null,
@@ -811398,7 +811751,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2022,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9D%82%E4%B8%8B%E7%BE%8E%E5%B8%8C.jpg",
@@ -813163,7 +813518,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2014,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -817056,7 +817413,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2010,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E7%B1%B3%E5%B1%B1%E5%8A%A0%E4%BB%A3%E5%AD%90.jpg",
@@ -819486,6 +819845,7 @@
       "cup_size": "C",
       "career_start": 2011,
       "tags": [
+        "C罩杯",
         "萝莉",
         "肛门",
         "货真价实的素人姑娘",
@@ -819718,6 +820078,7 @@
       "cup_size": "C",
       "career_start": 2015,
       "tags": [
+        "C罩杯",
         "母猪"
       ],
       "bio": null,
@@ -821724,7 +822085,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E7%9B%B8%E5%8E%9F%E4%B9%85%E7%BE%8E.jpg",
@@ -823231,7 +823594,9 @@
       "measurements_unit": "in",
       "cup_size": "H",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "H罩杯"
+      ],
       "bio": "Saita Eri, born December 9, is a Japanese voice actress and narrator from Tokyo. She is currently affiliated with VOICE PRO Arcen Ciel, and used to be affiliated with Office Mori, Aptepro and Power Rise.\n\nNene is a pseudonym by Saita Eri used when voicing characters in eroge and adult OVAs.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -831166,7 +831531,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2007,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "Leah Donna Dizon (born September 24, 1986) is a gaijin tarento, singer, and model. Born and raised in Las Vegas, Nevada, she moved to Tokyo, Japan in 2006 to pursue a career in entertainment. She made her recording debut on Victor Entertainment later that same year.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -831442,7 +831809,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": "Kawasaki Eriko is a voice actress (seiyuu) and narrator from Saitama Prefecture, Japan.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -833389,6 +833758,7 @@
       "cup_size": "C",
       "career_start": 2014,
       "tags": [
+        "C罩杯",
         "熟女",
         "低身长"
       ],
@@ -833878,6 +834248,7 @@
       "cup_size": "C",
       "career_start": null,
       "tags": [
+        "C罩杯",
         "熟女"
       ],
       "bio": null,
@@ -841925,7 +842296,9 @@
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2015,
-      "tags": [],
+      "tags": [
+        "C罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A7%E5%A1%9A%E5%A5%88%E3%80%85%E5%AD%90.jpg",
@@ -842032,7 +842405,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2011,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "里番声优小仓结衣，马甲佐倉もも花。\n\n新马甲石原爱依梨，推特@ishihara_airi。",
       "bio_lang": "ja",
       "avatar": null,
@@ -845191,7 +845566,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2016,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": null,
@@ -845337,7 +845714,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2005,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": "伊泽千夏(いざわ ちなつ、Chinatsu Izawa、伊沢千夏)，1985年7月14日出生于日本的东京都， 因为长相甜美、有气质，所以被誉为AV界的上品美女。",
       "bio_lang": "ja",
       "avatar": null,
@@ -846100,7 +846479,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": "Amamiya Yuu is a Japanese voice actress from Kanagawa Prefecture, Japan. She is currently a freelancer.\n\nIida Kuu, Kinashi Juri and Nagahara Kyouko is aliases used for adult material.",
       "bio_lang": "unknown",
       "avatar": null,
@@ -846981,6 +847362,7 @@
       "cup_size": "E",
       "career_start": 2014,
       "tags": [
+        "E罩杯",
         "熟女",
         "五十路"
       ],
@@ -849562,7 +849944,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2019,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/9-Javrave/%E3%83%8A%E3%83%87%E3%82%A3%E3%82%A2%E3%83%BB%E3%83%8A%E3%83%90%E3%82%B3%E3%83%AF.jpg",
@@ -850285,7 +850669,9 @@
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "B罩杯"
+      ],
       "bio": "如月カレン(Kisaragi karen)，身高156cm，出生于1981-03-26，她是一名日本女优。",
       "bio_lang": "ja",
       "avatar": null,
@@ -851588,7 +851974,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": 2015,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A0%97%E7%94%B0%E4%BD%B3%E5%AD%90.jpg",
@@ -856383,7 +856771,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2013,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%9C%A8%E4%B8%8B%E7%A4%BC%E5%AD%90.jpg",
@@ -857263,7 +857653,9 @@
       "measurements_unit": "in",
       "cup_size": "D",
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://stashdb.org/images/77a986bf-e731-4c98-9350-00154453223a",
@@ -857491,6 +857883,7 @@
       "cup_size": "H",
       "career_start": 2018,
       "tags": [
+        "H罩杯",
         "巨乳",
         "爆乳",
         "美人"
@@ -858771,6 +859164,7 @@
       "cup_size": "G",
       "career_start": 2022,
       "tags": [
+        "G罩杯",
         "长身",
         "巨乳",
         "巨尻",
@@ -862192,7 +862586,9 @@
       "measurements_unit": "in",
       "cup_size": "E",
       "career_start": 2004,
-      "tags": [],
+      "tags": [
+        "E罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://stashdb.org/images/89c54195-9742-435a-b105-4e06ec55e394",
@@ -862474,6 +862870,7 @@
       "cup_size": "H",
       "career_start": 2005,
       "tags": [
+        "H罩杯",
         "熟女",
         "巨乳",
         "丰满",
@@ -913850,7 +914247,9 @@
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2003,
-      "tags": [],
+      "tags": [
+        "F罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E8%A6%B3%E6%9C%88%E3%81%82%E3%81%84%E3%81%8B.jpg",
