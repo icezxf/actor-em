@@ -149,31 +149,50 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 本轮产物先收好：下面要让工作区对齐最新 main，而数据文件是本轮算出来的，
-          # 跟远端没有合并的价值（只会冲突）。
+          # 本轮产物先收好：数据文件是整份重算出来的，跟远端没有合并的价值——合并必然冲突。
+          # 所以策略是「落到最新 main → 把本轮产物盖回去 → 再提交」，而不是 git pull --rebase。
+          # （2026-11-21 用 rebase 时，别人推进来的文档提交让 actors.jsonl 冲突，
+          #   22 分钟的抓取结果整轮丢掉。）
           KEEP="$RUNNER_TEMP/actors-out"
-          mkdir -p "$KEEP"
-          cp -a actors.jsonl actors.json actors.manifest.json "$KEEP"/ 2>/dev/null || true
-          if [ -d data ]; then cp -a data "$KEEP"/data; fi
+          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          for f in actors.jsonl actors.json actors.manifest.json data; do
+            [ -e "$f" ] && cp -a "$f" "$KEEP"/ || true
+          done
           rows=$(wc -l < actors.jsonl 2>/dev/null || echo 0)
+          MSG="chore(actors): sync $(date -u +%F) (${rows} actors)"
 
-          # 直接落到最新 main 上：以前用 git pull --rebase --autostash，
-          # 一旦别人在这轮跑的时候推了文档/脚本，rebase 会在 actors.jsonl 上冲突，
-          # 整轮抓取结果直接丢掉（2026-11-21 就因此丢过一次 2000 人的补抓）。
-          git fetch --depth=1 origin main
-          git reset --hard FETCH_HEAD
-          cp -a "$KEEP"/actors.jsonl "$KEEP"/actors.json "$KEEP"/actors.manifest.json . 2>/dev/null || true
-          if [ -d "$KEEP/data" ]; then mkdir -p data && cp -a "$KEEP/data/." data/; fi
+          # 对齐最新 main 并提交；返回 2 表示「内容没变」。
+          # 注意：GitHub 的 run 是 bash -e，函数必须显式 return，调用点写在 if 里，
+          # 否则函数返回非 0 会直接退出、走不到下面的判断。
+          commit_on_latest() {
+            git fetch --depth=1 origin main || return 1
+            git reset --hard FETCH_HEAD || return 1
+            for f in actors.jsonl actors.json actors.manifest.json; do
+              if [ -f "$KEEP/$f" ]; then cp -a "$KEEP/$f" . || return 1; fi
+            done
+            if [ -d "$KEEP/data" ]; then
+              mkdir -p data && cp -a "$KEEP/data/." data/ || return 1
+            fi
+            # 逐个判断存在再 add：这些文件不是每轮都会生成。
+            # actors.xlsx 是纯展示派生物，日更的 2 万行二进制会把仓库撑爆，改走 artifact 上传。
+            for f in actors.jsonl actors.json actors.manifest.json data \
+                     data/avatar_review.json data/avatar_choices.json; do
+              if [ -e "$f" ]; then git add -- "$f" || return 1; fi
+            done
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "$MSG" || return 1
+            return 0
+          }
 
-          # actors.xlsx 是纯展示派生物，日更的 2 万行二进制会把仓库撑爆，改走 artifact 上传。
-          git add actors.jsonl actors.json actors.manifest.json data/ \
-            data/avatar_review.json data/avatar_choices.json
-          if git diff --cached --quiet; then
-            echo "本轮无变化，跳过提交"
-            exit 0
-          fi
-          git commit -m "chore(actors): sync $(date -u +%F) (${rows} actors)"
-          git push
+          for attempt in 1 2 3; do
+            if commit_on_latest; then rc=0; else rc=$?; fi
+            if [ "$rc" = 2 ]; then echo "本轮无变化，跳过提交"; exit 0; fi
+            if [ "$rc" != 0 ]; then echo "提交失败（退出码 $rc）"; exit "$rc"; fi
+            if git push; then echo "已推送（第 $attempt 次尝试）"; exit 0; fi
+            echo "push 被拒：远端在提交期间又前进了，重新对齐后重试"
+            sleep 5
+          done
+          echo "连续 3 次推送失败，放弃"; exit 1
 
       # xlsx 是给人看的派生物，不入库；每次跑完挂成 artifact，保留 90 天可下载。
       - name: Upload Excel

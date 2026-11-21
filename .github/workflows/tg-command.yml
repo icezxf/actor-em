@@ -87,15 +87,38 @@ jobs:
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # actors.jsonl 是真源，必须提交；actors.json 是派生，一起带上免得下游读到旧版。
-          # 交互模式不一定生成 manifest，逐个判断存在再 add。xlsx 不入库（走 actor-sync 的 artifact）。
+          # 交互模式不一定生成 manifest，逐个判断存在再收。
+          # xlsx 不入库（走 actor-sync 的 artifact）。
+          KEEP="$RUNNER_TEMP/tg-out"
+          rm -rf "$KEEP"; mkdir -p "$KEEP"
           for f in actors.jsonl actors.json actors.manifest.json \
                    data/avatar_review.json data/avatar_choices.json; do
-            [ -f "$f" ] && git add -- "$f" || true
+            [ -f "$f" ] && cp -a --parents "$f" "$KEEP"/ || true
           done
-          if git diff --cached --quiet; then
-            echo "本次无变化，跳过提交"
-            exit 0
-          fi
-          git commit -m "chore(actors): tg $(date -u +%F-%H%M)"
-          git pull --rebase --autostash origin main
-          git push
+          MSG="chore(actors): tg $(date -u +%F-%H%M)"
+
+          # 数据文件整份重算，跟远端没有合并价值：对齐最新 main 再盖回去，
+          # 不用 git pull --rebase（会在 actors.jsonl 上冲突，整轮结果丢掉）。
+          # GitHub 的 run 是 bash -e，函数要显式 return、调用点写在 if 里。
+          commit_on_latest() {
+            git fetch --depth=1 origin main || return 1
+            git reset --hard FETCH_HEAD || return 1
+            for f in actors.jsonl actors.json actors.manifest.json \
+                     data/avatar_review.json data/avatar_choices.json; do
+              if [ -f "$KEEP/$f" ]; then cp -a "$KEEP/$f" "$f" || return 1; fi
+              if [ -f "$f" ]; then git add -- "$f" || return 1; fi
+            done
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "$MSG" || return 1
+            return 0
+          }
+
+          for attempt in 1 2 3; do
+            if commit_on_latest; then rc=0; else rc=$?; fi
+            if [ "$rc" = 2 ]; then echo "本次无变化，跳过提交"; exit 0; fi
+            if [ "$rc" != 0 ]; then echo "提交失败（退出码 $rc）"; exit "$rc"; fi
+            if git push; then echo "已推送（第 $attempt 次尝试）"; exit 0; fi
+            echo "push 被拒：远端在提交期间又前进了，重新对齐后重试"
+            sleep 5
+          done
+          echo "连续 3 次推送失败，放弃"; exit 1
