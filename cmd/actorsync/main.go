@@ -897,6 +897,9 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	if cfg.IdolDB {
 		fetcher.IdolDB = actorsync.NewIdolDBClient(hc)
 	}
+	if cfg.CastWiki {
+		fetcher.CastWiki = actorsync.NewCastWikiClient(hc)
+	}
 	if cfg.TheActorBase {
 		fetcher.TheActorBase = actorsync.NewTheActorBaseClient(hc)
 	}

@@ -22,7 +22,7 @@ var ErrNotFound = errors.New("not found")
 // 字段来源见 docs/actor-fields.md，这里只强调四条硬规则：
 //   - 生日以 JavStash 为准，它缺席时才用 MDCx（并标 BirthDateSource=mdcx）
 //   - 三围 MDCx 打底（厘米反推成「底围+杯」英寸写法），TPDB 兜底
-//   - 简介只要中文：wiki → dramaface → yinrenlu → cinewho → jav-idol-db → theactorbase，不取英文、不机翻
+//   - 简介只要中文：wiki → dramaface → theactorbase → yinrenlu → cinewho → jav-idol-db → castwiki，不取英文、不机翻
 //   - 中文人物站能按原名精确对账，除简介外还补生日/身高/出道年（只填空位）
 //   - 搜 TPDB 必须用 StashDB 英文名（英文站），从 JavStash 的 stashdb 链接 UUID 反查
 type FetchResult struct {
@@ -69,6 +69,7 @@ type Fetcher struct {
 	Yinrenlu     *YinrenluClient
 	Cinewho      *CinewhoClient
 	IdolDB       *IdolDBClient
+	CastWiki     *CastWikiClient
 	Gfriends     *Gfriends
 	MDCx         *MDCxDB
 	Dict         *Dict
@@ -255,7 +256,7 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	// ---------- 7. 中文简介补充 ----------
 	// 维基往往只有一句话（「XXX是一位日本AV女优。」），下面几站给的是整段经历。
 	// 猜 slug 的站（dramaface / theactorbase）只认罗马字，MDCx 覆盖 93.9% 放最前面；
-	// 按名字搜详情页的中文站（yinrenlu / cinewho / jav-idol-db）也在同一组词里找。
+	// 按名字搜详情页的中文站（yinrenlu / cinewho / jav-idol-db / castwiki）也在同一组词里找。
 	// 数据返回的标准英文名也是可靠 slug（如 StashDB 的 "Kana Momonogi"）。
 	terms := candidates
 	if p := f.MDCx.Lookup(name); p != nil && p.Romaji != "" {
@@ -333,7 +334,7 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	return res
 }
 
-// fetchCNProfiles 跑三个「先搜索/按名取档、再读详情」的中文人物站。
+// fetchCNProfiles 跑「先搜索/按名取档、再读详情」的中文人物站。
 // 每个源单独 12 秒超时，任何一个挂掉都不拖累其他源，也不影响已抓到的字段。
 func (f *Fetcher) fetchCNProfiles(ctx context.Context, res *FetchResult, terms []string) {
 	type cnSource struct {
@@ -349,6 +350,9 @@ func (f *Fetcher) fetchCNProfiles(ctx context.Context, res *FetchResult, terms [
 	}
 	if f.IdolDB != nil {
 		sources = append(sources, cnSource{"idoldb", f.IdolDB.Fetch})
+	}
+	if f.CastWiki != nil {
+		sources = append(sources, cnSource{"castwiki", f.CastWiki.Fetch})
 	}
 	for _, s := range sources {
 		cctx, cancel := context.WithTimeout(ctx, 12*time.Second)

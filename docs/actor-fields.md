@@ -20,6 +20,7 @@
 | **yinrenlu**（映人录） | 中文简介（2 段）、中文艺名、罗马字、生日、出道年、出生地 | `/search?q=` → `/people/<id>`，样本 10 查 9 中 | 默认开启（`YINRENLU=0` 关）；卡片原名 + 详情原名双重对账 |
 | **cinewho**（影中人） | 中文简介（长）、生日、身高、三围、中文名、英文名 | `/search.php?q=` → `/cine/<slug>`，JSON-LD `Person` 结构 | 默认开启（`CINEWHO=0` 关）；详情页原名/英文名对账 |
 | **jav-idol-db** | 16 份中文简介、日文原名 / `name_zh` / 罗马字 / 生日 / 三围 / 出道 | GitHub raw 的 `data/actresses/<日文名>/profile.json`，共 114 份 | 默认开启（`IDOLDB=0` 关）；目录名即原名，按名取档几乎不串人 |
+| **castwiki**（卡司Wiki） | 中文简介（**整段，600–1000 字，现有源里最长**）、中文名、生日、出生地（都道府县）、身高、三围、出道年 | `/search.php?xml=yes` → `/profile/<slug>`，详情页 JSON-LD `Person` | 默认开启（`CASTWIKI=0` 关）；**slug 不能猜**（桃乃木かな → `busycy`），只走站内搜索 |
 | **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 中文简介链末端，需 `THEACTORBASE=1` 开 |
 | **gfriends** | 头像图库（51 分类 / 107,720 条 / 10GB，每日更新） | 一个演员可能多张 | **头像首选**，同时给国内镜像 |
 | ~~Ouxiang~~ | ~~中文简介~~ | 站点已挂 | 只保留 `provider_ids.Ouxiang` 存档 |
@@ -45,7 +46,7 @@
 |---|---|---|---|
 | `gender` | string? | JavStash → TPDB → cinewho | `female` / `male` |
 | `birth_date` | string? | **JavStash → MDCx 兜底 → 中文人物站兜底** | 见下方「生日的来源」 |
-| `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb`，空表示没有生日 |
+| `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb` / `castwiki`，空表示没有生日 |
 | `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
 | `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country` → StashDB `country`（这两个只到「日本」） | **都道府县级一律带国家**，如 `日本·东京都`；落到 Emby `ProductionLocations` |
 | `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → StashDB → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
@@ -61,7 +62,7 @@
 |---|---|---|---|
 | JavStash | 40.9%（866 条实测） | — | 直接写，`birth_date_source=javstash` |
 | MDCx `birthday` | 65.2%（14,254 条） | 75.8%（178 条都有里 135 条一致） | 只在空位补，`birth_date_source=mdcx` |
-| yinrenlu / cinewho / jav-idol-db | 三站合计只补前两站剩下的空位 | 页面原名与候选名精确一致才采 | `birth_date_source` 写对应站名，便于单独剔除 |
+| yinrenlu / cinewho / jav-idol-db / castwiki | 合计只补前两站剩下的空位 | 页面原名与候选名精确一致才采 | `birth_date_source` 写对应站名，便于单独剔除 |
 
 JavStash + MDCx 把覆盖率从 40.9% 提到 **65.7%**（+215 条 / 866 条）。冲突的 24.2% 里 79% 连年份都不同，多发生在短名和常见名上（`AI`、`MINAMO`、`SOPHIA`、`かわいさとみ`），本质是 MDCx 按名字索引撞了同名异人。
 
@@ -133,7 +134,7 @@ band   = (下胸围 + 11cm) / 2.54，取最近偶数   （→ 36）
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
-| `bio` | string? | 中文维基 → dramaface（短简介才升级）→ theactorbase（同上）→ 映人录 → 影中人 → jav-idol-db，**谁长用谁** | **不取英文简介，不调 DeepL** |
+| `bio` | string? | 中文维基 → dramaface（短简介才升级）→ theactorbase（同上）→ 映人录 → 影中人 → jav-idol-db → 卡司Wiki，**谁长用谁** | **不取英文简介，不调 DeepL** |
 | `bio_lang` | string? | `zh` / `ja` | 中文维基常返回繁中 |
 
 来源共 **6 个**，按读法分两类：
@@ -210,7 +211,7 @@ David → 大衛王是公元前10世紀以色列聯合王國的第二任國王
 成组重复的存量简介由 `PurgeSharedBios()` 在每轮收尾（和 `--backfill`）里清理：
 同一段文字出现 ≥2 次时，只保留名字出现在简介里的那条，其余清空等待重抓。
 
-**先搜后读详情的源反过来必须精确对账**：yinrenlu / cinewho / jav-idol-db 都会把
+**先搜后读详情的源反过来必须精确对账**：yinrenlu / cinewho / jav-idol-db / castwiki 都会把
 页面上的显示名、原名（`person-native` / JSON-LD `name`）、罗马字、其他艺名与候选名
 逐个归一化后比对，任一个完全一致才采信；搜索结果里同姓/同名但名字不一致的人直接跳过。
 这类源因为身份已确认，简介不必再含 AV 圈关键词也能通过 `validCNBio()`

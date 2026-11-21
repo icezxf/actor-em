@@ -156,7 +156,7 @@ MDCX_CSV=/tmp/mdcx_profiles.csv GFRIENDS=1 THEACTORBASE=1 ACTORS_CONCURRENCY=10 
 | `GFRIENDS_INDEX` | 本地 `Filetree.json` 路径，填了就不联网拉；调试用 |
 | `THEACTORBASE=1` | 启用 theactorbase 中文简介兜底（抓网页，比 API 慢） |
 
-以下四个**默认开启**，不需要 Key；设成 `0` 可单独关掉以加快调试：
+以下五个**默认开启**，不需要 Key；设成 `0` 可单独关掉以加快调试：
 
 | 环境变量 = `0` | 关掉什么 | 对结果的影响 |
 |---|---|---|
@@ -164,6 +164,7 @@ MDCX_CSV=/tmp/mdcx_profiles.csv GFRIENDS=1 THEACTORBASE=1 ACTORS_CONCURRENCY=10 
 | `YINRENLU=0` | 映人录：搜索 → 详情页 | 少中文简介、生日/出道年兜底 |
 | `CINEWHO=0` | 影中人：搜索 → JSON-LD | 少中文简介、生日/身高/三围兜底 |
 | `IDOLDB=0` | MagicBude/jav-idol-db 的 114 份 `profile.json` | 少少量中文简介和结构字段 |
+| `CASTWIKI=0` | 卡司Wiki：搜索 → JSON-LD | 少最长的那批中文简介（600–1000 字） |
 
 三个中文人物站都先按**原名精确对账**才采信；串人的概率远低于按名字索引的 MDCx。
 
@@ -243,7 +244,7 @@ actorsync [flags]
 | `aliases` | string[] | 别名（来自 MDCx） |
 | `gender` | string? | `female` / `male`，小写 |
 | `birth_date` | string? | `1996-05-10`，JavStash 优先、MDCx 兜底（40.9% → 65.7%），再退中文人物站 |
-| `birth_date_source` | string? | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb` |
+| `birth_date_source` | string? | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb` / `castwiki` |
 | `birth_place` | string? | 中文地名，都道府县级带国家：`日本·东京都`；只有国家时写 `日本` |
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
 | `height_cm` | int? | 身高厘米 |
@@ -253,7 +254,7 @@ actorsync [flags]
 | `cup_size` | string? | 纯字母，如 `E`；来自 MDCx（73.1%），同时拼进 `measurements` 首段 |
 | `career_start` | int? | 出道年份，取 MDCx `career_period` 的首年 |
 | `tags` | string[] | 标签，来自 MDCx（覆盖 43.3%，已过滤敏感/未成年相关） |
-| `bio` | string? | 简介，只要中文；维基 → dramaface → 映人录 → 影中人 → jav-idol-db → theactorbase，谁长用谁 |
+| `bio` | string? | 简介，只要中文；维基 → dramaface → theactorbase → 映人录 → 影中人 → jav-idol-db → 卡司Wiki，谁长用谁 |
 | `bio_lang` | string? | `zh` / `ja` / `en` |
 | `avatar` | string? | 头像**网络地址**（数据源原图），不下载转存 |
 | `avatar_cn` | string? | 国内可访问镜像（jsDelivr），只有 gfriends 的图有 |

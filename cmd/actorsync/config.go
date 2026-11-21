@@ -27,6 +27,7 @@ type Config struct {
 	Yinrenlu      bool   // YINRENLU=0 关闭；映人录中文简介+生日/出道年
 	Cinewho       bool   // CINEWHO=0 关闭；影中人中文简介+生日/身高/三围
 	IdolDB        bool   // IDOLDB=0 关闭；MagicBude/jav-idol-db 档案补充
+	CastWiki      bool   // CASTWIKI=0 关闭；卡司Wiki 中文简介（整段，最长）
 
 	// alist（仅 --scan-nfo 读 nfo 用；头像不转存）
 	AlistURL  string
@@ -114,6 +115,7 @@ func applyEnv(c *Config) {
 	c.Yinrenlu = !(os.Getenv("YINRENLU") == "0" || strings.EqualFold(os.Getenv("YINRENLU"), "false"))
 	c.Cinewho = !(os.Getenv("CINEWHO") == "0" || strings.EqualFold(os.Getenv("CINEWHO"), "false"))
 	c.IdolDB = !(os.Getenv("IDOLDB") == "0" || strings.EqualFold(os.Getenv("IDOLDB"), "false"))
+	c.CastWiki = !(os.Getenv("CASTWIKI") == "0" || strings.EqualFold(os.Getenv("CASTWIKI"), "false"))
 	set(&c.AlistURL, "ALIST_URL")
 	set(&c.AlistUser, "ALIST_USER")
 	set(&c.AlistPass, "ALIST_PASS")
