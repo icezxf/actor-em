@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T09:28:05Z",
+  "generated_at": "2026-11-21T09:48:28Z",
   "count": 19161,
   "by_status": {
     "failed": 15,
@@ -10,8 +10,8 @@
     "skipped": 194
   },
   "last_run": {
-    "started_at": "2026-11-21T09:05:43Z",
-    "duration_sec": 1342,
+    "started_at": "2026-11-21T09:28:47Z",
+    "duration_sec": 1181,
     "picked": 2000,
     "added": 0,
     "updated": 32,
@@ -21,8 +21,8 @@
   },
   "sources": {
     "cinewho": {
-      "miss": 953,
-      "ok": 1047
+      "miss": 954,
+      "ok": 1046
     },
     "dramaface": {
       "miss": 1978,
