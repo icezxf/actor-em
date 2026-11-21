@@ -171,6 +171,38 @@ jobs:
           retention-days: 90
           if-no-files-found: ignore
 
+      # 数据质量体检：只读、不改数据。有硬性问题时脚本退出码 1，
+      # 这里用 continue-on-error 兜住，避免体检把整轮同步判失败。
+      - name: 质量体检
+        if: ${{ always() && github.event.inputs.dry_run != 'true' }}
+        continue-on-error: true
+        run: |
+          if [ ! -f actors.jsonl ]; then
+            echo "没有 actors.jsonl，跳过体检"
+            exit 0
+          fi
+          python3 scripts/check_quality.py actors.jsonl \
+            --json quality-report.json > quality-report.md 2> quality-report.err || true
+          cat quality-report.md >> "$GITHUB_STEP_SUMMARY" || true
+          if [ -s quality-report.err ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**体检发现硬性问题：**" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat quality-report.err >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload quality report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-report
+          path: |
+            quality-report.md
+            quality-report.json
+          retention-days: 90
+          if-no-files-found: ignore
+
       - name: Summary
         if: always()
         run: |

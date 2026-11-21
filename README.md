@@ -67,6 +67,21 @@
 
 单条记录的完整示例见 [`actors.example.json`](actors.example.json)。
 
+### 数据质量体检
+
+`scripts/check_quality.py` 只读地过一遍 `actors.jsonl`，输出覆盖率表和异常清单：
+生日/出道年是否合法、三围单位与数值是否自洽、罩杯与标签是否一致、出生地有没有带国家、
+简介是否重复或掺日文、同一站点 ID 有没有指向两个人、头像有没有多人同图。
+
+```bash
+python3 scripts/check_quality.py                       # 默认读仓库根目录的 actors.jsonl
+python3 scripts/check_quality.py actors.jsonl --json out.json
+python3 scripts/check_quality.py actors.jsonl --baseline 上次的.json   # 顺带对比覆盖率变化
+```
+
+有硬性问题（生日/三围格式非法、罩杯非法、出生地未带国家、站点 ID 冲突）时退出码为 1。
+`actor-sync.yml` 每轮跑完会自动执行一遍，报告写进该次运行的 Summary，并挂成 `quality-report` artifact。
+
 ### 静态站（GitHub Pages）
 
 `scripts/build_site.py` 把 `actors.jsonl` 派生成一个纯静态的搜索页，`pages.yml` 负责生成与发布；

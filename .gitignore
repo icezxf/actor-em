@@ -19,6 +19,10 @@ site/
 *.log
 .DS_Store
 
+# 质量体检的本地产物（仓库里只留脚本，报告走 artifact）
+quality-report.*
+.quality/
+
 # 本地填写的 Secrets 清单，永不入库
 secrets.env
 
