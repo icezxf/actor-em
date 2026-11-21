@@ -29,7 +29,7 @@ const dramaFaceBase = "https://www.dramaface.com/model/"
 const dramaFaceUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 
 var (
-	reDramaDesc = regexp.MustCompile(`(?is)<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']`)
+	reDramaDesc  = regexp.MustCompile(`(?is)<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']`)
 	reDramaTitle = regexp.MustCompile(`(?is)<title>([^<]*)</title>`)
 	// 简介开头的属性串字段名，用于逐段剥掉（见 stripDramaFields）。
 	reDramaFieldLabel = regexp.MustCompile(`^(?:身高|罩杯|胸围|腰围|臀围|三围|三圍|生涯|出身|血型|标签|標籤|出道|事务所|事務所|爱好|愛好|年龄|年齡)\s*[:：]`)
@@ -129,8 +129,19 @@ func stripDramaFields(s string) string {
 			break
 		}
 		i++
-		// 跳过值："身高:155cm" 值在同一 token；"身高: 155cm" 值在下一个 token
-		if strings.TrimSpace(strings.SplitN(tokens[i-1], ":", 2)[1]) == "" && i < len(tokens) {
+		// 跳过值："身高:155cm" / "身高：155cm" 值在同一 token；
+		// "身高: 155cm" 值在下一个 token。站点两种冒号都在用，
+		// 早先只按半角切割，遇到全角会取 [1] 越界把整轮同步打挂。
+		label := tokens[i-1]
+		inlineValue := ""
+		// 全角冒号占 3 字节，不能用 IndexAny + p+1，否则切出来的是残留字节。
+		for _, sep := range []string{":", "："} {
+			if p := strings.Index(label, sep); p >= 0 {
+				inlineValue = strings.TrimSpace(label[p+len(sep):])
+				break
+			}
+		}
+		if inlineValue == "" && i < len(tokens) {
 			i++
 		}
 	}

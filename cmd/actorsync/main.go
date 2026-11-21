@@ -279,9 +279,10 @@ func main() {
 	close(idxQueue)
 
 	type fetched struct {
-		idx  int
-		item actorsync.PlanItem
-		res  *actorsync.FetchResult
+		idx      int
+		item     actorsync.PlanItem
+		res      *actorsync.FetchResult
+		panicked any // 单个源的解析 panic，只跳过这个人，不能拖垮整轮
 	}
 	results := make(chan fetched, concurrency*2)
 
@@ -291,7 +292,8 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for idx := range idxQueue {
-				results <- fetched{idx: idx, item: plan[idx], res: engine.FetchPhase(ctx, plan[idx].Name)}
+				res, panicked := safeFetch(engine, ctx, plan[idx].Name)
+				results <- fetched{idx: idx, item: plan[idx], res: res, panicked: panicked}
 			}
 		}()
 	}
@@ -303,6 +305,11 @@ func main() {
 	done := 0
 	for f := range results {
 		prefix := fmt.Sprintf("[%d/%d] %s（%s）", f.idx+1, len(plan), f.item.Name, f.item.Reason)
+		if f.panicked != nil {
+			failed++
+			logger.Printf("%s → 抓取 panic，已跳过（不动库里的旧数据）: %v", prefix, f.panicked)
+			continue
+		}
 		if len(f.item.Missing) > 0 {
 			prefix += fmt.Sprintf("（缺 %s）", strings.Join(f.item.Missing, ","))
 		}
@@ -424,6 +431,14 @@ func main() {
 	}
 	logger.Printf("完成：库内 %d 条，新增 %d，更新 %d，保留 %d，失败 %d，用时 %s",
 		len(db.Actors), added, updated, kept, failed, time.Since(start).Round(time.Second))
+}
+
+// safeFetch 把单个演员的抓取 panic 拦在 worker 内。
+// 任何一个数据源的 HTML 解析出错都不该让两万条的全量任务整体崩掉；
+// 主循环收到 panicked != nil 时只跳过这个人，不动库里的旧数据。
+func safeFetch(e *actorsync.Engine, ctx context.Context, name string) (res *actorsync.FetchResult, panicked any) {
+	defer func() { panicked = recover() }()
+	return e.FetchPhase(ctx, name), nil
 }
 
 // runBackfillBirthday 用 MDCx 离线档案给库里空着的生日补值。
