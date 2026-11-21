@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T12:03:31Z",
+  "generated_at": "2026-11-21T12:35:48Z",
   "count": 19161,
   "by_status": {
     "failed": 15,
@@ -10,63 +10,63 @@
     "skipped": 194
   },
   "last_run": {
-    "started_at": "2026-11-21T11:57:42Z",
-    "duration_sec": 348,
-    "picked": 150,
+    "started_at": "2026-11-21T12:11:56Z",
+    "duration_sec": 1432,
+    "picked": 2000,
     "added": 0,
-    "updated": 150,
+    "updated": 27,
     "failed": 0,
     "source": "txt",
     "source_count": 21283
   },
   "sources": {
     "castwiki": {
-      "miss": 146,
-      "ok": 4
+      "miss": 1962,
+      "ok": 38
     },
     "cinewho": {
-      "miss": 110,
-      "ok": 40
+      "miss": 963,
+      "ok": 1037
     },
     "dramaface": {
-      "miss": 145,
-      "ok": 5
+      "miss": 1983,
+      "ok": 17
     },
     "gfriends": {
-      "miss": 70,
-      "ok": 80
+      "miss": 325,
+      "ok": 1675
     },
     "idoldb": {
-      "miss": 149,
-      "ok": 1
+      "miss": 1992,
+      "ok": 8
     },
     "javstash": {
-      "miss": 8,
-      "ok": 142
+      "miss": 269,
+      "ok": 1731
     },
     "mdcx": {
-      "miss": 65,
-      "ok": 85
+      "miss": 74,
+      "ok": 1926
     },
     "stashdb": {
-      "miss": 2,
-      "ok": 42
+      "miss": 264,
+      "ok": 614
     },
     "theactorbase": {
-      "miss": 144,
-      "ok": 6
+      "miss": 1976,
+      "ok": 24
     },
     "tpdb": {
-      "miss": 83,
-      "ok": 67
+      "miss": 524,
+      "ok": 1476
     },
     "wiki": {
-      "miss": 149,
-      "ok": 1
+      "miss": 1990,
+      "ok": 10
     },
     "yinrenlu": {
-      "miss": 127,
-      "ok": 23
+      "miss": 1970,
+      "ok": 30
     }
   }
 }
