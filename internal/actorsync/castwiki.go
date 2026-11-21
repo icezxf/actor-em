@@ -113,6 +113,16 @@ type castWikiPerson struct {
 
 // Fetch 先站内搜索、再读详情页，返回可并入记录的 CNProfile；取不到返回 nil。
 func (c *CastWikiClient) Fetch(ctx context.Context, candidates []string) (*CNProfile, string) {
+	return c.FetchFor(ctx, candidates, "")
+}
+
+// FetchFor 是带「身份硬约束」的版本：primary 非空时，站方页面主名必须与它一致。
+//
+// 为什么要单独一个入口：字典会把同一个人挂上一串艺名（实测一个人 15 个别名，
+// 其中混着**别的演员**的正名），而统一的 CNProfile 接口只拿得到候选名列表。
+// 拿候选名核身份，「矢沢飛鳥」会因为别名里有「雪奈真冬」而认下雪奈真冬的页面。
+// 传清单名就能切断这条路：页面主名是雪奈真冬，跟清单名矢沢飛鳥不一致，直接拒。
+func (c *CastWikiClient) FetchFor(ctx context.Context, candidates []string, primary string) (*CNProfile, string) {
 	if c == nil {
 		return nil, ""
 	}
@@ -126,7 +136,7 @@ func (c *CastWikiClient) Fetch(ctx context.Context, candidates []string) (*CNPro
 		if !ok {
 			continue
 		}
-		if p := c.fetchProfile(ctx, slug, candidates); p != nil {
+		if p := c.fetchProfile(ctx, slug, candidates, primary); p != nil {
 			return p, subject
 		}
 	}
@@ -242,7 +252,7 @@ func hasCJK(s string) bool {
 }
 
 // fetchProfile 读详情页，解析 JSON-LD（缺失时退回 HTML 里的 intro 段）。
-func (c *CastWikiClient) fetchProfile(ctx context.Context, slug string, candidates []string) *CNProfile {
+func (c *CastWikiClient) fetchProfile(ctx context.Context, slug string, candidates []string, primary string) *CNProfile {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL()+slug, nil)
 	if err != nil {
 		return nil
@@ -274,7 +284,12 @@ func (c *CastWikiClient) fetchProfile(ctx context.Context, slug string, candidat
 		}
 	}
 	// 身份再核一遍：搜索给的 subject 已经对过，但详情页可能被站方合并/重定向到别人。
-	if !castWikiPageMatches(person, body, candidates) {
+	// 有清单名就用它当唯一标准，没才退回候选名列表。
+	verify := candidates
+	if strings.TrimSpace(primary) != "" {
+		verify = []string{primary}
+	}
+	if !castWikiPageMatches(person, body, verify) {
 		return nil
 	}
 

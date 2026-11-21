@@ -300,3 +300,45 @@ func TestCastWikiSkipsTemplateBio(t *testing.T) {
 		t.Errorf("结构化字段应照收：%q %q", p.BirthDate, p.BirthPlace)
 	}
 }
+
+// 别名污染：字典把「矢沢飛鳥 / 西山楓 / 雪奈真冬」归成一个人，候选列表里
+// 三个名字都在。不带清单名时，「矢沢飛鳥」会因为候选里有「雪奈真冬」而认下
+// 雪奈真冬的页面；传清单名就切断这条路。
+func TestCastWikiFetchForUsesPrimaryName(t *testing.T) {
+	const searchXML = `<?xml version="1.0" encoding="UTF-8" ?>
+<result>
+  <doc index="1" percent="100%"><slug><![CDATA[yukinamafuyu]]></slug>
+    <subject><![CDATA[Yukina Mafuyu]]></subject></doc>
+</result>`
+	profile := `<html><head><title>雪奈真冬(Yukina Mafuyu)的个人主页 - 卡司Wiki</title>
+<script type="application/ld+json">{"@type":"Person","name":"雪奈真冬",
+"alternateName":"Yukina Mafuyu","birthDate":"1995-02-14","birthPlace":"东京都",
+"description":"雪奈真冬，1995年出生于东京都，2016年以专属身份出道，擅长舞蹈，"
++"后来转战职业摔角，成为 Fighting Girls International 的一员。"}</script></head><body></body></html>`
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/search.php") {
+			fmt.Fprint(w, searchXML)
+			return
+		}
+		fmt.Fprint(w, profile)
+	}))
+	defer srv.Close()
+
+	c := NewCastWikiClient(srv.Client())
+	c.Base = srv.URL + "/profile/"
+	c.Search = srv.URL + "/search.php"
+
+	// 字典里「矢沢飛鳥」的别名含「雪奈真冬」，不带清单名时会被认成同一个人
+	if p, _ := c.Fetch(context.Background(), []string{"矢沢飛鳥", "雪奈真冬", "Yukina Mafuyu"}); p == nil {
+		t.Fatal("不带清单名时应按候选名命中（这是已知的别名污染路径）")
+	}
+	// 带清单名后必须拒
+	if p, _ := c.FetchFor(context.Background(), []string{"矢沢飛鳥", "雪奈真冬", "Yukina Mafuyu"}, "矢沢飛鳥"); p != nil {
+		t.Fatalf("清单名与站方主名不符应拒绝，得到 %+v", p)
+	}
+	// 本人仍然能命中
+	if p, _ := c.FetchFor(context.Background(), []string{"雪奈真冬", "Yukina Mafuyu"}, "雪奈真冬"); p == nil {
+		t.Fatal("清单名一致时应命中")
+	}
+}

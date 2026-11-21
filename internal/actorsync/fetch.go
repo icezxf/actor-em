@@ -299,6 +299,22 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	// 除了更长的中文简介，还能补生日/身高/出道年这些结构性空位。
 	f.fetchCNProfiles(ctx, res, terms)
 
+	// 卡司Wiki 单独跑：它的身份核对比别的源更严——站方主名必须与清单名一致。
+	// 统一的 CNProfile 接口只给候选名列表，而字典会把不同演员的艺名混进同一份
+	// 候选里（实测一个人 15 个别名，其中含别的演员正名），拿候选核身份会串号。
+	if f.CastWiki != nil {
+		cctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+		p, matched := f.CastWiki.FetchFor(cctx, terms, res.NameOriginal)
+		cancel()
+		if p != nil && p.hasContent() {
+			f.mark(res, "castwiki", true)
+			f.logf("[%s] castwiki 命中：%s（简介 %d 字）", res.NameOriginal, matched, len([]rune(p.Bio)))
+			f.applyCNProfile(res, "castwiki", p)
+		} else {
+			f.mark(res, "castwiki", false)
+		}
+	}
+
 	// 简介到中文人物站为止。MDCx 那个「身高: 166cm | 罩杯: D | 三围: 84/60/86」
 	// 是字段串不是文章，塞进 Overview 只会跟头部那行五项重复，宁可空着。
 
@@ -350,9 +366,6 @@ func (f *Fetcher) fetchCNProfiles(ctx context.Context, res *FetchResult, terms [
 	}
 	if f.IdolDB != nil {
 		sources = append(sources, cnSource{"idoldb", f.IdolDB.Fetch})
-	}
-	if f.CastWiki != nil {
-		sources = append(sources, cnSource{"castwiki", f.CastWiki.Fetch})
 	}
 	for _, s := range sources {
 		cctx, cancel := context.WithTimeout(ctx, 12*time.Second)

@@ -20,7 +20,7 @@
 | **yinrenlu**（映人录） | 中文简介（2 段）、中文艺名、罗马字、生日、出道年、出生地 | `/search?q=` → `/people/<id>`，样本 10 查 9 中 | 默认开启（`YINRENLU=0` 关）；卡片原名 + 详情原名双重对账 |
 | **cinewho**（影中人） | 中文简介（长）、生日、身高、三围、中文名、英文名 | `/search.php?q=` → `/cine/<slug>`，JSON-LD `Person` 结构 | 默认开启（`CINEWHO=0` 关）；详情页原名/英文名对账 |
 | **jav-idol-db** | 16 份中文简介、日文原名 / `name_zh` / 罗马字 / 生日 / 三围 / 出道 | GitHub raw 的 `data/actresses/<日文名>/profile.json`，共 114 份 | 默认开启（`IDOLDB=0` 关）；目录名即原名，按名取档几乎不串人 |
-| **castwiki**（卡司Wiki） | 中文简介（**整段，600–1000 字，现有源里最长**）、中文名、生日、出生地（都道府县）、身高、三围、出道年 | `/search.php?xml=yes` → `/profile/<slug>`，详情页 JSON-LD `Person` | 默认开启（`CASTWIKI=0` 关）；**slug 不能猜**（桃乃木かな → `busycy`），只走站内搜索 |
+| **castwiki**（卡司Wiki） | 中文简介（整段，600–1000 字）、中文名、生日、出生地（都道府县）、身高、三围、出道年 | `/search.php?xml=yes` → `/profile/<slug>`，详情页 JSON-LD `Person` | 默认开启（`CASTWIKI=0` 关）；**slug 不能猜**（桃乃木かな → `busycy`），只走站内搜索。实测 2000 人命中 38、有效中文简介 0——站上一半页面没写简介（返回英文模板），另一半不少只有英文条目。**它只对知名演员有价值**（三上悠亜 965 字、桃乃木かな 910 字），且要 `refresh` 才会作用于「已有短简介」的人 |
 | **theactorbase** | 中文简介（约 500 字） | 静态 HTML，slug = `罗马字姓-名` | 中文简介链末端，需 `THEACTORBASE=1` 开 |
 | **gfriends** | 头像图库（51 分类 / 107,720 条 / 10GB，每日更新） | 一个演员可能多张 | **头像首选**，同时给国内镜像 |
 | ~~Ouxiang~~ | ~~中文简介~~ | 站点已挂 | 只保留 `provider_ids.Ouxiang` 存档 |

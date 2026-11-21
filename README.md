@@ -164,7 +164,7 @@ MDCX_CSV=/tmp/mdcx_profiles.csv GFRIENDS=1 THEACTORBASE=1 ACTORS_CONCURRENCY=10 
 | `YINRENLU=0` | 映人录：搜索 → 详情页 | 少中文简介、生日/出道年兜底 |
 | `CINEWHO=0` | 影中人：搜索 → JSON-LD | 少中文简介、生日/身高/三围兜底 |
 | `IDOLDB=0` | MagicBude/jav-idol-db 的 114 份 `profile.json` | 少少量中文简介和结构字段 |
-| `CASTWIKI=0` | 卡司Wiki：搜索 → JSON-LD | 少最长的那批中文简介（600–1000 字） |
+| `CASTWIKI=0` | 卡司Wiki：搜索 → JSON-LD | 少一批长中文简介（600–1000 字，只对知名演员有效） |
 
 三个中文人物站都先按**原名精确对账**才采信；串人的概率远低于按名字索引的 MDCx。
 
