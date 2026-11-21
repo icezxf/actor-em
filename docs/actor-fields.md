@@ -13,7 +13,7 @@
 | **MDCx** `actor-mapping.sqlite3` | 中文名（`zh_cn`）、别名、罗马字 | 22,209 演员，中文名 99.9% | 补字典用，接入后字典涨到 21,161 演员 / 64,319 别名 |
 | **MDCx** `actor-profile.sqlite3` | 演艺期间、身高、**三围分项（bust/waist/hip，80%）**、罩杯、出生地、别名、结构化简介 | 21,860 演员 | 结构化字段的主力；三围是厘米，读入时换算成英寸 |
 | **JavStash** | 生日、出道年、身高、**三围（band/cup/waist/hip）**、图、别名、外链 | 日系演员主力 | **生日唯一权威源**；三围排 TPDB 之前 |
-| **StashDB** | 生日、身高、三围（同上，字段一致）、图、外链 | 欧美兜底 | 与 JavStash 同一套 schema，共用一套查询字段 |
+| **StashDB** | 出生地（只到国家）、出道年、身高、三围（字段与 JavStash 完全一致）、图、别名、外链；**英文名**是搜 TPDB 的硬规定关键词 | 与 JavStash 同一套 schema，共用一套查询字段 | 整条记录按空位合并（生日除外，JavStash 唯一权威）；日系演员靠 JavStash 外链里的 UUID 反查 |
 | **TPDB** | 三围（英寸）、体重、长简介、出道年、图 | 三围 46% / 体重 13% / 长简介 27% | 三围**兜底**：第一段可能是「下胸围+杯」，不能直接当胸围 |
 | **中文维基** | 中文简介 | 命中率一般，但质量最高 | 简介第 1 顺位，需带 `WIKI_EMAIL` 防风控 |
 | **dramaface**（剧面） | 中文简介（整段，质量高） | 静态 HTML，slug = `罗马字名去空格拼接`（如 `MomonogiKana`），大小写不敏感 | 简介第 2 顺位，默认开启（`DRAMAFACE=0` 关），需浏览器 UA |
@@ -47,8 +47,8 @@
 | `birth_date` | string? | **JavStash → MDCx 兜底 → 中文人物站兜底** | 见下方「生日的来源」 |
 | `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb`，空表示没有生日 |
 | `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
-| `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | **都道府县级一律带国家**，如 `日本·东京都`；落到 Emby `ProductionLocations` |
-| `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
+| `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country` → StashDB `country`（这两个只到「日本」） | **都道府县级一律带国家**，如 `日本·东京都`；落到 Emby `ProductionLocations` |
+| `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → StashDB → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
 
 **出生地一律带国家**：库里存的和导出给 Emby 的是同一个值，都道府县级一律拼成
 `日本·东京都`（分隔符 `·`），本来只到国家的保留 `日本`；港澳台这类「中国XX」的
@@ -284,19 +284,22 @@ gfriends 直链 `raw.githubusercontent.com/gfriends/gfriends/master/Content/<分
 
 ## 3. 出道年份：数据源里到底有没有
 
-**有，三个源都有字段，MDCx 覆盖最实在。**
+**有，四个源都有字段，MDCx 覆盖最实在。**
 
 | 源 | 字段 | 实测覆盖 | 语义 |
 |---|---|---|---|
 | MDCx profile | `website_fields.career_period` | **14,232 / 21,860 = 65.1%** | `2019年 -` / `1999年 - 2004年`，首年即出道年 |
-| JavStash | `career_start_year: Int` | 字段存在（stash-box 标准 schema），填充率待首轮跑量确认 | 精确的出道年 |
+| JavStash | `career_start_year: Int` | 字段在 schema 里，命中就带 | 精确的出道年，填 MDCx 的空位 |
+| StashDB | `career_start_year: Int` | 同上（同一套 stash-box schema） | 精确的出道年；JavStash 链接里带 stashdb UUID 的人靠它补 |
 | TPDB | `extras.career_start_year` | 待跑量统计 | 精确的出道年 |
 | 中文维基 | 简介正文 `20XX年…出道` | 命中一部分 | 正则兜底 |
 
 MDCx 的取值很干净：`'2021年-'`、`'2009年 -'`、`'2011~'` 这类占绝大多数，直接 `re.search(r'(19|20)\d{2}')` 取首段即可；
 `'1999年 - 2004年'` 取 1999，正好是出道年。年份分布 1967–2025，没有脏值。
 
-按既定规则「MDCx 优先」，最终取 MDCx `career_period` 首年；MDCx 没有的再依次问 JavStash、TPDB、简介正则。
+按既定规则「MDCx 优先」，最终取 MDCx `career_period` 首年；MDCx 没有的再依次问 JavStash、StashDB、TPDB、简介正则。
+线上 16,376 条导出记录里 **10,860 条（66.3%）有出道年**——比 MDCx 单独的 65.1% 略高，
+多出来的就是 JavStash / TPDB 补上的那批。
 
 ---
 

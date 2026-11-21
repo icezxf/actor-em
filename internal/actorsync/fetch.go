@@ -193,14 +193,15 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		js = f.searchCandidates(ctx, res, f.JavStash, candidates)
 	}
 
-	// ---------- 5. StashDB：英文名是搜 TPDB 的硬规定关键词 ----------
+	// ---------- 5. StashDB：出生地/出道年/三围的第二个 stash-box 源 ----------
 	// 用户硬性要求：搜 TPDB 必须用 StashDB 的标准英文名（TPDB 是英文站）。
 	// 两条路径拿这个英文名：
 	//   (a) JavStash 命中 → 它的 urls 里常直接带 stashdb.org/performers/<uuid>
 	//       （实测 12432 个 JavStash 命中里 3817 个带，31%），用 UUID 精确反查，
 	//       这样日本演员也有 StashDB 英文名可搜 TPDB。
 	//   (b) JavStash 没命中（欧美演员）→ 按候选名查 StashDB。
-	// 拿到的 performer.Name 供第 6 步 tpdbTerms 排第一。
+	// 拿到的 performer.Name 供第 6 步 tpdbTerms 排第一；
+	// 整条记录也一并应用（见下面的 applyPerformer）。
 	var sd *Performer
 	if f.StashDB != nil && f.StashDB.APIKey != "" {
 		sdUUID := ""
@@ -215,8 +216,20 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 				f.logf("[%s] StashDB 按 JavStash 链接 UUID 命中：%s", name, p.Name)
 			}
 		}
+		// (b) 走 searchCandidates 时它内部已经应用过整条记录，不用再来一次
+		applied := false
 		if sd == nil && js == nil {
 			sd = f.searchCandidates(ctx, res, f.StashDB, candidates)
+			applied = sd != nil
+		}
+		// StashDB 的整条记录都要用上，不能只取那个英文名：它和 JavStash 同一套
+		// schema，同样有 country（→ 出生地）、career_start_year、身高、三围、别名、图。
+		// JavStash 在前面已经应用过，所以已有值不会被顶掉（applyPerformer 只补空位），
+		// 但 JavStash 没填的空字段、以及 JavStash 缺席的欧美演员都能吃上。
+		if sd != nil && !applied {
+			f.mark(res, "stashdb", true)
+			f.applyPerformer(res, sd)
+			f.logf("[%s] StashDB 记录并入：出生地/出道年/身高/三围按空位补齐", name)
 		}
 	}
 
