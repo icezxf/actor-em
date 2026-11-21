@@ -290,7 +290,14 @@ func (c *CastWikiClient) fetchProfile(ctx context.Context, slug string, candidat
 	}
 	// 简介：先剥掉开头的「身高: / 罩杯: / 生日: …」属性串，剩下的才是正文。
 	// 属性串原样塞进 Overview 会跟 Emby 头部那行五项重复。
-	out.Bio = stripCastWikiFields(raw)
+	bio := stripCastWikiFields(raw)
+	// 没写简介的页面，intro 是一段英文模板（"A curated record of the person behind
+	// the screen…"），站上大约一半命中都是它；另有相当一部分页面只有英文简介。
+	// 这类一律不收——但生日/身高/三围仍从属性串里抽，那部分不受影响。
+	if isCastWikiTemplate(raw) || !LooksChineseBio(bio) {
+		bio = ""
+	}
+	out.Bio = bio
 
 	// 结构化字段都从属性串里抽，抽不到就留空，让别的源去补。
 	head := raw
@@ -343,43 +350,48 @@ func parseCastWikiLD(body []byte) *castWikiPerson {
 	return nil
 }
 
-// castWikiPageMatches 用 JSON-LD 的 name / alternateName 和页面标题核身份。
-// 标题形如「三上悠亜(Yua Mikami,三上悠亚)的个人主页,资料信息,联系方式 - 卡司Wiki」，
-// 括号里是罗马字和中文名，括号前是日文原名。
+// castWikiPageMatches 判断详情页是不是本人，**只认站方的主名**。
+//
+// 主名取 JSON-LD 的 name（如「相沢みなみ」），没有就用标题括号前那段。
+// 站方主名对不上候选就是别人的页面，别名里出现我们手上的名字也不算数：
+// 实测搜「今井まい」返回的页面主体是「陽木かれん」，搜「矢沢飛鳥」返回的是
+// 「雪奈真冬」——这两条都是字典把不同演员的别名混在一起造成的，
+// 按别名放行就会把别人的整段经历写进库里。
 func castWikiPageMatches(person *castWikiPerson, body []byte, candidates []string) bool {
-	var names []string
+	var primary string
 	if person != nil {
-		names = append(names, person.Name, person.AlternateName)
+		primary = strings.TrimSpace(person.Name)
 	}
-	if m := reCastWikiTitle.FindSubmatch(body); len(m) > 1 {
-		title := html.UnescapeString(strings.TrimSpace(string(m[1])))
-		if i := strings.Index(title, "的个人主页"); i > 0 {
-			title = title[:i]
-		}
-		names = append(names, title)
-		if l := strings.Index(title, "("); l > 0 {
-			names = append(names, strings.TrimSpace(title[:l]))
-			if r := strings.LastIndex(title, ")"); r > l {
-				for _, part := range strings.Split(title[l+1:r], ",") {
-					names = append(names, strings.TrimSpace(part))
-				}
+	if primary == "" {
+		if m := reCastWikiTitle.FindSubmatch(body); len(m) > 1 {
+			title := html.UnescapeString(strings.TrimSpace(string(m[1])))
+			if i := strings.Index(title, "的个人主页"); i > 0 {
+				title = title[:i]
+			}
+			if l := strings.Index(title, "("); l > 0 {
+				primary = strings.TrimSpace(title[:l])
 			}
 		}
 	}
-	for _, n := range names {
-		if strings.TrimSpace(n) == "" {
-			continue
-		}
-		if cnNameHit([]string{n}, candidates) {
+	if primary == "" {
+		return false
+	}
+	if cnNameHit([]string{primary}, candidates) {
+		return true
+	}
+	for _, cand := range candidates {
+		if sameRomanizedName(primary, cand) {
 			return true
-		}
-		for _, cand := range candidates {
-			if sameRomanizedName(n, cand) {
-				return true
-			}
 		}
 	}
 	return false
+}
+
+// isCastWikiTemplate 认出「没写简介也给你一段话」的模板文案。
+// 它不是任何人的介绍，收进去等于给所有人挂同一句英文。
+func isCastWikiTemplate(s string) bool {
+	return strings.Contains(s, "A curated record of the person behind") ||
+		strings.Contains(s, "CastWiki's people archive")
 }
 
 // castWikiChineseName 从标题里取中文艺名。

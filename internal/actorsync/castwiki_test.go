@@ -241,3 +241,62 @@ func TestCastWikiLive(t *testing.T) {
 			p.BirthDate, p.BirthPlace, p.HeightCm, head)
 	}
 }
+
+// 站方主名对不上候选就不是本人：别名里出现我们手上的名字也不算。
+// 实测搜「今井まい」返回的主体是「陽木かれん」，搜「矢沢飛鳥」返回的是「雪奈真冬」，
+// 都是字典把不同演员的别名混在一起，按别名放行会写进别人的经历。
+func TestCastWikiPageMatchesPrimaryNameOnly(t *testing.T) {
+	page := []byte(`<html><head><title>陽木かれん(Karen Aoki,Mai Imai)的个人主页,资料 - 卡司Wiki</title></head><body></body></html>`)
+	person := &castWikiPerson{Type: "Person", Name: "陽木かれん", AlternateName: "Mai Imai"}
+
+	if castWikiPageMatches(person, page, []string{"今井まい", "Mai Imai"}) {
+		t.Error("主体是别人时，别名一致也不能放行")
+	}
+	if !castWikiPageMatches(person, page, []string{"陽木かれん"}) {
+		t.Error("主名一致应该放行")
+	}
+	// 标题兜底：JSON-LD 缺失时用括号前那段当主名
+	if castWikiPageMatches(nil, page, []string{"今井まい"}) {
+		t.Error("JSON-LD 缺失时也不能按别名放行")
+	}
+	if !castWikiPageMatches(nil, page, []string{"陽木かれん"}) {
+		t.Error("JSON-LD 缺失时应退回标题主名")
+	}
+}
+
+// 没写简介的页面给的是英文模板文案，不能当成简介收下；生日/三围仍要知道。
+func TestCastWikiSkipsTemplateBio(t *testing.T) {
+	const searchXML = `<?xml version="1.0" encoding="UTF-8" ?>
+<result>
+  <doc index="1" percent="100%"><slug><![CDATA[serizawayuzu]]></slug>
+    <subject><![CDATA[Serizawa Yuzu]]></subject></doc>
+</result>`
+	profile := `<html><head><title>芹沢ゆず(Serizawa Yuzu)的个人主页 - 卡司Wiki</title>
+<script type="application/ld+json">{"@type":"Person","name":"芹沢ゆず",
+"alternateName":"Serizawa Yuzu","birthDate":"1998-03-04","birthPlace":"北海道"}</script>
+</head><body><p class="person-profile-intro">A curated record of the person behind the screen, assembled from CastWiki's people archive.</p></body></html>`
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/search.php") {
+			fmt.Fprint(w, searchXML)
+			return
+		}
+		fmt.Fprint(w, profile)
+	}))
+	defer srv.Close()
+
+	c := NewCastWikiClient(srv.Client())
+	c.Base = srv.URL + "/profile/"
+	c.Search = srv.URL + "/search.php"
+
+	p, _ := c.Fetch(context.Background(), []string{"芹沢ゆず", "Serizawa Yuzu"})
+	if p == nil {
+		t.Fatal("应命中本人")
+	}
+	if p.Bio != "" {
+		t.Errorf("模板文案不该当简介：%q", p.Bio)
+	}
+	if p.BirthDate != "1998-03-04" || p.BirthPlace != "北海道" {
+		t.Errorf("结构化字段应照收：%q %q", p.BirthDate, p.BirthPlace)
+	}
+}
