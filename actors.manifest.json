@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T07:02:03Z",
+  "generated_at": "2026-11-21T07:24:42Z",
   "count": 19161,
   "by_status": {
     "failed": 15,
@@ -10,14 +10,59 @@
     "skipped": 194
   },
   "last_run": {
-    "started_at": "2026-11-21T06:56:57Z",
-    "duration_sec": 305,
-    "picked": 0,
+    "started_at": "2026-11-21T07:03:05Z",
+    "duration_sec": 1296,
+    "picked": 2000,
     "added": 0,
-    "updated": 0,
+    "updated": 72,
     "failed": 0,
     "source": "txt",
     "source_count": 21283
   },
-  "sources": {}
+  "sources": {
+    "cinewho": {
+      "miss": 926,
+      "ok": 1074
+    },
+    "dramaface": {
+      "miss": 1962,
+      "ok": 37
+    },
+    "gfriends": {
+      "miss": 369,
+      "ok": 1631
+    },
+    "idoldb": {
+      "miss": 1989,
+      "ok": 11
+    },
+    "javstash": {
+      "miss": 301,
+      "ok": 1699
+    },
+    "mdcx": {
+      "miss": 82,
+      "ok": 1918
+    },
+    "stashdb": {
+      "miss": 296,
+      "ok": 631
+    },
+    "theactorbase": {
+      "miss": 1950,
+      "ok": 49
+    },
+    "tpdb": {
+      "miss": 490,
+      "ok": 1510
+    },
+    "wiki": {
+      "miss": 1983,
+      "ok": 17
+    },
+    "yinrenlu": {
+      "miss": 1926,
+      "ok": 74
+    }
+  }
 }
