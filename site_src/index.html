@@ -15,12 +15,18 @@
     <h1>演员库</h1>
     <span id="count" class="count">加载中…</span>
   </div>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button type="button" data-view="actors" class="on" role="tab">演员</button>
+    <button type="button" data-view="dict" role="tab">字典</button>
+    <button type="button" data-view="mdcx" role="tab">MDCx</button>
+  </nav>
   <div class="search">
     <input id="q" type="search" placeholder="搜名字 / 别名 / 标签，如 三上、桥本有菜、E罩杯" autocomplete="off" spellcheck="false">
   </div>
   <button id="theme" class="icon-btn" title="切换深浅色" aria-label="切换深浅色">◐</button>
 </header>
 
+<section id="view-actors">
 <div class="toolbar">
   <select id="cup" aria-label="罩杯">
     <option value="">全部罩杯</option>
@@ -50,6 +56,52 @@
   <div id="sentinel" class="sentinel"></div>
   <p id="empty" class="empty" hidden>没有匹配的演员，换个关键词试试。</p>
 </main>
+</section>
+
+<section id="view-dict" hidden>
+  <div class="toolbar">
+    <select id="dict-src" aria-label="来源">
+      <option value="">全部来源</option>
+      <option value="mdcx">mdcx</option>
+      <option value="amane">amane</option>
+    </select>
+    <span class="hint">抓取清单的合并结果：一个别名一行归并成一个人，点名字可跳到演员详情。</span>
+  </div>
+  <div class="tablewrap">
+    <table class="dtable">
+      <thead>
+        <tr><th>日文名</th><th>中文名</th><th>来源</th><th>别名</th></tr>
+      </thead>
+      <tbody id="dict-body"></tbody>
+    </table>
+  </div>
+  <div id="dict-sentinel" class="sentinel"></div>
+  <p id="dict-empty" class="empty" hidden>没有匹配的条目。</p>
+</section>
+
+<section id="view-mdcx" hidden>
+  <div class="toolbar">
+    <select id="mdcx-sort" aria-label="排序">
+      <option value="name">按日文名</option>
+      <option value="career">按出道年（新→旧）</option>
+      <option value="height">按身高（高→低）</option>
+    </select>
+    <span class="hint">MDCx 原始档案（我们字段的地基），点一行展开简介，点名字跳到演员详情。</span>
+  </div>
+  <div class="tablewrap">
+    <table class="dtable wide">
+      <thead>
+        <tr>
+          <th>日文名</th><th>中文名</th><th>生日</th><th>出生地</th><th>身高</th>
+          <th>罩杯</th><th>三围</th><th>出道</th><th>标签</th>
+        </tr>
+      </thead>
+      <tbody id="mdcx-body"></tbody>
+    </table>
+  </div>
+  <div id="mdcx-sentinel" class="sentinel"></div>
+  <p id="mdcx-empty" class="empty" hidden>没有匹配的档案。</p>
+</section>
 
 <footer class="foot">
   数据来自 actor-em 每日同步 · <span id="generated"></span>
@@ -76,9 +128,11 @@
       <p id="m-bio" class="bio"></p>
     </div>
     <div id="m-links" class="m-links"></div>
+    <div id="m-xref" class="m-xref"></div>
   </div>
 </div>
 
 <script src="assets/app.js"></script>
+<script src="assets/tables.js"></script>
 </body>
 </html>

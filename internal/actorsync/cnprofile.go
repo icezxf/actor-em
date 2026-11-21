@@ -68,7 +68,8 @@ func validCNBio(bio string) bool {
 	if bioDisambigWords.MatchString(bio) || bioMaleWords.MatchString(bio) || bioFieldDump.MatchString(bio) {
 		return false
 	}
-	return true
+	// 中文人物站偶尔也有英文条目，简介只收中文。
+	return LooksChineseBio(bio)
 }
 
 var (

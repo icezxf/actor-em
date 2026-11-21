@@ -85,3 +85,22 @@ func TestBioHeightCm(t *testing.T) {
 		}
 	}
 }
+
+// 简介只收中文：英文条目要在入库前拦掉，日文条目同样不收。
+func TestLooksChineseBio(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want bool
+	}{
+		{"中文正文", "三上悠亚，原名鬼头桃菜（きとう ももな），1993年8月16日出生于日本爱知县名古屋市，日本女优、歌手，2015年出道。", true},
+		{"纯英文", "AIKA is a Japanese AV actress active since 2007. She has appeared in many videos and is known for her work.", false},
+		{"日文为主", "あいかは日本のAV女優である。二〇〇七年にデビューして、多くの作品に出演している。趣味は料理と旅行です。", false},
+		{"字段串不是简介", "身高: 155cm 罩杯: D 三围: 84/60/86", false},
+	}
+	for _, tc := range cases {
+		if got := LooksChineseBio(tc.in); got != tc.want {
+			t.Errorf("%s: got %v want %v", tc.name, got, tc.want)
+		}
+	}
+}

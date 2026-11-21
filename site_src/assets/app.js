@@ -34,7 +34,8 @@
     mTags: document.getElementById('m-tags'),
     mAliases: document.getElementById('m-aliases'),
     mBio: document.getElementById('m-bio'),
-    mLinks: document.getElementById('m-links')
+    mLinks: document.getElementById('m-links'),
+    mXref: document.getElementById('m-xref')
   };
 
   var state = { q: '', cup: '', height: '', sort: 'name', tag: '', onlyAvatar: false };
@@ -77,6 +78,22 @@
         detailCache[shard] = data;
         cb(data[String(id)] || null);
       });
+  }
+
+  // 名字索引：字典页 / MDCx 页点名字时能跳回演员详情（对照用）
+  var nameIndex = {};
+
+  function normName(s) {
+    return (s || '').toLowerCase().replace(/[\s\u3000·・._\-]+/g, '');
+  }
+
+  function buildNameIndex() {
+    all.forEach(function (a) {
+      [a.name, a.orig].concat(a.aliases).forEach(function (n) {
+        var k = normName(n);
+        if (k && !nameIndex[k]) nameIndex[k] = a;
+      });
+    });
   }
 
   function cupRank(c) {
@@ -272,6 +289,20 @@
       el.mLinks.appendChild(link);
     });
 
+    // 对照入口：跳到字典 / MDCx 表，按日文原名搜
+    el.mXref.textContent = '';
+    [['mdcx', 'MDCx 档案'], ['dict', '字典条目']].forEach(function (pair) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'linkish';
+      b.textContent = pair[1] + ' ↗';
+      b.addEventListener('click', function () {
+        closeDetail();
+        if (window.SiteTables) window.SiteTables.jump(pair[0], a.orig || a.name);
+      });
+      el.mXref.appendChild(b);
+    });
+
     el.modal.hidden = false;
     document.body.style.overflow = 'hidden';
   }
@@ -357,11 +388,19 @@
 
   initTheme();
 
+  // 给 tables.js 用：按名字找演员、打开详情
+  window.ActorSite = {
+    find: function (n) { return nameIndex[normName(n)] || null; },
+    open: function (a) { if (a) openDetail(a); },
+    refresh: function () { if (all.length) reset(); }
+  };
+
   Promise.all([
     fetch('data/actors.json').then(function (r) { return r.json(); }),
     fetch('data/meta.json').then(function (r) { return r.json(); }).catch(function () { return {}; })
   ]).then(function (res) {
     all = res[0].rows.map(decode);
+    buildNameIndex();
     buildFilters();
     reset();
     if (res[1] && res[1].generated_at) {

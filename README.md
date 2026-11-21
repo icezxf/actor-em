@@ -85,15 +85,23 @@ python3 scripts/check_quality.py actors.jsonl --baseline 上次的.json   # 顺�
 ### 静态站（GitHub Pages）
 
 `scripts/build_site.py` 把 `actors.jsonl` 派生成一个纯静态的搜索页，`pages.yml` 负责生成与发布；
-模板在 `site_src/`（`index.html` + `assets/app.js` + `assets/style.css`），生成物 `site/` 不入库。
+模板在 `site_src/`（`index.html` + `assets/app.js` + `assets/tables.js` + `assets/style.css`），生成物 `site/` 不入库。
 
 ```bash
 python3 scripts/build_site.py actors.jsonl   # 本地生成，产物在 site/
 python3 -m http.server -d site 8000          # 打开 http://localhost:8000
 ```
 
-页面能做的：按名字/别名/标签搜（含 `E罩杯`）、按罩杯和身高筛、按名字/出生年/身高/罩杯/出道年排序、
-只看有图、点开看三围/生日/出身/别名/简介/外链。
+页面有三个视图（顶部切换，搜索框共用）：
+
+| 视图 | 数据 | 用途 |
+|---|---|---|
+| 演员 | `actors.jsonl` | 成品记录：搜索/筛选/排序、点开看三围/生日/出身/别名/简介/外链 |
+| 字典 | `actor_dict.csv` | 抓取清单的合并结果（68k 行按人归并成 23k 行） |
+| MDCx | `mdcx_profiles.csv` | MDCx 原始档案，点开一行看它的简介原文 |
+
+字典和 MDCx 用来**对照**：名字能对上演员库的会变成链接，点一下直接打开成品详情；
+反过来在演员详情底部有「MDCx 档案 / 字典条目」，点进去按日文原名预填搜索。
 
 体积上的取舍：主索引 `site/data/actors.json` 1.6 万条约 3.3MB（gzip 后约 1MB），
 字段压成定长数组、头像域名缩写（`~g/` gfriends、`~t/` thepodb、`~j/` javstash、`~s/` stashdb）

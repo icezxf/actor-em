@@ -2,10 +2,12 @@ package actorsync
 
 import (
 	"context"
+	"encoding/xml"
 	"fmt"
 	"html"
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -24,8 +26,19 @@ import (
 //   - 简介在 <meta name="description"> 里，是整段中文，质量高于维基的一句话。
 //
 // 注意：站点对无浏览器 UA 的请求返回 403，必须带常规 UA。
+//
+// 站内有搜索，比猜 slug 可靠得多（2026-11 实测）：
+//
+//	/search.php?q=三上悠亚&f=_all&m=yes&s=relevance&xml=yes
+//	→ <doc percent="100%"><username>yuamikami</username>
+//	    <subject><![CDATA[三上悠亜-三上悠亚-Yua Mikami]]></subject></doc>
+//
+// username 就是演员页 slug，subject 是「日文名-中文名-罗马字」三段，
+// 正好用来核身份。所以顺序是：先搜（最多 2 个词），搜不到再猜 slug 兜底。
 // 每个演员最多试 4 个 slug，由外层串行调用，不并发猛冲。
 const dramaFaceBase = "https://www.dramaface.com/model/"
+
+const dramaFaceSearchURL = "https://www.dramaface.com/search.php"
 
 const dramaFaceUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
 
@@ -37,8 +50,9 @@ var (
 )
 
 type DramaFaceClient struct {
-	HTTP *http.Client
-	Base string // 允许测试覆盖；空则用默认 dramaFaceBase
+	HTTP   *http.Client
+	Base   string // 允许测试覆盖；空则用默认 dramaFaceBase
+	Search string // 允许测试覆盖；空则用默认 dramaFaceSearchURL
 }
 
 func NewDramaFaceClient(hc *http.Client) *DramaFaceClient {
@@ -55,13 +69,39 @@ func (c *DramaFaceClient) baseURL() string {
 	return dramaFaceBase
 }
 
-// FetchBio 按候选名试出演员页，返回中文简介；取不到返回空串。
+func (c *DramaFaceClient) searchURL() string {
+	if c.Search != "" {
+		return c.Search
+	}
+	return dramaFaceSearchURL
+}
+
+// FetchBio 先站内搜索、再猜 slug，返回中文简介；取不到返回空串。
 func (c *DramaFaceClient) FetchBio(ctx context.Context, candidates []string) string {
 	if c == nil {
 		return ""
 	}
+	// 1) 站内搜索：一次请求就能拿到准确 slug 和身份，比猜准得多。
+	for i, q := range dramaSearchQueries(candidates) {
+		if i >= 2 {
+			break // 每个演员最多搜 2 个词
+		}
+		slug, ok := c.searchSlug(ctx, q, candidates)
+		if !ok {
+			continue
+		}
+		if bio, hit := c.fetchOne(ctx, slug, candidates); hit && bio != "" {
+			return bio
+		}
+	}
+
+	// 2) 猜 slug 兜底：站内没收录、或搜索接口抽风时还能捞到。
 	tried := map[string]bool{}
 	for _, cand := range candidates {
+		// 中文候选拼不出 slug（站内 slug 是罗马字），只会白丢请求。
+		if !hasLatinLetter(cand) {
+			continue
+		}
 		for _, slug := range dramaSlugs(cand) {
 			key := strings.ToLower(slug)
 			if key == "" || tried[key] {
@@ -78,6 +118,112 @@ func (c *DramaFaceClient) FetchBio(ctx context.Context, candidates []string) str
 		}
 	}
 	return ""
+}
+
+// dramaSearchResult 是 /search.php?xml=yes 的 <doc>。
+type dramaSearchResult struct {
+	Percent  string `xml:"percent,attr"`
+	Username string `xml:"username"`
+	Subject  string `xml:"subject"`
+}
+
+type dramaSearchReply struct {
+	XMLName xml.Name            `xml:"result"`
+	Docs    []dramaSearchResult `xml:"doc"`
+}
+
+// searchSlug 搜一次，返回 subject 里确实含候选名的那个 doc 的 username。
+//
+// subject 形如「三上悠亜-三上悠亚-Yua Mikami」，按「-」切开逐段比：
+// 精确等于（去空格、忽略大小写）才算本人，避免热搜词第一条是同名别人。
+func (c *DramaFaceClient) searchSlug(ctx context.Context, q string, candidates []string) (string, bool) {
+	u := fmt.Sprintf("%s?q=%s&f=_all&m=yes&s=relevance&xml=yes",
+		c.searchURL(), url.QueryEscape(q))
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return "", false
+	}
+	req.Header.Set("User-Agent", dramaFaceUA)
+	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
+	resp, err := c.HTTP.Do(req)
+	if err != nil {
+		return "", false
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", false
+	}
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return "", false
+	}
+	var reply dramaSearchReply
+	if err := xml.Unmarshal(body, &reply); err != nil {
+		return "", false
+	}
+	for _, doc := range reply.Docs {
+		if doc.Username == "" {
+			continue
+		}
+		if dramaSubjectMatches(doc.Subject, candidates) {
+			return strings.TrimSpace(doc.Username), true
+		}
+	}
+	return "", false
+}
+
+// dramaSubjectMatches 判断搜索结果条目的 subject 是否指向本人。
+func dramaSubjectMatches(subject string, candidates []string) bool {
+	if strings.TrimSpace(subject) == "" {
+		return false
+	}
+	parts := strings.Split(subject, "-")
+	for _, p := range parts {
+		np := normalizeForMatch(p)
+		if np == "" {
+			continue
+		}
+		for _, cand := range candidates {
+			nc := normalizeForMatch(cand)
+			if len([]rune(nc)) < 2 && latinWordKey(p) == "" {
+				continue
+			}
+			if np == nc || sameRomanizedName(p, cand) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// dramaSearchQueries 挑出值得搜的候选词：只留带拉丁字母的（站内按罗马字/英文名收录），
+// 去重并保持原顺序（调用方已把 MDCx 罗马字、JavStash/StashDB 英文名排在前面）。
+func dramaSearchQueries(candidates []string) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, c := range candidates {
+		c = strings.TrimSpace(c)
+		if c == "" || !hasLatinLetter(c) {
+			continue
+		}
+		k := normalizeForMatch(c)
+		if k == "" || seen[k] {
+			continue
+		}
+		seen[k] = true
+		out = append(out, c)
+	}
+	return out
+}
+
+// hasLatinLetter 判断是否含 a-z（罗马字候选才有拼 slug 的价值）。
+func hasLatinLetter(s string) bool {
+	for _, r := range s {
+		if r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string, candidates []string) (string, bool) {
@@ -125,6 +271,11 @@ func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string, candidates 
 		if !ValidBio(desc) {
 			return "", true
 		}
+	}
+	// 站上有英文条目（如 AIKA 的 "AIKA is a Japanese AV actress…"），
+	// 简介只收中文，英文的留着会让 Emby Overview 中英混杂。
+	if !LooksChineseBio(desc) {
+		return "", true
 	}
 	return desc, true
 }

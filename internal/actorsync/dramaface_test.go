@@ -108,3 +108,83 @@ func TestDramaPageMatches(t *testing.T) {
 		}
 	}
 }
+
+// 站内有搜索：一次请求就能拿到准确 slug，不用再猜。
+// 三上悠亚实测 /search.php?xml=yes 返回 username=yuamikami、subject 三段名。
+func TestDramaFaceSearchPath(t *testing.T) {
+	const desc = "三上悠亚，原名鬼头桃菜，1993年8月16日出生于爱知县名古屋市，日本女优、歌手。"
+	var searched, fetched string
+	mux := http.NewServeMux()
+	mux.HandleFunc("/search.php", func(w http.ResponseWriter, r *http.Request) {
+		searched = r.URL.Query().Get("q")
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:result count="2" total="79719" xmlns:xs="https://www.dramaface.com">
+  <doc index="1" percent="76%"><username>rikkaono</username><subject><![CDATA[小野六花-Rikka Ono]]></subject></doc>
+  <doc index="2" percent="100%"><username>yuamikami</username><subject><![CDATA[三上悠亜-三上悠亚-Yua Mikami]]></subject></doc>
+</xs:result>`)
+	})
+	mux.HandleFunc("/model/yuamikami", func(w http.ResponseWriter, _ *http.Request) {
+		fetched = "yuamikami"
+		fmt.Fprintf(w, `<html><head><title>三上悠亚 (三上悠亜,Yua Mikami) 角色解析、出演作品 - 剧面</title><meta name="description" content="%s"></head></html>`, desc)
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	c := &DramaFaceClient{HTTP: srv.Client(), Base: srv.URL + "/model/", Search: srv.URL + "/search.php"}
+	got := c.FetchBio(context.Background(), []string{"Yua Mikami", "三上悠亚"})
+	if got != desc {
+		t.Fatalf("应走搜索拿到本人简介，得到 %q", got)
+	}
+	if searched != "Yua Mikami" {
+		t.Errorf("应先用排在前面的罗马字搜，实际搜的是 %q", searched)
+	}
+	if fetched != "yuamikami" {
+		t.Errorf("应打开搜索结果给的 slug，实际 %q", fetched)
+	}
+}
+
+// 搜索第一条往往是同名的别人，subject 对不上就不能用。
+func TestDramaFaceSearchRejectsOtherPerson(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/search.php", func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:result count="1"><doc index="1" percent="100%"><username>momo</username>
+<subject><![CDATA[市井桃-ＭＯ☆ＭＯ-MOMO]]></subject></doc></xs:result>`)
+	})
+	mux.HandleFunc("/model/momo", func(w http.ResponseWriter, _ *http.Request) {
+		t.Error("subject 对不上时不该再打开别人的页面")
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	c := &DramaFaceClient{HTTP: srv.Client(), Base: srv.URL + "/model/", Search: srv.URL + "/search.php"}
+	if bio := c.FetchBio(context.Background(), []string{"Momo Sakata"}); bio != "" {
+		t.Fatalf("同名别人应被拒，得到 %q", bio)
+	}
+}
+
+func TestDramaSubjectMatches(t *testing.T) {
+	cands := []string{"三上悠亚", "Yua Mikami"}
+	cases := []struct {
+		subject string
+		want    bool
+	}{
+		{"三上悠亜-三上悠亚-Yua Mikami", true},
+		{"三上悠亜-三上悠亚-Yua Mikami", true},
+		{"小野六花-Rikka Ono", false},
+		{"", false},
+	}
+	for _, tc := range cases {
+		if got := dramaSubjectMatches(tc.subject, cands); got != tc.want {
+			t.Errorf("%q: got %v want %v", tc.subject, got, tc.want)
+		}
+	}
+}
+
+// 中文候选拼不出 slug，别浪费请求。
+func TestDramaSearchQueriesOnlyLatin(t *testing.T) {
+	got := dramaSearchQueries([]string{"三上悠亚", "Yua Mikami", "yua  mikami", "三上悠亜"})
+	if len(got) != 1 || got[0] != "Yua Mikami" {
+		t.Fatalf("只应保留拉丁候选并去重，得到 %v", got)
+	}
+}

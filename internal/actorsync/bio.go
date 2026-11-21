@@ -107,3 +107,30 @@ func BioConflictsHeight(bio string, heightCm int) bool {
 	}
 	return d > 3
 }
+
+// hanKanaCount 数汉字和假名的个数，用来判断一段简介到底是不是中文。
+// 只看「有没有汉字」不够：日文维基的正文里同样有大量汉字。
+func hanKanaCount(s string) (han, kana int) {
+	for _, r := range s {
+		switch {
+		case r >= 0x3040 && r <= 0x30FF: // 平假名 + 片假名
+			kana++
+		case r >= 0x4E00 && r <= 0x9FFF: // CJK 统一汉字
+			han++
+		}
+	}
+	return han, kana
+}
+
+// LooksChineseBio 判断简介是否以中文为主。
+//
+// 规则：汉字至少 20 个，且汉字数远多于假名数（≥3 倍）。
+// 这样「三上悠亚，原名鬼头桃菜（きとう ももな）…」这种夹假名的中文能过，
+// 而日文简介（假名多）和纯英文简介（AIKA is a Japanese AV actress…）会被拦下。
+func LooksChineseBio(s string) bool {
+	han, kana := hanKanaCount(s)
+	if han < 20 {
+		return false
+	}
+	return han >= kana*3
+}

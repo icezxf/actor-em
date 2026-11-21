@@ -133,8 +133,47 @@ band   = (下胸围 + 11cm) / 2.54，取最近偶数   （→ 36）
 
 | 字段 | 类型 | 来源优先级 | 说明 |
 |---|---|---|---|
-| `bio` | string? | 中文维基 → dramaface（短简介才升级）→ yinrenlu → cinewho → jav-idol-db → theactorbase，**谁长用谁** | **不取英文简介，不调 DeepL** |
+| `bio` | string? | 中文维基 → dramaface（短简介才升级）→ theactorbase（同上）→ 映人录 → 影中人 → jav-idol-db，**谁长用谁** | **不取英文简介，不调 DeepL** |
 | `bio_lang` | string? | `zh` / `ja` | 中文维基常返回繁中 |
+
+来源共 **6 个**，按读法分两类：
+
+| 类型 | 源 | 做法 | 身份确认 |
+|---|---|---|---|
+| 按标题取正文 | 中文维基 | `zh.wikipedia` extracts | `ValidBio` + 身高对账 |
+| 站内搜索 | **dramaface** | `/search.php?xml=yes` 拿 slug 再读详情 | 搜索结果的 `subject`（日文名-中文名-罗马字）逐段比对 |
+| 猜 slug | theactorbase | 罗马字拼 `姓-名` / `名-姓`，最多 4 个 | 页面标题里的中文名/罗马字比对 |
+| 站内搜索 + 详情页 | 映人录、影中人 | 搜名字 → 详情页 | 显示名/原名/罗马字逐个归一化比对 |
+| 静态档案 | jav-idol-db | 读仓库里的 `profile.json` | 目录名（日文名）匹配 |
+
+dramaface 很早就有站内搜索，以前只靠猜 slug：`Kana Momonogi` → `MomonogiKana` / `KanaMomonogi`
+逐个试，短名还会退回末段（`Momo Sakata` → `Momo`）。现在先搜：
+
+```
+/search.php?q=三上悠亚&f=_all&m=yes&s=relevance&xml=yes
+→ <doc percent="100%"><username>yuamikami</username>
+   <subject><![CDATA[三上悠亜-三上悠亚-Yua Mikami]]></subject></doc>
+```
+
+`username` 就是详情页 slug，`subject` 是「日文名-中文名-罗马字」三段，正好用来核身份；
+搜不到才退回猜 slug。每个演员最多搜 2 次 + 试 4 个 slug，比原来纯猜省请求。
+
+theactorbase 的 slug 就是罗马字，但**词序不统一**（同一个站两种都有）：
+
+```
+三上悠亜   Mikami Yua    → /people/mikami-yua      （姓-名）
+桃乃木かな Kana Momonogi  → /people/kana-momonogi   （名-姓）
+松咲那奈   Matsuzaki Nana → /people/matsuzaki-nana  （姓-名）
+```
+
+它没有可用的站内搜索（`/search/<词>` 只返回空壳，结果由前端 JS 渲染），所以两种词序都试，
+并且用页面标题（`三上悠亜（三上悠亚 / Mikami Yua）资料_作品`）里的中文名和罗马字核身份，
+词序不同也算同一个人（`latinWordKey` 按词排序后比较）。
+
+**简介只收中文**：`LooksChineseBio()` 要求汉字 ≥20 且汉字数 ≥3 倍假名数。
+站上有英文条目（如 AIKA 的 `AIKA is a Japanese AV actress…`）和日文条目，
+放进 Emby Overview 会中英混杂；夹少量假名的中文简介（`三上悠亚，原名鬼头桃菜（きとう ももな）…`）不受影响。
+
 
 维基是**按标题查**而不是按人查，短名字会命中同名物，且看起来完全合法。实测
 936 条里有 82% 的简介是垃圾：
@@ -158,7 +197,8 @@ David → 大衛王是公元前10世紀以色列聯合王國的第二任國王
 实测 `Mio Fukada` 的简介写着「161cm 出生于 1995-11-12」，而 JavStash 给的是
 `153cm / 1998-12-27` —— 抓到的是同名的另一个人。
 
-**猜 slug 的源必须回头看标题对身份**：dramaface 的 slug 是罗马字拼接，两个词的还会退回
+**猜 slug 的源必须回头看标题对身份**（dramaface 现在已改成站内搜索优先，下面的历史问题
+仍适用于「搜索没命中、退回猜 slug」的兜底路径）：dramaface 的 slug 是罗马字拼接，两个词的还会退回
 「末段」当候选（`Momo Sakata` → `Momo`），而站上确实存在名字就叫 Momo 的别人。实测
 `坂田もも` 因此拿回了「市井桃（ＭＯ☆ＭＯ）」的简介，同一段文字最终挂到 19 个名字带
 「もも/桃」的人身上，全库这种成组重复的简介有 100 组、559 人。
