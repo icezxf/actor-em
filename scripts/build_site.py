@@ -44,6 +44,8 @@ AVATAR_PREFIXES = [
 FIELDS = [
     "id", "name", "name_original", "avatar", "birth_date", "height_cm",
     "cup_size", "measurements", "career_start", "tags", "aliases", "birth_place",
+    # country 是 ISO 码（JP/US/TW…），前端翻成中文并做「日本 / 其他 → 具体国家」两级筛选
+    "country",
 ]
 
 # 别名给搜索用，个别人有上百条（含各种活动名），全带上会把索引撑大 0.5MB，取前 12 条足够。
@@ -194,6 +196,7 @@ def build_rows(rows: list[dict]):
             "|".join(a.get("tags") or []),              # 9
             "|".join((a.get("aliases") or [])[:MAX_ALIASES]),  # 10
             a.get("birth_place") or "",                 # 11
+            a.get("country") or "",                     # 12
         ])
         bio = a.get("bio") or ""
         home = a.get("homepage_url") or ""

@@ -11,10 +11,25 @@
   var CUPS = 'ABCDEFGHIJKLMNO'.split('');
   var PAGE = 60;
 
+  // country 字段存的是 ISO 码（JP/US/TW…），页面上统一显示中文名。
+  // 没列出来的码直接显示原码，别假装认识。
+  var COUNTRY_NAMES = {
+    JP: '日本', US: '美国', KR: '韩国', CN: '中国', TW: '中国台湾', HK: '中国香港',
+    MO: '中国澳门', CA: '加拿大', GB: '英国', UK: '英国', AU: '澳大利亚', FR: '法国',
+    DE: '德国', RU: '俄罗斯', IT: '意大利', ES: '西班牙', BR: '巴西', PH: '菲律宾',
+    TH: '泰国', VN: '越南', SG: '新加坡', MY: '马来西亚', ID: '印度尼西亚',
+    NZ: '新西兰', NL: '荷兰', SE: '瑞典', NO: '挪威', DK: '丹麦', FI: '芬兰',
+    CH: '瑞士', AT: '奥地利', BE: '比利时', PL: '波兰', CZ: '捷克', HU: '匈牙利',
+    RO: '罗马尼亚', UA: '乌克兰', TR: '土耳其', MX: '墨西哥', AR: '阿根廷',
+    CO: '哥伦比亚', CL: '智利', PE: '秘鲁', IN: '印度', IL: '以色列', ZA: '南非'
+  };
+
   var el = {
     q: document.getElementById('q'),
     cup: document.getElementById('cup'),
     height: document.getElementById('height'),
+    region: document.getElementById('region'),
+    country: document.getElementById('country'),
     sort: document.getElementById('sort'),
     onlyAvatar: document.getElementById('onlyAvatar'),
     tagbar: document.getElementById('tagbar'),
@@ -38,7 +53,7 @@
     mXref: document.getElementById('m-xref')
   };
 
-  var state = { q: '', cup: '', height: '', sort: 'name', tag: '', onlyAvatar: false };
+  var state = { q: '', cup: '', height: '', region: '', country: '', sort: 'name', tag: '', onlyAvatar: false };
   var all = [];
   var view = [];
   var shown = 0;
@@ -56,7 +71,7 @@
     return {
       id: r[0], name: r[1], orig: r[2], avatar: avatarUrl(r[3]),
       birth: r[4], height: r[5], cup: r[6], meas: r[7], career: r[8],
-      tags: tags, aliases: aliases, place: r[11],
+      tags: tags, aliases: aliases, place: r[11], country: (r[12] || '').toUpperCase(),
       search: (r[1] + ' ' + r[2] + ' ' + aliases.join(' ') + ' ' + tags.join(' ')).toLowerCase()
     };
   }
@@ -107,6 +122,28 @@
     return isNaN(n) ? 0 : n;
   }
 
+  function countryLabel(code) {
+    var c = (code || '').toUpperCase();
+    if (!c) return '';
+    return COUNTRY_NAMES[c] || code;
+  }
+
+  // 判定「日本人」：优先看国家码；没有码时看定稿后的出生地（都道府县都会补成「日本·东京都」）。
+  // 两样都没有的记录算「不确定」，只在「全部」里出现，不塞进任何一边。
+  function isJapan(a) {
+    if (a.country) return a.country === 'JP';
+    return /^日本/.test(a.place || '');
+  }
+
+  function inRegion(a) {
+    if (!state.region) return true;
+    if (state.region === 'jp') return isJapan(a);
+    // 其他：必须有明确国家码，且不是日本（未知的不算「其他」）
+    if (!a.country || a.country === 'JP') return false;
+    if (state.country && a.country !== state.country) return false;
+    return true;
+  }
+
   function inHeight(h) {
     var r = state.height;
     if (!r) return true;
@@ -124,6 +161,7 @@
       if (state.cup && a.cup !== state.cup) return false;
       if (state.tag && a.tags.indexOf(state.tag) < 0) return false;
       if (!inHeight(a.height)) return false;
+      if (!inRegion(a)) return false;
       if (q && a.search.indexOf(q) < 0) return false;
       return true;
     });
@@ -312,6 +350,30 @@
     document.body.style.overflow = '';
   }
 
+  // 「其他」里的具体国家：按人数降序，最多列 30 个（再往后都是个位数，翻着累）
+  function buildCountryFilter() {
+    var counts = {};
+    all.forEach(function (a) {
+      if (!a.country || a.country === 'JP') return;
+      counts[a.country] = (counts[a.country] || 0) + 1;
+    });
+    var codes = Object.keys(counts).sort(function (x, y) {
+      return counts[y] - counts[x] || countryLabel(x).localeCompare(countryLabel(y), 'zh');
+    });
+    el.country.textContent = '';
+    var total = codes.reduce(function (n, c) { return n + counts[c]; }, 0);
+    var all_ = document.createElement('option');
+    all_.value = '';
+    all_.textContent = '全部国家（' + total + '）';
+    el.country.appendChild(all_);
+    codes.slice(0, 30).forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c;
+      o.textContent = countryLabel(c) + '（' + counts[c] + '）';
+      el.country.appendChild(o);
+    });
+  }
+
   function buildFilters() {
     var cupCount = {};
     var tagCount = {};
@@ -350,6 +412,7 @@
         });
         el.tagbar.appendChild(b);
       });
+    buildCountryFilter();
   }
 
   function applyTheme(mode) {
@@ -380,6 +443,17 @@
   });
   el.cup.addEventListener('change', function () { state.cup = el.cup.value; reset(); });
   el.height.addEventListener('change', function () { state.height = el.height.value; reset(); });
+  el.region.addEventListener('change', function () {
+    state.region = el.region.value;
+    var other = state.region === 'other';
+    el.country.hidden = !other;
+    if (!other) {
+      state.country = '';
+      el.country.value = '';
+    }
+    reset();
+  });
+  el.country.addEventListener('change', function () { state.country = el.country.value; reset(); });
   el.sort.addEventListener('change', function () { state.sort = el.sort.value; reset(); });
   el.onlyAvatar.addEventListener('change', function () { state.onlyAvatar = el.onlyAvatar.checked; reset(); });
   el.mClose.addEventListener('click', closeDetail);

@@ -124,6 +124,11 @@ body {
   cursor: pointer;
 }
 
+/* 「具体国家」下拉只在选择「其他」时出现，hidden 必须真的不占位 */
+.toolbar select[hidden] {
+  display: none;
+}
+
 .chk {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 13px; color: var(--muted);
