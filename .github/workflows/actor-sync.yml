@@ -149,6 +149,22 @@ jobs:
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 本轮产物先收好：下面要让工作区对齐最新 main，而数据文件是本轮算出来的，
+          # 跟远端没有合并的价值（只会冲突）。
+          KEEP="$RUNNER_TEMP/actors-out"
+          mkdir -p "$KEEP"
+          cp -a actors.jsonl actors.json actors.manifest.json "$KEEP"/ 2>/dev/null || true
+          if [ -d data ]; then cp -a data "$KEEP"/data; fi
+          rows=$(wc -l < actors.jsonl 2>/dev/null || echo 0)
+
+          # 直接落到最新 main 上：以前用 git pull --rebase --autostash，
+          # 一旦别人在这轮跑的时候推了文档/脚本，rebase 会在 actors.jsonl 上冲突，
+          # 整轮抓取结果直接丢掉（2026-11-21 就因此丢过一次 2000 人的补抓）。
+          git fetch --depth=1 origin main
+          git reset --hard FETCH_HEAD
+          cp -a "$KEEP"/actors.jsonl "$KEEP"/actors.json "$KEEP"/actors.manifest.json . 2>/dev/null || true
+          if [ -d "$KEEP/data" ]; then mkdir -p data && cp -a "$KEEP/data/." data/; fi
+
           # actors.xlsx 是纯展示派生物，日更的 2 万行二进制会把仓库撑爆，改走 artifact 上传。
           git add actors.jsonl actors.json actors.manifest.json data/ \
             data/avatar_review.json data/avatar_choices.json
@@ -156,9 +172,7 @@ jobs:
             echo "本轮无变化，跳过提交"
             exit 0
           fi
-          rows=$(wc -l < actors.jsonl 2>/dev/null || echo 0)
           git commit -m "chore(actors): sync $(date -u +%F) (${rows} actors)"
-          git pull --rebase --autostash origin main
           git push
 
       # xlsx 是给人看的派生物，不入库；每次跑完挂成 artifact，保留 90 天可下载。

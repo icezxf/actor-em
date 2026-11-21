@@ -780,7 +780,7 @@ func TestDramaFaceFetchBio(t *testing.T) {
 			_, _ = w.Write([]byte(`<html><head><title>桃乃木香奈 (桃乃木かな,Kana Momonogi) 角色解析</title><meta name="description" content="桃乃木かな（日文名：桃乃木 かな，出生于1996年12月24日）是日本知名的AV女优、歌手，隶属于事务所。她来自东京都，2015年进入AV行业并于同年10月出道，随后崭露头角获得多项大奖。"></head></html>`))
 		case "/model/YuaMikami":
 			// 开头带属性串，需剥掉后才是正文
-			_, _ = w.Write([]byte(`<html><head><title>三上悠亚</title><meta name="description" content="身高: 155cm 罩杯: D 胸围: 84cm 三上悠亚，原名鬼头桃菜，1993年出生于日本爱知县名古屋市，是前女子偶像团体SKE48的成员，后成为AV演员，演艺经历丰富。"></head></html>`))
+			_, _ = w.Write([]byte(`<html><head><title>三上悠亚 (三上悠亜,Yua Mikami) 角色解析</title><meta name="description" content="身高: 155cm 罩杯: D 胸围: 84cm 三上悠亚，原名鬼头桃菜，1993年出生于日本爱知县名古屋市，是前女子偶像团体SKE48的成员，后成为AV演员，演艺经历丰富。"></head></html>`))
 		case "/model/Kana":
 			_, _ = w.Write([]byte(`<html><head><title>提示信息 -  9K星图</title><meta name="description" content=",9K星图"></head></html>`))
 		default:

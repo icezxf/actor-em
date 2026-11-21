@@ -437,6 +437,11 @@ func main() {
 	if cupFixed > 0 {
 		logger.Printf("罩杯进标签：%d 条（如「E罩杯」）", cupFixed)
 	}
+	// 同一段简介挂在多人身上 = 匹配串号（dramaface 短 slug 撞名），
+	// 先清空，等下一轮按修好的匹配重抓，别把别人简介推给 Emby。
+	if n := actorsync.PurgeSharedBios(db.Actors); n > 0 {
+		logger.Printf("清理串号简介：%d 条（同一段文字挂在多人身上，已清空待重抓）", n)
+	}
 	if err := db.Save(cfg.DataFile); err != nil {
 		logger.Fatalf("保存 %s 失败: %v", cfg.DataFile, err)
 	}
@@ -669,7 +674,12 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", nPlaceFix)
 	logger.Printf("罩杯进标签：%d 条（如「E罩杯」）", nCupTag)
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix + nCupTag
+	nBioPurged := actorsync.PurgeSharedBios(db.Actors)
+	if nBioPurged > 0 {
+		logger.Printf("清理串号简介：%d 条（同一段文字挂在多人身上，已清空待重抓）", nBioPurged)
+	}
+
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix + nCupTag + nBioPurged
 	if total == 0 {
 		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}

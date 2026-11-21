@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // DramaFaceClient 抓 dramaface.com（剧面）的中文简介。
@@ -70,7 +71,7 @@ func (c *DramaFaceClient) FetchBio(ctx context.Context, candidates []string) str
 			if len(tried) > 4 {
 				return "" // 每个演员最多试 4 个 slug
 			}
-			bio, ok := c.fetchOne(ctx, slug)
+			bio, ok := c.fetchOne(ctx, slug, candidates)
 			if ok && bio != "" {
 				return bio
 			}
@@ -79,7 +80,7 @@ func (c *DramaFaceClient) FetchBio(ctx context.Context, candidates []string) str
 	return ""
 }
 
-func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string) (string, bool) {
+func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string, candidates []string) (string, bool) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL()+slug, nil)
 	if err != nil {
 		return "", false
@@ -98,8 +99,19 @@ func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string) (string, bo
 	if err != nil {
 		return "", false
 	}
-	// 未命中页 title 是「提示信息 - 9K星图」，正文没有简介。
-	if m := reDramaTitle.FindSubmatch(body); len(m) > 1 && strings.Contains(string(m[1]), "提示信息") {
+	title := ""
+	if m := reDramaTitle.FindSubmatch(body); len(m) > 1 {
+		title = html.UnescapeString(strings.TrimSpace(string(m[1])))
+		// 未命中页 title 是「提示信息 - 9K星图」，正文没有简介。
+		if strings.Contains(title, "提示信息") {
+			return "", false
+		}
+	}
+	// slug 是罗马字，短名（Momo / Aika）会撞到同名别人——实测「坂田もも」曾经
+	// 拿到「市井桃（ＭＯ☆ＭＯ）」的简介，一次错配就污染了一整批同名人。
+	// 站点标题形如「桃乃木香奈 (桃乃木かな,Kana Momonogi) 角色解析…」，
+	// 用它把页面身份核一遍。
+	if !dramaPageMatches(title, slug, candidates) {
 		return "", false
 	}
 	m := reDramaDesc.FindSubmatch(body)
@@ -115,6 +127,52 @@ func (c *DramaFaceClient) fetchOne(ctx context.Context, slug string) (string, bo
 		}
 	}
 	return desc, true
+}
+
+// dramaPageMatches 判断抓到的页面是不是本人。
+//
+// 两条放行条件，任一成立即可：
+//  1. 标题里出现候选名（去空格、忽略大小写、全角转半角后比对）——
+//     候选名来自字典，中文名/日文名/罗马字都在里面；
+//  2. slug 本身就够长（≥8 字符，即「姓+名」拼起来的形态）且出现在标题里，
+//     这样两种词序都能命中，也不依赖候选名是否带罗马字。
+//
+// 只有单个词（"Momo"）的 slug 必须靠候选名把关，因为站上确实存在同名的别人。
+func dramaPageMatches(title, slug string, candidates []string) bool {
+	if title == "" {
+		return false
+	}
+	namePart := title
+	if i := strings.Index(namePart, "角色解析"); i > 0 {
+		namePart = namePart[:i]
+	}
+	norm := normalizeForMatch(namePart)
+	if s := normalizeForMatch(slug); len([]rune(s)) >= 8 && strings.Contains(norm, s) {
+		return true
+	}
+	for _, cand := range candidates {
+		n := normalizeForMatch(cand)
+		if len([]rune(n)) >= 3 && strings.Contains(norm, n) {
+			return true
+		}
+	}
+	return false
+}
+
+// normalizeForMatch 去空格/中点、转小写、全角 ASCII 转半角，只用于名字比对。
+func normalizeForMatch(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		switch {
+		case r == ' ' || r == '\u3000' || r == '・' || r == '·' || r == '-' || r == '_':
+			continue
+		case r >= '！' && r <= '～': // 全角 ASCII
+			b.WriteRune(r - 0xFEE0)
+		default:
+			b.WriteRune(unicode.ToLower(r))
+		}
+	}
+	return b.String()
 }
 
 // stripDramaFields 剥掉简介开头的「字段: 值 字段: 值 ...」串，只留正文。

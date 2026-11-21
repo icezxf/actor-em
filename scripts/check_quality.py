@@ -303,17 +303,21 @@ def main():
     rep.check("无标签", empty_tags, n, "MDCx 没有标签的人")
 
     # ---------- 别名 ----------
-    self_alias, too_many = [], []
+    self_alias, ja_alias, too_many = [], [], []
     for a in exp:
-        al = a.get("aliases") or []
-        own = {s.strip().lower() for s in
-               (a.get("name"), a.get("name_original")) if s}
-        hit = [t for t in al if (t or "").strip().lower() in own]
-        if hit:
-            self_alias.append(f"{a.get('key')} 主名 {a.get('name')}，别名里重复了 {hit}")
+        al = [(t or "").strip() for t in (a.get("aliases") or [])]
+        name = (a.get("name") or "").strip()
+        orig = (a.get("name_original") or "").strip()
+        low = [t.lower() for t in al]
+        if name and name.lower() in low:
+            self_alias.append(f"{a.get('key')} 主名 {name}")
+        if orig and orig.lower() in low:
+            ja_alias.append(f"{a.get('key')} {orig}")
         if len(al) > 12:
             too_many.append(f"{a.get('key')} 别名 {len(al)} 个")
-    rep.check("别名含本人主名", self_alias, n, "无意义，下游匹配会绕圈")
+    # 主名重复是真冗余（下游按名字匹配会绕圈）；日文原名重复只是啰嗦，无害
+    rep.check("别名含本人主名", self_alias, n, "中文主名又出现在别名里")
+    rep.check("别名含日文原名", ja_alias, n, "冗余但无害，可忽略")
     rep.check("别名过多", too_many, n, "> 12 个别名")
 
     # ---------- 跨字段一致性 ----------
