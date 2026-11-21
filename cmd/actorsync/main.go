@@ -36,7 +36,7 @@ func main() {
 	flag.BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "只打印结果，不写本地文件")
 	flag.BoolVar(&cfg.Verbose, "verbose", cfg.Verbose, "打印每个数据源的命中情况")
 	flag.BoolVar(&refreshAll, "refresh-all", false, "重抓库里所有演员（耗时最长；配合 --limit 0 才是全量）")
-	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔，例如 --refresh 小凑四叶,三上悠亚")
+	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔；名字不在字典里也行（会当新人抓），例如 --refresh 小凑四叶,三上悠亚")
 	flag.BoolVar(&fillMissing, "fill-missing", false, "只重抓有缺字段的已有演员，只填空位不覆盖已有值")
 	flag.StringVar(&fillFields, "fill-fields", "", "配合 --fill-missing：要补的字段，逗号分隔；留空=全部可补字段")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "数据文件路径，默认 actors.jsonl")
@@ -197,6 +197,17 @@ func main() {
 	for _, n := range strings.Split(refresh, ",") {
 		if s := strings.TrimSpace(n); s != "" {
 			refreshNames = append(refreshNames, s)
+		}
+	}
+	// --refresh 里的人如果压根不在清单里（字典没收录、也没写进 actors.txt，
+	// 比如临时想起一个人或者是从 Telegram 抓过的），先补进清单再算计划：
+	// 库里有记录就走「刷新」，没有就走「新增」。
+	// 不补的话 BuildPlan 只遍历清单，手输的名字会被静默忽略。
+	if len(refreshNames) > 0 {
+		before := len(names)
+		names = mergeNames(names, refreshNames)
+		if added := len(names) - before; added > 0 {
+			logger.Printf("--refresh 额外补进清单 %d 个（字典里没有）", added)
 		}
 	}
 	plan := actorsync.BuildPlanWithFill(db, names, refreshNames, refreshAll, fillFieldList)
@@ -729,6 +740,23 @@ func newTelegram(cfg *Config) *actorsync.TelegramClient {
 		tg.APIBase = base
 	}
 	return tg
+}
+
+// mergeNames 把 extra 里还没出现过的名字追加到 names 尾部（按归一化名字去重）。
+func mergeNames(names, extra []string) []string {
+	seen := make(map[string]bool, len(names)+len(extra))
+	for _, n := range names {
+		seen[actorsync.NormalizeName(n)] = true
+	}
+	for _, n := range extra {
+		k := actorsync.NormalizeName(n)
+		if k == "" || seen[k] {
+			continue
+		}
+		seen[k] = true
+		names = append(names, n)
+	}
+	return names
 }
 
 // collectNames 组装本轮待抓清单。

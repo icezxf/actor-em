@@ -23,7 +23,7 @@ on:
         type: boolean
         default: false
       refresh:
-        description: "重抓指定演员，逗号分隔（留空则只抓还没入库的）"
+        description: "重抓指定演员，逗号分隔；名字不在字典里也行（会当新人抓，留空则只抓还没入库的）"
         default: ""
       refresh_all:
         description: "全量重抓库里所有演员（要真全量请同时把 limit 设为 0）"

@@ -179,7 +179,7 @@ actorsync [flags]
   --names actors.txt   手工补充清单（字典之外再加人）
   --limit N            本轮最多处理多少个（0 = 不限）
   --dry-run            只打印，不写本地文件
-  --refresh 名字,名字   重抓指定演员
+  --refresh 名字,名字   重抓指定演员（不在字典里的人也行，会当新人抓）
   --refresh-all        重抓库里所有演员（配合 --limit 0 才是真全量）
   --fill-missing       只重抓有缺字段的已有演员，只填空位、不覆盖已有值
   --fill-fields 字段   配合 --fill-missing，逗号分隔；留空=全部可补字段
@@ -495,6 +495,10 @@ docker run -d --name actor-em --restart unless-stopped \
 
 - **默认不刷新老记录**。演员补了新简介不会自动更新；用 `--refresh 名字` 单抓、
   `--refresh-all --limit 0` 全量覆盖重抓，或 `--fill-missing` 只挑缺字段的记录补值。
+- **不在 MDCx 里的人也能抓**。MDCx 只是字段地基，不是准入闸门：它查不到就只记一条 miss，
+  继续走维基 → JavStash → StashDB/TPDB → 中文站。`--refresh 名字` 里的名字如果字典和
+  `actors.txt` 都没有，会临时补进本轮清单（库里有记录就刷新，没有就当新人抓）；
+  代价是没有 MDCx 那份三围/罩杯/出生地/标签打底，只能靠在线源兜。
 - **不加锁**。如果两条记录用同一个名字，头像会互相覆盖（后写的胜）。
 - `key` 一旦写入就不再改，即使后来匹配到了 JavStash ID——避免同一人出现两条。
 - **三围会换算**。MDCx 的厘米分项换算成英寸，并用日标杯差反推底围，写成 `36J-25-39`
