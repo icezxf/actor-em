@@ -510,8 +510,8 @@ docker run -d --name actor-em --restart unless-stopped \
 - 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`、`refresh_all`、`fill_missing`、`fill_fields`、`fill_order`、`fill_min_age`、`backfill`
   - 全量重抓：`refresh_all=true` + `limit=0`（四种改写模式互斥，不能同时勾）
   - 只补缺字段：`fill_missing=true`，默认补全部可补字段；只想补简介和生日就填 `fill_fields=bio,birthday`
-  - 挑人顺序：`fill_order` 默认 `complete`（资料最全的先补，产出最高）。实测同 2000 人补简介，「缺得最多优先」只补到 3.4%，「有生日+出道年」的那批能到 8.3%——两样都没有的人拿到简介的概率是 0
-  - 不重复抓：`fill_min_age=21` 让 `scraped_at` 在 21 天内的记录本轮跳过。补值没补到字段时数据不动、只推 `scraped_at`，就是这个标记
+  - 挑人顺序：`fill_order` 默认 `complete`（资料最全的先补，产出最高）。实测补简介：`missing` 2000 人补到 3.35%，`complete` 补到 4.35%；连生日和出道年都没有的人，拿到简介的概率是 0
+  - 不重复抓：`fill_min_age=21` 让 `scraped_at` 在 21 天内的记录本轮跳过。补值没补到字段时数据不动、只推 `scraped_at`，就是这个标记。注意 `scraped_at` 也会被全量刷新更新——刚跑完 `refresh_all` 的那几天，这个过滤会把所有人都挡掉
   - 补离线字段：`backfill=true`（不联网），顺带把存量出生地补成 `日本·东京都`
   - 补缺字段只认 `ok/partial` 记录，重抓后逐字段填空，已有值/status/头像都保留
 - 有变化才 commit，无变化不产生空提交
