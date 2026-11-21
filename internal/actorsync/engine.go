@@ -138,20 +138,20 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 	actor := BuildActor(name, res, existing)
 
 	// 缺字段重抓：以旧记录为底，只把新抓到的值填进空位。
-	// 没有补到任何字段时连 scraped_at 都不动，避免制造无意义的 diff。
+	// 没补到字段时数据一个字节都不改，只把 scraped_at 往前推——
+	// 这是「这个人刚试过」的唯一痕迹，--fill-min-age 靠它避免反复重抓同一批人。
 	hadAvatar := false
+	nothingFilled := false
 	if opts.FillFields != nil && existing != nil {
 		hadAvatar = StrVal(existing.Avatar) != ""
+		attemptAt := actor.ScrapedAt
 		base := cloneActor(existing)
 		filled := MergeMissingFields(base, actor, opts.FillFields)
 		out.Filled = filled
 		if len(filled) == 0 {
-			out.Actor = base
-			out.Name = base.Name
+			nothingFilled = true
+			base.ScrapedAt = attemptAt
 			out.Kept = true
-			out.AvatarNote = "没有补到新字段"
-			out.Candidates = OrderCandidates(res.Images, StrVal(base.Avatar))
-			return out, nil
 		}
 		actor = base
 	}
@@ -163,7 +163,11 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 		avatarNote = "人工选图"
 	}
 	switch {
+	case nothingFilled:
+		// 本轮什么都没补到：连头像都不动，保持旧记录原样。
+		avatarNote = "没有补到新字段"
 	case opts.SkipAvatar:
+
 		if res.ImageURL != "" {
 			avatarNote = "已跳过头像处理"
 		}

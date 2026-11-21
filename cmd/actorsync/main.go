@@ -25,6 +25,8 @@ func main() {
 		refreshAll  bool
 		fillMissing bool
 		fillFields  string
+		fillOrder   string
+		fillMinAge  int
 		scanNFO     bool
 		noXlsx      bool
 		serveBot    bool
@@ -39,6 +41,8 @@ func main() {
 	flag.StringVar(&refresh, "refresh", "", "重抓指定演员，逗号分隔；名字不在字典里也行（会当新人抓），例如 --refresh 小凑四叶,三上悠亚")
 	flag.BoolVar(&fillMissing, "fill-missing", false, "只重抓有缺字段的已有演员，只填空位不覆盖已有值")
 	flag.StringVar(&fillFields, "fill-fields", "", "配合 --fill-missing：要补的字段，逗号分隔；留空=全部可补字段")
+	flag.StringVar(&fillOrder, "fill-order", "complete", "配合 --fill-missing 的挑人顺序：complete=最完整优先（产出最高）/ missing=缺得最多优先 / name=按名字")
+	flag.IntVar(&fillMinAge, "fill-min-age", 0, "配合 --fill-missing：跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过）")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "数据文件路径，默认 actors.jsonl")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
@@ -69,13 +73,19 @@ func main() {
 		logger.Fatal("--backfill / --refresh-all / --refresh / --fill-missing 只能选一个")
 	}
 	var fillFieldList []string
+	fillOrd := actorsync.FillOrderMissing
 	if fillMissing {
 		var err error
 		fillFieldList, err = actorsync.ParseFillFields(fillFields)
 		if err != nil {
 			logger.Fatalf("解析 --fill-fields 失败: %v", err)
 		}
-		logger.Printf("缺字段补值模式：%s", strings.Join(fillFieldList, ", "))
+		fillOrd, err = actorsync.ParseFillOrder(fillOrder)
+		if err != nil {
+			logger.Fatalf("解析 --fill-order 失败: %v", err)
+		}
+		logger.Printf("缺字段补值模式：%s（排序 %s，跳过 %d 天内试过的）",
+			strings.Join(fillFieldList, ", "), fillOrd, fillMinAge)
 	}
 
 	// 交互服务要一直挂着，5 小时超时只适合一次批量同步
@@ -210,7 +220,7 @@ func main() {
 			logger.Printf("--refresh 额外补进清单 %d 个（字典里没有）", added)
 		}
 	}
-	plan := actorsync.BuildPlanWithFill(db, names, refreshNames, refreshAll, fillFieldList)
+	plan := actorsync.BuildPlanWithFillOrder(db, names, refreshNames, refreshAll, fillFieldList, fillOrd, fillMinAge)
 
 	stats := actorsync.RunStats{
 		StartedAt:   start.UTC().Format(time.RFC3339),

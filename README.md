@@ -30,7 +30,7 @@
 | 工作流 | 职责 | 触发 | 产物 |
 |---|---|---|---|
 | `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping` 成中文字典；并把 MDCx 两个库导成档案宽表 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`mdcx_profiles.csv`、`data/base_sources.json` |
-| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`refresh_all`/`fill_missing`/`fill_fields`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
+| `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`refresh_all`/`fill_missing`/`fill_fields`/`fill_order`/`fill_min_age`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
 | `tg-command.yml` | 处理一条 Telegram update：刮削 → 发候选图 → 换图 → 提交状态 | Cloudflare Worker 派发 | 同上（按需） |
 | `pages.yml` | 把 `actors.jsonl` 派生成静态站并发 GitHub Pages | 模板/脚本改动、`actor-sync` 跑完、手动 | Pages（`site/` 不入库） |
 
@@ -206,6 +206,8 @@ actorsync [flags]
   --refresh-all        重抓库里所有演员（配合 --limit 0 才是真全量）
   --fill-missing       只重抓有缺字段的已有演员，只填空位、不覆盖已有值
   --fill-fields 字段   配合 --fill-missing，逗号分隔；留空=全部可补字段
+  --fill-order 顺序    挑人顺序：complete=最完整优先（默认，产出最高）/ missing=缺得最多优先 / name
+  --fill-min-age N     跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过）
   --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
@@ -505,9 +507,11 @@ docker run -d --name actor-em --restart unless-stopped \
 3. 没问题再放开 `limit=0` 首铺
 
 - 定时：每天 04:00 UTC
-- 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`、`refresh_all`、`fill_missing`、`fill_fields`、`backfill`
+- 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`、`refresh_all`、`fill_missing`、`fill_fields`、`fill_order`、`fill_min_age`、`backfill`
   - 全量重抓：`refresh_all=true` + `limit=0`（四种改写模式互斥，不能同时勾）
   - 只补缺字段：`fill_missing=true`，默认补全部可补字段；只想补简介和生日就填 `fill_fields=bio,birthday`
+  - 挑人顺序：`fill_order` 默认 `complete`（资料最全的先补，产出最高）。实测同 2000 人补简介，「缺得最多优先」只补到 3.4%，「有生日+出道年」的那批能到 8.3%——两样都没有的人拿到简介的概率是 0
+  - 不重复抓：`fill_min_age=21` 让 `scraped_at` 在 21 天内的记录本轮跳过。补值没补到字段时数据不动、只推 `scraped_at`，就是这个标记
   - 补离线字段：`backfill=true`（不联网），顺带把存量出生地补成 `日本·东京都`
   - 补缺字段只认 `ok/partial` 记录，重抓后逐字段填空，已有值/status/头像都保留
 - 有变化才 commit，无变化不产生空提交

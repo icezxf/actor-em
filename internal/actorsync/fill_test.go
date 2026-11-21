@@ -111,6 +111,112 @@ func TestBuildPlanWithFill(t *testing.T) {
 	}
 }
 
+func TestBuildPlanFillOrderComplete(t *testing.T) {
+	// 三个人都缺 bio：资料全的（有生日+出道年+头像+标签）应排最前，
+	// 什么都没有的排最后——实测这类人拿到简介的概率是 0。
+	rich := &Actor{
+		Name: "资料全", Status: StatusOK, Aliases: []string{},
+		BirthDate: StrPtr("1993-08-16"), CareerStart: IntPtr(2015),
+		HeightCm: IntPtr(160), Avatar: StrPtr("https://a/1.jpg"),
+		Tags: []string{"a"}, ProviderIDs: map[string]string{"JavStash": "1"},
+		ScrapedAt: "2026-01-01T00:00:00Z",
+	}
+	mid := &Actor{Name: "资料半", Status: StatusOK, Aliases: []string{}, BirthDate: StrPtr("1995-01-01")}
+	poor := &Actor{Name: "没有资料", Status: StatusPartial, Aliases: []string{}}
+	db := &Db{Actors: []*Actor{rich, mid, poor}}
+
+	plan := BuildPlanWithFillOrder(db, []string{"没有资料", "资料半", "资料全"}, nil, false,
+		[]string{"bio"}, FillOrderComplete, 0)
+	if len(plan) != 3 {
+		t.Fatalf("三条都缺 bio，应该都进计划: %+v", plan)
+	}
+	order := []string{plan[0].Name, plan[1].Name, plan[2].Name}
+	want := []string{"资料全", "资料半", "没有资料"}
+	if !reflect.DeepEqual(order, want) {
+		t.Fatalf("最完整优先排序不对: got %v want %v", order, want)
+	}
+
+	// 同分时先挑最久没试过的：把两人的完整度调成一样，早抓过的排前面。
+	rich.CareerStart = nil
+	rich.ScrapedAt = "2026-06-01T00:00:00Z"
+	mid.HeightCm = IntPtr(160)
+	mid.Avatar = StrPtr("https://a/2.jpg")
+	mid.Tags = []string{"a"}
+	mid.ProviderIDs = map[string]string{"TPDB": "2"}
+	mid.ScrapedAt = "2025-01-01T00:00:00Z"
+	plan = BuildPlanWithFillOrder(db, []string{"资料全", "资料半", "没有资料"}, nil, false,
+		[]string{"bio"}, FillOrderComplete, 0)
+	if plan[0].Name != "资料半" {
+		t.Fatalf("同分应挑最久没试过的，实际首位 %s", plan[0].Name)
+	}
+}
+
+func TestBuildPlanFillMinAge(t *testing.T) {
+	now := time.Now().UTC()
+	fresh := &Actor{Name: "刚试过", Status: StatusOK, Aliases: []string{},
+		ScrapedAt: now.Add(-2 * 24 * time.Hour).Format(time.RFC3339)}
+	old := &Actor{Name: "很久没试", Status: StatusOK, Aliases: []string{},
+		ScrapedAt: now.Add(-40 * 24 * time.Hour).Format(time.RFC3339)}
+	db := &Db{Actors: []*Actor{fresh, old}}
+
+	plan := BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试"}, nil, false,
+		[]string{"bio"}, FillOrderComplete, 30)
+	if len(plan) != 1 || plan[0].Name != "很久没试" {
+		t.Fatalf("30 天内试过的应跳过: %+v", plan)
+	}
+
+	// minAge=0 时不跳过任何东西
+	plan = BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试"}, nil, false,
+		[]string{"bio"}, FillOrderComplete, 0)
+	if len(plan) != 2 {
+		t.Fatalf("minAge=0 不该过滤: %+v", plan)
+	}
+}
+
+func TestParseFillOrder(t *testing.T) {
+	for in, want := range map[string]FillOrder{
+		"": FillOrderComplete, "complete": FillOrderComplete,
+		"MISSING": FillOrderMissing, " name ": FillOrderName,
+	} {
+		got, err := ParseFillOrder(in)
+		if err != nil || got != want {
+			t.Fatalf("ParseFillOrder(%q) = %q, %v；want %q", in, got, err, want)
+		}
+	}
+	if _, err := ParseFillOrder("最全"); err == nil {
+		t.Fatal("非法值应当报错")
+	}
+}
+
+func TestEngineFillAttemptKeepsScrapedAt(t *testing.T) {
+	// 一个字段都没补到：内容不动，但 scraped_at 要推到现在，
+	// 否则 --fill-min-age 永远认为「没试过」，每轮重抓同一批人。
+	existing := &Actor{
+		Key: "javstash:abc", Name: "空手", Status: StatusOK, CreatedAt: "t0",
+		Tags: []string{}, Aliases: []string{}, ScrapedAt: "2020-01-01T00:00:00Z",
+		ProviderIDs: map[string]string{}, Sources: map[string]bool{},
+	}
+	db := &Db{Actors: []*Actor{existing}}
+	e := &Engine{DB: db}
+	// 抓到一堆结构字段但就是没有简介。
+	res := &FetchResult{BirthDate: "1990-01-01", HeightCm: 155,
+		Sources: map[string]bool{"javstash": true}}
+
+	out, err := e.ApplyPhase(context.Background(), "空手", res, ProcessOptions{FillFields: []string{"bio"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !out.Kept || len(out.Filled) != 0 {
+		t.Fatalf("没补到字段应当 Kept 且 Filled 为空: %+v", out)
+	}
+	if out.Actor.ScrapedAt == "2020-01-01T00:00:00Z" || out.Actor.ScrapedAt == "" {
+		t.Fatalf("scraped_at 应该更新为本次尝试时间: %s", out.Actor.ScrapedAt)
+	}
+	if StrVal(out.Actor.Bio) != "" {
+		t.Fatalf("不该凭空出现简介: %v", StrVal(out.Actor.Bio))
+	}
+}
+
 func TestEngineFillKeepsExistingValues(t *testing.T) {
 	existing := &Actor{
 		Key: "javstash:abc", Name: "小凑四叶", Status: StatusOK, CreatedAt: "t0",

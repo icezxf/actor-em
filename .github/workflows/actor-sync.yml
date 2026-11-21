@@ -36,6 +36,12 @@ on:
       fill_fields:
         description: "缺字段补抓要补哪些字段，逗号分隔；留空=全部可补字段（bio,birthday,height,measurements,tags 等）"
         default: ""
+      fill_order:
+        description: "补字段挑人顺序：complete=最完整优先（产出最高，默认）/ missing=缺得最多优先 / name=按名字"
+        default: "complete"
+      fill_min_age:
+        description: "跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过；补长篇数据建议 21~30）"
+        default: "0"
       backfill:
         description: "只做离线补值：用 MDCx 档案补空生日/三围/标签/身高/罩杯/出道年，并把存量出生地补成「日本·东京都」，不联网、不抓取"
         type: boolean
@@ -123,6 +129,8 @@ jobs:
           REFRESH_ALL_INPUT: ${{ github.event.inputs.refresh_all }}
           FILL_MISSING_INPUT: ${{ github.event.inputs.fill_missing }}
           FILL_FIELDS_INPUT: ${{ github.event.inputs.fill_fields }}
+          FILL_ORDER_INPUT: ${{ github.event.inputs.fill_order }}
+          FILL_MIN_AGE_INPUT: ${{ github.event.inputs.fill_min_age || '0' }}
           DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
         run: |
           ARGS=()
@@ -137,6 +145,12 @@ jobs:
           fi
           if [ -n "$FILL_FIELDS_INPUT" ]; then
             ARGS+=(--fill-fields "$FILL_FIELDS_INPUT")
+          fi
+          if [ -n "$FILL_ORDER_INPUT" ]; then
+            ARGS+=(--fill-order "$FILL_ORDER_INPUT")
+          fi
+          if [ -n "$FILL_MIN_AGE_INPUT" ] && [ "$FILL_MIN_AGE_INPUT" != "0" ]; then
+            ARGS+=(--fill-min-age "$FILL_MIN_AGE_INPUT")
           fi
           if [ "$DRY_RUN_INPUT" = "true" ]; then
             ARGS+=(--dry-run)

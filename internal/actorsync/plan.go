@@ -1,6 +1,7 @@
 package actorsync
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -14,16 +15,55 @@ type PlanItem struct {
 	Missing  []string // fill 模式：本条记录缺哪些字段
 }
 
+// FillOrder 决定 --fill-missing 按什么顺序挑人。顺序直接决定一轮能补到多少：
+// 同一批 2000 人，「缺得最多优先」只补到 3.4%，「最完整优先」能到 8% 以上
+// （有生日+出道年的人拿到简介的概率 8.3%，两样都没有的是 0%）。
+type FillOrder string
+
+const (
+	// FillOrderComplete 先挑字段最全的：资料越全的人越有名，越可能有简介等
+	// 长尾数据可补。同分时先挑最久没试过的，避免每轮都重抓同一批人。
+	FillOrderComplete FillOrder = "complete"
+	// FillOrderMissing 先挑缺得最多的：同样预算先把最残的记录救起来。
+	FillOrderMissing FillOrder = "missing"
+	// FillOrderName 按名字排，结果可复现，适合排查/小批量。
+	FillOrderName FillOrder = "name"
+)
+
+// ParseFillOrder 解析 --fill-order，留空默认 complete。
+func ParseFillOrder(s string) (FillOrder, error) {
+	switch FillOrder(strings.ToLower(strings.TrimSpace(s))) {
+	case "", FillOrderComplete:
+		return FillOrderComplete, nil
+	case FillOrderMissing:
+		return FillOrderMissing, nil
+	case FillOrderName:
+		return FillOrderName, nil
+	}
+	return "", fmt.Errorf("未知的补字段排序 %q（可选 complete / missing / name）", s)
+}
+
 // BuildPlanWithFill 在 BuildPlan 之上支持「缺字段重抓」。
 //
 // fillFields 非 nil 表示 --fill-missing 模式：只挑库里已经导出、但仍有空字段的
 // 记录（reason=fill），不掺 new/retry；补值在 Engine 里按只填空位合并。
 // 传 nil 时行为与 BuildPlan 完全一致。
+//
+// 等价于 BuildPlanWithFillOrder(..., FillOrderMissing, 0)，即老行为。
 func BuildPlanWithFill(db *Db, names []string, refresh []string, refreshAll bool, fillFields []string) []PlanItem {
+	return BuildPlanWithFillOrder(db, names, refresh, refreshAll, fillFields, FillOrderMissing, 0)
+}
+
+// BuildPlanWithFillOrder 同上，但可以指定挑人顺序，以及跳过最近刚试过的人。
+//
+// minAgeDays > 0 时，scraped_at 在这么多天以内的记录本轮不碰——配合「最完整
+// 优先」就是一列不重复的队列：每轮往后走一段，不会把同一批硬骨头反复抓。
+func BuildPlanWithFillOrder(db *Db, names []string, refresh []string, refreshAll bool, fillFields []string, order FillOrder, minAgeDays int) []PlanItem {
 	if fillFields == nil {
 		return BuildPlan(db, names, refresh, refreshAll)
 	}
 
+	now := time.Now().UTC()
 	var items []PlanItem
 	for _, raw := range names {
 		name := strings.TrimSpace(raw)
@@ -33,6 +73,9 @@ func BuildPlanWithFill(db *Db, names []string, refresh []string, refreshAll bool
 		existing := db.FindByName(name)
 		if existing == nil || !existing.Exportable() {
 			// skipped / no_source / failed 本来就不进下游，补了也没人看。
+			continue
+		}
+		if minAgeDays > 0 && scrapedWithin(existing, now, minAgeDays) {
 			continue
 		}
 		missing := MissingFields(existing, fillFields)
@@ -46,11 +89,80 @@ func BuildPlanWithFill(db *Db, names []string, refresh []string, refreshAll bool
 			Missing:  missing,
 		})
 	}
-	// 缺得最多的排前面：同样的预算先救最残的记录。
-	sort.SliceStable(items, func(i, j int) bool {
-		return len(items[i].Missing) > len(items[j].Missing)
-	})
+
+	switch order {
+	case FillOrderName:
+		sort.SliceStable(items, func(i, j int) bool { return items[i].Name < items[j].Name })
+	case FillOrderMissing:
+		// 缺得最多的排前面：同样的预算先救最残的记录。
+		sort.SliceStable(items, func(i, j int) bool {
+			return len(items[i].Missing) > len(items[j].Missing)
+		})
+	default:
+		// 最完整优先；完整度相同的先挑最久没试过的（scraped_at 最早），再按名字，
+		// 保证每轮挑到的都是「更可能有货」且「很久没打扰」的人。
+		sort.SliceStable(items, func(i, j int) bool {
+			a, b := items[i], items[j]
+			if pa, pb := fillPriority(a.Existing), fillPriority(b.Existing); pa != pb {
+				return pa > pb
+			}
+			if a.Existing.ScrapedAt != b.Existing.ScrapedAt {
+				return a.Existing.ScrapedAt < b.Existing.ScrapedAt
+			}
+			if len(a.Missing) != len(b.Missing) {
+				return len(a.Missing) < len(b.Missing)
+			}
+			return a.Name < b.Name
+		})
+	}
 	return items
+}
+
+// fillPriority 是「最完整优先」的打分。权重照实测产出标定：
+// 生日、出道年是简介可得性的最强预测（有则 8.3%，都没有 0%），给最高分；
+// 身高/三围/头像/标签/provider_ids 是「这人被多个源收录过」的旁证，给低分。
+func fillPriority(a *Actor) int {
+	if a == nil {
+		return 0
+	}
+	score := 0
+	if StrVal(a.BirthDate) != "" {
+		score += 5
+	}
+	if a.CareerStart != nil && *a.CareerStart > 0 {
+		score += 5
+	}
+	if a.HeightCm != nil && *a.HeightCm > 0 {
+		score += 2
+	}
+	if StrVal(a.Measurements) != "" {
+		score += 2
+	}
+	if StrVal(a.Avatar) != "" {
+		score += 2
+	}
+	if n := len(a.Tags); n > 0 {
+		if n > 5 {
+			n = 5
+		}
+		score += n
+	}
+	if len(a.ProviderIDs) > 0 {
+		score += 2
+	}
+	return score
+}
+
+// scrapedWithin 判断这条记录是不是 minAgeDays 天内刚试过。
+func scrapedWithin(a *Actor, now time.Time, minAgeDays int) bool {
+	if a.ScrapedAt == "" {
+		return false
+	}
+	t, err := time.Parse(time.RFC3339, a.ScrapedAt)
+	if err != nil {
+		return false
+	}
+	return now.Sub(t) < time.Duration(minAgeDays)*24*time.Hour
 }
 
 // BuildPlan 对比 txt 清单和本地库，算出本轮该抓谁。
