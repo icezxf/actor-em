@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T08:41:51Z",
+  "generated_at": "2026-11-21T09:03:37Z",
   "count": 19161,
   "by_status": {
     "failed": 15,
@@ -10,8 +10,8 @@
     "skipped": 194
   },
   "last_run": {
-    "started_at": "2026-11-21T08:20:10Z",
-    "duration_sec": 1301,
+    "started_at": "2026-11-21T08:42:33Z",
+    "duration_sec": 1263,
     "picked": 2000,
     "added": 0,
     "updated": 34,
