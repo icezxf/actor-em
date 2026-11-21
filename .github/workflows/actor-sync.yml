@@ -37,7 +37,7 @@ on:
         description: "缺字段补抓要补哪些字段，逗号分隔；留空=全部可补字段（bio,birthday,height,measurements,tags 等）"
         default: ""
       backfill:
-        description: "只做离线补值：用 MDCx 档案补空生日/三围/标签/身高/罩杯/出道年，不联网、不抓取"
+        description: "只做离线补值：用 MDCx 档案补空生日/三围/标签/身高/罩杯/出道年，并把存量出生地补成「日本·东京都」，不联网、不抓取"
         type: boolean
         default: false
 

@@ -607,8 +607,22 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 			nCareer++
 		}
 		if actorsync.StrVal(a.BirthPlace) == "" && p.BirthPlace != "" {
-			a.BirthPlace = actorsync.StrPtr(p.BirthPlace)
+			// 和在线抓取保持同一口径：都道府县级补上国家，写成「日本·东京都」
+			a.BirthPlace = actorsync.StrPtr(actorsync.QualifyBirthPlace(p.BirthPlace, p.Country))
+			if actorsync.StrVal(a.Country) == "" && p.Country != "" {
+				a.Country = actorsync.StrPtr(p.Country)
+			}
 			nPlace++
+		}
+	}
+
+	// 出生地补国家：老库里只存了「东京都」，下游（Emby ProductionLocations）
+	// 看不出是哪国。这一步纯离线、幂等，跑一次 backfill 就能把存量改成
+	// 「日本·东京都」，不必为了一个字段重抓两万条。
+	nPlaceFix := 0
+	for _, a := range db.Actors {
+		if actorsync.QualifyActorBirthPlace(a) {
+			nPlaceFix++
 		}
 	}
 
@@ -617,8 +631,9 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	logger.Printf("补空字段：生日 %d、三围 %d、标签 %d、身高 %d、罩杯 %d、出道年 %d、出生地 %d（MDCx 查不到 %d 条）",
 		nBirth, nMeas, nTags, nHeight, nCup, nCareer, nPlace, noMatch)
 	logger.Printf("补中文别名：%d 条（字典里的旧名/异名，让 Emby 按旧名也能命中）", nAlias)
+	logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", nPlaceFix)
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix
 	if total == 0 {
 		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}

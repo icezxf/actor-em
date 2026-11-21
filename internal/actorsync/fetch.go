@@ -91,7 +91,7 @@ func (f *Fetcher) logf(format string, args ...any) {
 
 var countryToChinese = map[string]string{
 	"JP": "日本", "US": "美国", "KR": "韩国", "CN": "中国",
-	"TW": "中国台湾", "HK": "中国香港", "CA": "加拿大",
+	"TW": "中国台湾", "HK": "中国香港", "MO": "中国澳门", "CA": "加拿大",
 	"UK": "英国", "GB": "英国", "AU": "澳大利亚", "FR": "法国",
 	"DE": "德国", "RU": "俄罗斯", "IT": "意大利", "ES": "西班牙",
 	"BR": "巴西",
@@ -306,6 +306,11 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 
 	// ---------- 10. 主页：JavStash 演员页 > TPDB 演员页 ----------
 	res.HomePageURL = buildHomePageURL(res.ProviderIDs)
+
+	// ---------- 11. 出生地补国家 ----------
+	// 下游拿到的是一条 Emby ProductionLocations，只有「东京都」看不出国家，
+	// 统一成「日本·东京都」；本来就只有国家（「日本」）的原样留着。
+	res.finalizeBirthPlace()
 
 	return res
 }

@@ -16,8 +16,9 @@ type Actor struct {
 	// BirthDateSource：javstash（权威）/ mdcx / yinrenlu / cinewho / idoldb。
 	// 空表示还没有生日。下游若不信任二手生日，按这个字段过滤即可。
 	BirthDateSource *string `json:"birth_date_source"`
-	BirthPlace      *string `json:"birth_place"`
-	Country         *string `json:"country"`
+	// BirthPlace 一律带国家：都道府县级写成「日本·东京都」，只有国家时写「日本」。
+	BirthPlace *string `json:"birth_place"`
+	Country    *string `json:"country"`
 
 	HeightCm         *int    `json:"height_cm"`
 	WeightKg         *int    `json:"weight_kg"`         // 只有 TPDB 有，覆盖很低

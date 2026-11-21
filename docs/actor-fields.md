@@ -46,8 +46,13 @@
 | `birth_date` | string? | **JavStash → MDCx 兜底 → 中文人物站兜底** | 见下方「生日的来源」 |
 | `birth_date_source` | string? | 跟 `birth_date` 同时写 | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb`，空表示没有生日 |
 | `death_date` | — | 不采集 | 忌日明确不要，字段直接删 |
-| `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | 落到 Emby `ProductionLocations` |
+| `birth_place` | string? | MDCx bio 的「出身:」（44.3%，到都道府县）→ MDCx profile `birthplace`（43.7%）→ JavStash `country`（只到「日本」） | **都道府县级一律带国家**，如 `日本·东京都`；落到 Emby `ProductionLocations` |
 | `country` | string? | 从 `birth_place` 反推（出生地是日本都道府县 → `JP`）→ JavStash → TPDB `birthplace_code` | 两位码；**MDCx 没有国家码字段**，只能从出生地推 |
+
+**出生地一律带国家**：库里存的和导出给 Emby 的是同一个值，都道府县级一律拼成
+`日本·东京都`（分隔符 `·`），本来只到国家的保留 `日本`；港澳台这类「中国XX」的
+国家名本身已是省级，不再叠一层。国家码缺失但认得出是日本都道府县时，顺手把
+`country` 补成 `JP`。`--backfill` 会把存量记录按同一口径改写，不必重抓。
 
 **生日的两级来源**：JavStash 是权威，它给了就绝不覆盖；只有它没给时才用 MDCx。
 

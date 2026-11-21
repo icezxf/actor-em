@@ -200,7 +200,7 @@ actorsync [flags]
 | `gender` | string? | `female` / `male`，小写 |
 | `birth_date` | string? | `1996-05-10`，JavStash 优先、MDCx 兜底（40.9% → 65.7%），再退中文人物站 |
 | `birth_date_source` | string? | `javstash` / `mdcx` / `yinrenlu` / `cinewho` / `idoldb` |
-| `birth_place` | string? | 中文地名，如 `东京都`（MDCx 出生地经简繁归一） |
+| `birth_place` | string? | 中文地名，都道府县级带国家：`日本·东京都`；只有国家时写 `日本` |
 | `country` | string? | 两位码，从出生地反推，如 `JP` |
 | `height_cm` | int? | 身高厘米 |
 | `weight_kg` | int? | 体重公斤。**只有 JavStash / TPDB 有**，MDCx 无此字段 |
@@ -466,6 +466,7 @@ docker run -d --name actor-em --restart unless-stopped \
 - 手动：可指定 `limit`、`concurrency`、`dry_run`、`refresh`、`refresh_all`、`fill_missing`、`fill_fields`、`backfill`
   - 全量重抓：`refresh_all=true` + `limit=0`（四种改写模式互斥，不能同时勾）
   - 只补缺字段：`fill_missing=true`，默认补全部可补字段；只想补简介和生日就填 `fill_fields=bio,birthday`
+  - 补离线字段：`backfill=true`（不联网），顺带把存量出生地补成 `日本·东京都`
   - 补缺字段只认 `ok/partial` 记录，重抓后逐字段填空，已有值/status/头像都保留
 - 有变化才 commit，无变化不产生空提交
 - 同一时间只跑一轮（`concurrency: actor-data`）
