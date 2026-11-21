@@ -56,8 +56,9 @@ func BuildPlanWithFill(db *Db, names []string, refresh []string, refreshAll bool
 
 // BuildPlanWithFillOrder 同上，但可以指定挑人顺序，以及跳过最近刚试过的人。
 //
-// minAgeDays > 0 时，scraped_at 在这么多天以内的记录本轮不碰——配合「最完整
-// 优先」就是一列不重复的队列：每轮往后走一段，不会把同一批硬骨头反复抓。
+// minAgeDays > 0 时，上轮补字段刚试过（retry_after 还没到期）的记录本轮跳过——
+// 配合「最完整优先」就是一列不重复的队列：每轮往后走一段，不会把同一批硬骨头反复抓。
+// 用 retry_after 而不是 scraped_at，是因为后者会被 refresh_all 顺手刷新。
 func BuildPlanWithFillOrder(db *Db, names []string, refresh []string, refreshAll bool, fillFields []string, order FillOrder, minAgeDays int) []PlanItem {
 	if fillFields == nil {
 		return BuildPlan(db, names, refresh, refreshAll)
@@ -75,7 +76,7 @@ func BuildPlanWithFillOrder(db *Db, names []string, refresh []string, refreshAll
 			// skipped / no_source / failed 本来就不进下游，补了也没人看。
 			continue
 		}
-		if minAgeDays > 0 && scrapedWithin(existing, now, minAgeDays) {
+		if minAgeDays > 0 && fillBackoffActive(existing, now) {
 			continue
 		}
 		missing := MissingFields(existing, fillFields)
@@ -153,16 +154,20 @@ func fillPriority(a *Actor) int {
 	return score
 }
 
-// scrapedWithin 判断这条记录是不是 minAgeDays 天内刚试过。
-func scrapedWithin(a *Actor, now time.Time, minAgeDays int) bool {
-	if a.ScrapedAt == "" {
+// fillBackoffActive 判断「这个人上轮补字段刚试过、还没到再试的时候」。
+//
+// 判据是 retry_after，不是 scraped_at：scraped_at 会被全量刷新顺手更新
+// （refresh_all 之后所有人都算刚抓过，用它当过滤条件会把整张计划清空），
+// 而 retry_after 只有补字段这一条路径会为 ok/partial 记录设置。
+func fillBackoffActive(a *Actor, now time.Time) bool {
+	if a.RetryAfter == nil || *a.RetryAfter == "" {
 		return false
 	}
-	t, err := time.Parse(time.RFC3339, a.ScrapedAt)
+	t, err := time.Parse(time.RFC3339, *a.RetryAfter)
 	if err != nil {
 		return false
 	}
-	return now.Sub(t) < time.Duration(minAgeDays)*24*time.Hour
+	return now.Before(t)
 }
 
 // BuildPlan 对比 txt 清单和本地库，算出本轮该抓谁。

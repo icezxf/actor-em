@@ -153,22 +153,33 @@ func TestBuildPlanFillOrderComplete(t *testing.T) {
 
 func TestBuildPlanFillMinAge(t *testing.T) {
 	now := time.Now().UTC()
+	// 判据是 retry_after：上轮补字段时打上的「过几天再试」。
+	// scraped_at 不用来判，因为它会被 refresh_all 顺手刷新，届时所有人都算刚抓过。
 	fresh := &Actor{Name: "刚试过", Status: StatusOK, Aliases: []string{},
-		ScrapedAt: now.Add(-2 * 24 * time.Hour).Format(time.RFC3339)}
+		ScrapedAt:  now.Add(-2 * 24 * time.Hour).Format(time.RFC3339),
+		RetryAfter: StrPtr(now.Add(19 * 24 * time.Hour).Format(time.RFC3339))}
 	old := &Actor{Name: "很久没试", Status: StatusOK, Aliases: []string{},
-		ScrapedAt: now.Add(-40 * 24 * time.Hour).Format(time.RFC3339)}
-	db := &Db{Actors: []*Actor{fresh, old}}
+		ScrapedAt:  now.Add(-40 * 24 * time.Hour).Format(time.RFC3339),
+		RetryAfter: StrPtr(now.Add(-9 * 24 * time.Hour).Format(time.RFC3339))}
+	justScraped := &Actor{Name: "全量刷新刚抓过", Status: StatusOK, Aliases: []string{},
+		ScrapedAt: now.Add(-1 * time.Hour).Format(time.RFC3339)}
+	db := &Db{Actors: []*Actor{fresh, old, justScraped}}
 
-	plan := BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试"}, nil, false,
+	plan := BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试", "全量刷新刚抓过"}, nil, false,
 		[]string{"bio"}, FillOrderComplete, 30)
-	if len(plan) != 1 || plan[0].Name != "很久没试" {
-		t.Fatalf("30 天内试过的应跳过: %+v", plan)
+	if len(plan) != 2 {
+		t.Fatalf("只有退避到期的该进计划，实际 %d: %+v", len(plan), plan)
+	}
+	for _, it := range plan {
+		if it.Name == "刚试过" {
+			t.Fatalf("退避没到期的不该被抓: %+v", it)
+		}
 	}
 
-	// minAge=0 时不跳过任何东西
-	plan = BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试"}, nil, false,
+	// minAge=0 时不看退避
+	plan = BuildPlanWithFillOrder(db, []string{"刚试过", "很久没试", "全量刷新刚抓过"}, nil, false,
 		[]string{"bio"}, FillOrderComplete, 0)
-	if len(plan) != 2 {
+	if len(plan) != 3 {
 		t.Fatalf("minAge=0 不该过滤: %+v", plan)
 	}
 }

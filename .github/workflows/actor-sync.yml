@@ -40,7 +40,7 @@ on:
         description: "补字段挑人顺序：complete=最完整优先（产出最高，默认）/ missing=缺得最多优先 / name=按名字"
         default: "complete"
       fill_min_age:
-        description: "跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过；补长篇数据建议 21~30）"
+        description: "补过的记退避 N 天，N 天内不再重抓，让队列往后走（0=不跳过；建议 21~30）"
         default: "0"
       backfill:
         description: "只做离线补值：用 MDCx 档案补空生日/三围/标签/身高/罩杯/出道年，并把存量出生地补成「日本·东京都」，不联网、不抓取"

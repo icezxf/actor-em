@@ -207,7 +207,7 @@ actorsync [flags]
   --fill-missing       只重抓有缺字段的已有演员，只填空位、不覆盖已有值
   --fill-fields 字段   配合 --fill-missing，逗号分隔；留空=全部可补字段
   --fill-order 顺序    挑人顺序：complete=最完整优先（默认，产出最高）/ missing=缺得最多优先 / name
-  --fill-min-age N     跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过）
+  --fill-min-age N     补过的记退避 N 天，N 天内不再重抓，让队列往后走（0=不跳过）
   --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
@@ -511,7 +511,7 @@ docker run -d --name actor-em --restart unless-stopped \
   - 全量重抓：`refresh_all=true` + `limit=0`（四种改写模式互斥，不能同时勾）
   - 只补缺字段：`fill_missing=true`，默认补全部可补字段；只想补简介和生日就填 `fill_fields=bio,birthday`
   - 挑人顺序：`fill_order` 默认 `complete`（资料最全的先补，产出最高）。实测补简介：`missing` 2000 人补到 3.35%，`complete` 补到 4.35%；连生日和出道年都没有的人，拿到简介的概率是 0
-  - 不重复抓：`fill_min_age=21` 让 `scraped_at` 在 21 天内的记录本轮跳过。补值没补到字段时数据不动、只推 `scraped_at`，就是这个标记。注意 `scraped_at` 也会被全量刷新更新——刚跑完 `refresh_all` 的那几天，这个过滤会把所有人都挡掉
+  - 不重复抓：`fill_min_age=21` 让这轮补过的人在 21 天内不再被抓（标记写在 `retry_after`）。判据不用 `scraped_at`：它会被 `refresh_all` 顺手刷新，刷新完所有人都算「刚抓过」，过滤会把整张计划清空——这个坑已经踩过
   - 补离线字段：`backfill=true`（不联网），顺带把存量出生地补成 `日本·东京都`
   - 补缺字段只认 `ok/partial` 记录，重抓后逐字段填空，已有值/status/头像都保留
 - 有变化才 commit，无变化不产生空提交

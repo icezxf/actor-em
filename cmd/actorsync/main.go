@@ -42,7 +42,7 @@ func main() {
 	flag.BoolVar(&fillMissing, "fill-missing", false, "只重抓有缺字段的已有演员，只填空位不覆盖已有值")
 	flag.StringVar(&fillFields, "fill-fields", "", "配合 --fill-missing：要补的字段，逗号分隔；留空=全部可补字段")
 	flag.StringVar(&fillOrder, "fill-order", "complete", "配合 --fill-missing 的挑人顺序：complete=最完整优先（产出最高）/ missing=缺得最多优先 / name=按名字")
-	flag.IntVar(&fillMinAge, "fill-min-age", 0, "配合 --fill-missing：跳过 scraped_at 在 N 天内的记录，避免每轮重抓同一批人（0=不跳过）")
+	flag.IntVar(&fillMinAge, "fill-min-age", 0, "配合 --fill-missing：抓过的记退避 N 天，N 天内不再重抓，避免每轮都是同一批人（0=不跳过）")
 	flag.StringVar(&cfg.DataFile, "data", cfg.DataFile, "数据文件路径，默认 actors.jsonl")
 	flag.StringVar(&cfg.ManifestFile, "manifest", cfg.ManifestFile, "manifest 路径")
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
@@ -347,6 +347,12 @@ func main() {
 			continue
 		}
 		actor := out.Actor
+		// 补字段模式：记下「这轮试过了」，--fill-min-age 靠它把队列往后推。
+		// 只给 ok/partial 打标记——failed/no_source 的 retry_after 有自己的退避语义。
+		if fillMissing && fillMinAge > 0 && !cfg.DryRun && actor != nil &&
+			(actor.Status == actorsync.StatusOK || actor.Status == actorsync.StatusPartial) {
+			actor.RetryAfter = actorsync.StrPtr(time.Now().UTC().AddDate(0, 0, fillMinAge).Format(time.RFC3339))
+		}
 		extra := ""
 		if len(out.Filled) > 0 {
 			extra += " | 补: " + strings.Join(out.Filled, ",")

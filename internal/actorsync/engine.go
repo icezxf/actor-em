@@ -138,8 +138,9 @@ func (e *Engine) ApplyPhase(ctx context.Context, name string, res *FetchResult, 
 	actor := BuildActor(name, res, existing)
 
 	// 缺字段重抓：以旧记录为底，只把新抓到的值填进空位。
-	// 没补到字段时数据一个字节都不改，只把 scraped_at 往前推——
-	// 这是「这个人刚试过」的唯一痕迹，--fill-min-age 靠它避免反复重抓同一批人。
+	// 没补到字段时数据一个字节都不改，只把 scraped_at 往前推，留下「这个人刚试过」的痕迹。
+	// （真正的「别马上再抓」标记是 retry_after，由调用方按 --fill-min-age 打，
+	//  因为 scraped_at 会被 refresh_all 顺手刷新，当过滤条件会误伤全库。）
 	hadAvatar := false
 	nothingFilled := false
 	if opts.FillFields != nil && existing != nil {
