@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-21T05:13:14Z",
+  "generated_at": "2026-11-21T06:41:41Z",
   "count": 16649,
   "actors": [
     {
@@ -4738,7 +4738,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:42Z",
-      "scraped_at": "2026-11-21T01:52:31Z"
+      "scraped_at": "2026-11-21T06:39:26Z"
     },
     {
       "key": "javstash:019f68a7-1cc3-72a9-bf44-426215490603",
@@ -5315,8 +5315,8 @@
       "tags": [
         "D罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "南爱梨（Minami Airi）是一位日本女性艺人，于1991年7月20日出生。她是一名在kawaii*（卡哇伊星探）公司下进行专属演艺活动的新人偶像。南爱梨以其惊人的超级E罩杯乳房而引起了极大的轰动，给人带来了强烈的冲击和震撼。\n\n南爱梨个性上非常温柔、善良，她容易被人影响，并且乐于为他人付出。她非常喜欢倾尽全力地满足别人的需求，喜欢付出爱与关怀。这种性格使得她成为一个非常迷人和吸引人的女孩。",
+      "bio_lang": "zh",
       "avatar": "https://javstash.org/images/0a56054c-f4ff-46fe-bfeb-939d1c1c7270",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -5343,7 +5343,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:25:12Z",
-      "scraped_at": "2026-11-21T05:02:36Z"
+      "scraped_at": "2026-11-21T06:30:14Z"
     },
     {
       "key": "javstash:019f8770-138d-7270-816a-6cc579ed878b",
@@ -8415,12 +8415,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:33Z",
-      "scraped_at": "2026-11-21T02:38:41Z"
+      "scraped_at": "2026-11-21T06:28:29Z"
     },
     {
       "key": "javstash:01a041ed-dc2d-7acb-a13a-dc1bea64a74e",
@@ -9607,12 +9607,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:36Z",
-      "scraped_at": "2026-11-21T01:34:36Z"
+      "scraped_at": "2026-11-21T06:28:35Z"
     },
     {
       "key": "javstash:01a06d12-d4c4-77f0-87ee-7ef1e99aed58",
@@ -26271,7 +26271,10 @@
       "homepage_url": "https://javstash.org/performers/0627fe72-0e00-4346-b16c-8e14fb9f593c",
       "provider_ids": {
         "JavStash": "0627fe72-0e00-4346-b16c-8e14fb9f593c",
-        "TPDB": "d3c3a301-9a8e-4d2b-a1c1-62e5e8569a95"
+        "StashDB": "e2d5067e-3075-4793-8a2f-c7e2e30c25a3",
+        "TPDB": "d3c3a301-9a8e-4d2b-a1c1-62e5e8569a95",
+        "Wikidata": "Q11189668",
+        "Wikipedia": "ja.wikipedia.org/wiki/ASUKA_(AV女優)"
       },
       "status": "ok",
       "sources": {
@@ -26281,15 +26284,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:47:12Z",
-      "scraped_at": "2026-11-21T02:30:47Z"
+      "scraped_at": "2026-11-21T06:27:50Z"
     },
     {
       "key": "javstash:0628fdc9-a630-43c8-b295-1979be1d07f7",
@@ -26767,25 +26771,26 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/065dbc14-bbb7-4ea6-bfcc-e607895715c8",
       "provider_ids": {
-        "JavStash": "065dbc14-bbb7-4ea6-bfcc-e607895715c8"
+        "JavStash": "065dbc14-bbb7-4ea6-bfcc-e607895715c8",
+        "TPDB": "33254f7e-11d5-4666-857d-1f65b0365e02"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
+        "cinewho": true,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
-        "tpdb": false,
+        "theactorbase": true,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:40:10Z",
-      "scraped_at": "2026-11-21T03:23:31Z"
+      "scraped_at": "2026-11-21T06:30:15Z"
     },
     {
       "key": "javstash:065f467c-9db5-419d-9855-f6524e6a997b",
@@ -30584,8 +30589,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "真城杏（ましろ杏），出生于 1990 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 ましろ杏、An Mashiro 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://javstash.org/images/6246db01-5842-41f0-92b5-874e74da04f3",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -30593,25 +30598,28 @@
       "provider_ids": {
         "JavStash": "078eeead-7d7a-40b5-a837-41f6b7f9c917",
         "StashDB": "dc10150b-51e3-499c-8620-ed24ce75cdfb",
-        "TPDB": "0cf2b167-4cdf-400f-98a2-700990495860"
+        "TPDB": "0cf2b167-4cdf-400f-98a2-700990495860",
+        "Wikidata": "Q11278238",
+        "Wikipedia": "ja.wikipedia.org/wiki/ましろ杏"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
-        "yinrenlu": false
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:33:40Z",
-      "scraped_at": "2026-11-21T02:24:15Z"
+      "scraped_at": "2026-11-21T06:29:55Z"
     },
     {
       "key": "javstash:0792ea9a-7780-480d-99a1-239dd06c354e",
@@ -36960,8 +36968,8 @@
         "少女偶像",
         "写真偶像"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "三浦奈々（简体中文：三浦奈奈，Miura Nana）是日本AV女优，隶属于**8man**事务所，2026年4月14日以日本影视制作公司**MADONNA**专属新人身份出道。官方宣传其“颜面偏差值80以上”，被定位为“钻石级新人”。\n\n三浦奈々隶属于日本艺能事务所**8man**。在进入影视行业前，由于其外貌出众，在街上经常被艺能经纪人和模特经纪人搭讪邀请。“结婚6年”，以成熟魅力和外貌优势受到关注。兴趣是化妆，特长是法语",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%B2%B3%E5%90%88%E3%81%BB%E3%81%AE%E3%81%8B.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E6%B2%B3%E5%90%88%E3%81%BB%E3%81%AE%E3%81%8B.jpg",
       "avatar_source_site": "gfriends",
@@ -36986,7 +36994,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:24:45Z",
-      "scraped_at": "2026-11-21T05:06:25Z"
+      "scraped_at": "2026-11-21T06:38:37Z"
     },
     {
       "key": "javstash:09b78fdc-3561-47a8-9436-5a7f6286a71b",
@@ -39715,25 +39723,28 @@
       "provider_ids": {
         "JavStash": "0a9778a8-0abc-4461-942c-041a4cde544d",
         "StashDB": "2b57a116-7ef3-428e-842d-15357a9920dd",
-        "TPDB": "2f04cf39-2be7-4c42-a1a6-1b4ada337639"
+        "TPDB": "2f04cf39-2be7-4c42-a1a6-1b4ada337639",
+        "Wikidata": "Q101199920",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E7%AB%B9%E5%86%85%E5%A4%8F%E5%B8%8C"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
+        "cinewho": true,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:39:46Z",
-      "scraped_at": "2026-11-21T03:34:10Z"
+      "scraped_at": "2026-11-21T06:28:12Z"
     },
     {
       "key": "javstash:0a9b29c9-2b8e-46b0-868c-f7951a0c5d14",
@@ -48012,27 +48023,31 @@
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/0d2a875a-7afd-44e2-9a7f-68a89e4c1e08",
       "provider_ids": {
+        "Imdb": "nm8564474",
         "JavStash": "0d2a875a-7afd-44e2-9a7f-68a89e4c1e08",
         "StashDB": "1623cb34-f932-4624-af35-169f097a8099",
-        "TPDB": "f32ef13e-4be8-47b4-8e17-583e2ee7580f"
+        "TPDB": "f32ef13e-4be8-47b4-8e17-583e2ee7580f",
+        "Wikidata": "Q8916509",
+        "Wikipedia": "ja.wikipedia.org/wiki/AIKA_(AV女優)"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:36:20Z",
-      "scraped_at": "2026-11-21T04:01:59Z"
+      "scraped_at": "2026-11-21T06:27:48Z"
     },
     {
       "key": "javstash:0d2daf50-14b0-4c86-87d4-918b4e783b79",
@@ -51991,15 +52006,19 @@
       "tags": [
         "G罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "莲美恋（あずみ恋），出生于 1991 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 あずみ恋、Ren Azumi 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E8%93%AE%E5%AE%9F%E3%82%8C%E3%82%93.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E8%93%AE%E5%AE%9F%E3%82%8C%E3%82%93.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/0e69457a-c51e-4253-846c-f657cf701249",
       "provider_ids": {
+        "Imdb": "nm5284992",
         "JavStash": "0e69457a-c51e-4253-846c-f657cf701249",
-        "TPDB": "f0b06d8d-e14f-4aca-a815-d5293b0d6ae2"
+        "StashDB": "1b3bc322-b308-4614-ac54-04d0ebe94a44",
+        "TPDB": "f0b06d8d-e14f-4aca-a815-d5293b0d6ae2",
+        "Wikidata": "Q11257516",
+        "Wikipedia": "ja.wikipedia.org/wiki/あずみ恋"
       },
       "status": "ok",
       "sources": {
@@ -52009,15 +52028,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:52:17Z",
-      "scraped_at": "2026-11-21T03:49:52Z"
+      "scraped_at": "2026-11-21T06:28:38Z"
     },
     {
       "key": "javstash:0e6a88f4-2905-4946-ac3f-41aa65860832",
@@ -53842,8 +53862,8 @@
         "C罩杯",
         "微乳"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Hitomi（ひとみ，1986年7月18日－）是日本前AV女优，亦为前写真偶像，隶属于Harvisters事务所。 个人背景与特点 兴趣爱好：喜欢看电影、料理及棒球。 特长：和道流空手道初段资格、唱歌。 身材特征：从小学6年级开始胸部逐渐发育，成为其显著特征。早期写真偶像时期的官方三围为B92（J罩杯）、W60、H83。AV出道初期三围调整为B97（J罩杯）、W59、H83，之后继续变化，达到B113（O罩杯）、W59、H83。 职业生涯 写真偶像时期 2007年11月，以写真作品亮相，凭借其独特的J罩杯身材引发关注。 AV出道 2008年10月，宣布改名为“Hitomi”，并以SODクリエイト公司发行的作品《Hitomi もっとJの衝撃》正式出道。 出道作品取得了成功，2008年DMM年度排行榜中排名第六。 AV事业的扩展 2009年，在出演了多部SOD的代表作后，与文化放送的节目《がちっ娘》合作，成为6位常驻嘉宾之一。 同年转为自由身份，参与多个品牌的拍摄，包括OPPAI与MOODYZ。 2016年后，成为OPPAI品牌的专属女优。 国际知名度 Hitomi在海外市场的影响力显著，曾登上杂志《Bachelor》封面，这是31年来首位获此殊荣的日本人。 在2019年获得十年最佳模特奖“Model of the Decade”。 其他成就 在2010年，主持电视节目《Jのぷるるん伝説》，以“おっぱい星”的女王形象亮相，通过娱乐化的互动吸引观众。 曾在美国杂志中两度被评选为“年度模特”。 成为法国漫画《Lastman》中角色“富江カタナ”的灵感来源。 引退与后续 2022年2月28日，Hitomi通过Twitter宣布将在4月发布最后一部作品后正式引退。 其职业生涯跨越多领域，凭借独特身材和职业形象在日本及海外市场享有高度评价。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%88%B8%E7%94%B0%E3%82%A8%E3%83%9F%E3%83%AA.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E6%88%B8%E7%94%B0%E3%82%A8%E3%83%9F%E3%83%AA.jpg",
       "avatar_source_site": "gfriends",
@@ -53851,25 +53871,28 @@
       "provider_ids": {
         "JavStash": "0f38cac6-c35c-4150-92ae-e01cf31bb31a",
         "StashDB": "7fd07f3f-f68c-45d7-8499-8d7602b443d9",
-        "TPDB": "55f1608f-4452-4e63-9c4d-2f91def0688d"
+        "TPDB": "55f1608f-4452-4e63-9c4d-2f91def0688d",
+        "Wikidata": "Q11583844",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E7%9E%B3%E3%83%AA%E3%83%A7%E3%82%A6"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
-        "dramaface": false,
+        "cinewho": true,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:57:22Z",
-      "scraped_at": "2026-11-21T02:40:41Z"
+      "scraped_at": "2026-11-21T06:27:57Z"
     },
     {
       "key": "javstash:0f391a3b-4ee2-4aa5-b85f-04e7c77cb88a",
@@ -62415,8 +62438,8 @@
       "tags": [
         "B罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "中尾芽衣子，出生于 1997 年。公开人物资料记录了其成人影视表演职业经历；该人物已故，本页保留历史职业资料。资料中的国籍／地区记录为日本。\n\n公开资料记录的逝世年份为 2025 年。姓名另有 Meiko Nakao 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-AVDC/%E9%B3%A5%E8%B6%8A%E4%B9%83%E4%BA%9C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-AVDC/%E9%B3%A5%E8%B6%8A%E4%B9%83%E4%BA%9C.jpg",
       "avatar_source_site": "gfriends",
@@ -62436,6 +62459,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": true,
         "wiki": false,
@@ -62444,7 +62468,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:05:57Z",
-      "scraped_at": "2026-11-21T04:08:45Z"
+      "scraped_at": "2026-11-21T06:39:44Z"
     },
     {
       "key": "javstash:126996a8-818a-420b-acb2-6805533bdcc5",
@@ -68032,32 +68056,38 @@
       "tags": [
         "E罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Sophia Burns，出生于 1997 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2021 年。姓名另有 ソフィア・バーンズ 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E3%81%A6%E3%81%83%E3%81%AA.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E3%81%A6%E3%81%83%E3%81%AA.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/14c4ca47-634a-4570-84d5-449b640b1ddd",
       "provider_ids": {
-        "JavStash": "14c4ca47-634a-4570-84d5-449b640b1ddd"
+        "Imdb": "nm12858706",
+        "JavStash": "14c4ca47-634a-4570-84d5-449b640b1ddd",
+        "StashDB": "04218cb2-9bde-45e5-add8-bcc82c2b2e41",
+        "TPDB": "4855961f-3187-4284-a361-90076ac99e7d",
+        "Tmdb": "3411875",
+        "Wikidata": "Q126366523"
       },
       "status": "partial",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:55Z",
-      "scraped_at": "2026-11-21T01:33:16Z"
+      "scraped_at": "2026-11-21T06:28:19Z"
     },
     {
       "key": "javstash:14c762ec-652f-4e17-9b84-9b85a04bd298",
@@ -73214,7 +73244,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:47:40Z",
-      "scraped_at": "2026-11-21T05:02:45Z"
+      "scraped_at": "2026-11-21T06:31:13Z"
     },
     {
       "key": "javstash:16a4a1ec-18cd-4ae2-aaee-10f4183cab52",
@@ -73841,14 +73871,19 @@
         "熟女",
         "美巨乳"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "七海遊愛（七海ゆあ），出生于 1996 年。公开人物资料记录了其成人影视表演职业经历；资料描述标注其已退出该行业。资料中的国籍／地区记录为日本。\n\n姓名另有 七海ゆあ、Yua Nanami 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%B9%B3%E7%80%AC%E3%82%86%E3%81%82.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%B9%B3%E7%80%AC%E3%82%86%E3%81%82.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/16c982a6-1822-40ac-98d4-fcb8488589f7",
       "provider_ids": {
-        "JavStash": "16c982a6-1822-40ac-98d4-fcb8488589f7"
+        "Imdb": "nm8906269",
+        "JavStash": "16c982a6-1822-40ac-98d4-fcb8488589f7",
+        "StashDB": "2895d99f-ce32-4a93-b8bd-478c921e4b83",
+        "TPDB": "3eec14ec-96b3-4e4f-ae4a-ad5b77620334",
+        "Wikidata": "Q38276514",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E4%B8%83%E6%B5%B7%E3%82%86%E3%81%82"
       },
       "status": "ok",
       "sources": {
@@ -73858,15 +73893,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:51:44Z",
-      "scraped_at": "2026-11-21T02:36:08Z"
+      "scraped_at": "2026-11-21T06:37:22Z"
     },
     {
       "key": "javstash:16d26f49-8e7b-4c86-bd8d-7e545c8339d8",
@@ -76908,8 +76944,8 @@
       "tags": [
         "D罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "源美奈（1992年7月19日-）是日本AV女优、写真偶像。 经历 东京都出身。初次体验是14岁的时候和高中生的男朋友在池袋的情人旅馆去的。 在2011年2月24日发售的《哈克茨美少女Revolution》中以色情出道，同年7月1日开始作为埃斯旺的宣传部长进行身体接触报告，9月16日发表卸任、10月7日，从埃斯旺AV出道。 虽然也是惠比寿麝香葡萄的6期生成员，但在AV出道前的9月退出了。 双叶文库的感官小说『恭候生女儿』写实化了的作品演出着。",
+      "bio_lang": "zh",
       "avatar": "https://javstash.org/images/a2b77bdb-bc16-4519-960a-088d553e4b5c",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -76928,6 +76964,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": true,
         "wiki": false,
@@ -76936,7 +76973,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T07:59:48Z",
-      "scraped_at": "2026-11-21T01:29:53Z"
+      "scraped_at": "2026-11-21T06:27:58Z"
     },
     {
       "key": "javstash:17ee7dec-a74d-44a9-ac15-31669ad4486a",
@@ -79515,7 +79552,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:53:10Z",
-      "scraped_at": "2026-11-21T05:02:37Z"
+      "scraped_at": "2026-11-21T06:30:31Z"
     },
     {
       "key": "javstash:18ccee43-83d7-4a9e-acd0-b724da720c12",
@@ -100473,25 +100510,28 @@
       "provider_ids": {
         "JavStash": "1febebe9-65b9-4303-9fe6-7356b7d669df",
         "StashDB": "b1f3fbda-92e6-4b09-95c2-8e9782eef305",
-        "TPDB": "fd0e32ce-2f3e-4ff6-993a-4b9c9825eedf"
+        "TPDB": "fd0e32ce-2f3e-4ff6-993a-4b9c9825eedf",
+        "Wikidata": "Q108776458",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E4%B8%89%E5%B0%BE%E3%82%81%E3%81%90"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
-        "dramaface": false,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:34:34Z",
-      "scraped_at": "2026-11-21T02:17:32Z"
+      "scraped_at": "2026-11-21T06:38:12Z"
     },
     {
       "key": "javstash:1ff1c886-f693-4059-96e4-d3ca68170047",
@@ -123421,12 +123461,12 @@
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:47Z",
-      "scraped_at": "2026-11-21T03:59:57Z"
+      "scraped_at": "2026-11-21T06:30:00Z"
     },
     {
       "key": "javstash:283285ad-28c8-4238-a0f5-c7334462fb96",
@@ -152809,8 +152849,8 @@
         "丰满",
         "性感"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "爱田优亚（1984年8月12日出生）是一名日本前AV女演员、前裸体模特、前偶像。\n\n简历：\n2003年，开始从事偶像活动。\n2004年1月，以《Pichi Pichi》作为AV出道作。作为Max-A和KUKI的专属签约艺人，以“纤细AV女优”作为卖点进行了10部作品的新人发展。\n2005年5月，开始在知名AV公司S1出演作品。在S1期间，共演出33部作品（包括精选集）。同时，也在Style Art的作品中活跃，直到2006年夏季期间每月发布大约两部左右的作品，但之后只发布一部左右的作品。\n2006年3月20日，获得2005年日本成人广播大奖（现SKY Perfect! Adult Broadcasting Awards）的女优大奖。\n2007年4月1日，开始在MOODYZ的作品中出演。直到退役前共演出4部作品。同年7月12日，她在个人官方博客中宣布了自己从AV女演员的退役决定。\n2008年退役。在AV退役后，她以裸体模特的身份继续活动，包括接受了最后的写真集拍摄。\n2008年2月16日，发售了最后的写真集《YUA》并举办了纪念活动，之后退出了裸体模特的工作。\n在2012年1月5日至2月29日进行的AV30周年纪念活动中，她以第15位的排名脱颖而出。\n\n个人：\n爱好是油画，特长是网球。\n偶像艺人爱之戸義妹。\n初体验是在中学三年级时与同年级的男生（是同一个人也是初吻）发生的。经验人数是7个，其中5个是男朋友，另外两个是搭讪的人。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%81%82%E3%81%84%E3%81%A0%E3%82%86%E3%81%82.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%81%82%E3%81%84%E3%81%A0%E3%82%86%E3%81%82.jpg",
       "avatar_source_site": "gfriends",
@@ -152830,6 +152870,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": true,
         "wiki": true,
@@ -152838,7 +152879,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:32:57Z",
-      "scraped_at": "2026-11-21T03:22:19Z"
+      "scraped_at": "2026-11-21T06:28:27Z"
     },
     {
       "key": "javstash:33476c99-6dbb-434c-9f06-a3e03a5b2074",
@@ -172018,15 +172059,17 @@
       "tags": [
         "J罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "七瀬麻衣（1995年7月14日 - ）是日本的AV女演员，属于ARROWS公司。她出生于东京。她的爱好是观看YouTube，拥有辨别香水的技能。\n\n2017年1月，她以MAX-A的专属女演员「菅野紗世」的名义出道。同年6月，改名为「七瀬麻衣」。此外，她也曾使用「南田美咲」的名字在WANZ FACTORY的作品中出演。\n\n据说她是一名高级美容师，但实际上她在一家提供性感按摩的高级援助交际店工作。她开始工作的原因是因为被男朋友甩了，随后半年时间她宅在家里。她意识到这样下去不行，于是在招聘杂志上找工作时偶然发现了这家店。\n\n关于她之所以选择AV出道，她表示是因为想在啪啪生活中体验高潮，并想尝试喷出女性体液。\n\n2020年2月，她宣布引退。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E6%9D%91%E4%B8%8A%E3%81%8B%E3%81%AA.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E6%9D%91%E4%B8%8A%E3%81%8B%E3%81%AA.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/3a2cacff-04b7-4973-86f3-b4acdc1da8ce",
       "provider_ids": {
         "JavStash": "3a2cacff-04b7-4973-86f3-b4acdc1da8ce",
-        "TPDB": "5ec1e01d-7825-4516-aaa1-fd29d47e7861"
+        "TPDB": "5ec1e01d-7825-4516-aaa1-fd29d47e7861",
+        "Wikidata": "Q47465049",
+        "Wikipedia": "ja.wikipedia.org/wiki/ななせ麻衣"
       },
       "status": "ok",
       "sources": {
@@ -172039,12 +172082,12 @@
         "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:08:22Z",
-      "scraped_at": "2026-11-21T02:52:35Z"
+      "scraped_at": "2026-11-21T06:29:35Z"
     },
     {
       "key": "javstash:3a2d1bde-7062-4feb-8868-0e9ea5551936",
@@ -172196,8 +172239,8 @@
         "巨乳",
         "萝莉"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Konoha（このは），出生于 1991 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 このは 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/9-Javrave/AI-Fix-%E6%8C%81%E7%94%B0%E7%BE%8E%E7%90%B4.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/9-Javrave/AI-Fix-%E6%8C%81%E7%94%B0%E7%BE%8E%E7%90%B4.jpg",
       "avatar_source_site": "gfriends",
@@ -172205,25 +172248,28 @@
       "provider_ids": {
         "JavStash": "3a3a577e-e062-41e6-ba1e-378967e0990c",
         "StashDB": "2dd12b02-892e-486f-99cd-c600cd14ada0",
-        "TPDB": "4412698d-b035-4cf9-b65c-ea30414fa648"
+        "TPDB": "4412698d-b035-4cf9-b65c-ea30414fa648",
+        "Wikidata": "Q10851325",
+        "Wikipedia": "ja.wikipedia.org/wiki/このは_(AV女優)"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:57:49Z",
-      "scraped_at": "2026-11-21T02:41:11Z"
+      "scraped_at": "2026-11-21T06:29:03Z"
     },
     {
       "key": "javstash:3a3c6f98-145c-4a67-9494-c7b870a77309",
@@ -176126,32 +176172,33 @@
         "细腰",
         "微乳"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "赤坂露娜（あかさか るな，1967年4月7日生），是日本的AV女演员和V电影女演员。\n\n简历\n她于2004年5月至同年12月期间担任“Madonna”的专属女演员。从2005年起，她作为“KMP Million”的专属女演员活跃。2014年9月，她再次从“Madonna”复出。\n\n她隶属于艺能经纪公司Nolins Farm。\n\n此外，她还是株式会社Daisy的代表董事。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%BD%A9%E6%9C%88%E5%B8%8C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%BD%A9%E6%9C%88%E5%B8%8C.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/3bb4bcbc-fa48-46e4-8110-b62ac27a21e4",
       "provider_ids": {
-        "JavStash": "3bb4bcbc-fa48-46e4-8110-b62ac27a21e4"
+        "JavStash": "3bb4bcbc-fa48-46e4-8110-b62ac27a21e4",
+        "TPDB": "b2b6abdb-bfea-46a7-b456-db6df72100fb"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
-        "dramaface": false,
+        "dramaface": true,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
-        "tpdb": false,
+        "theactorbase": true,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:53:54Z",
-      "scraped_at": "2026-11-21T02:37:30Z"
+      "scraped_at": "2026-11-21T06:29:09Z"
     },
     {
       "key": "javstash:3bbb05c4-a02c-4e73-ae28-dbf698e66b1b",
@@ -177247,8 +177294,8 @@
       "tags": [
         "F罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Maron，出生于 1989 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%AE%89%E5%A0%82%E6%80%9C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%AE%89%E5%A0%82%E6%80%9C.jpg",
       "avatar_source_site": "gfriends",
@@ -177256,7 +177303,9 @@
       "provider_ids": {
         "JavStash": "3c4674e9-e2e6-41f3-ab41-0c969b465bf9",
         "StashDB": "b6f7e4ae-a207-416b-99aa-f9840f906ff4",
-        "TPDB": "e6e9a041-c4f6-4482-9f6e-45019eda0621"
+        "TPDB": "e6e9a041-c4f6-4482-9f6e-45019eda0621",
+        "Wikidata": "Q11232790",
+        "Wikipedia": "ja.wikipedia.org/wiki/Maron"
       },
       "status": "ok",
       "sources": {
@@ -177266,15 +177315,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:39:00Z",
-      "scraped_at": "2026-11-21T02:22:13Z"
+      "scraped_at": "2026-11-21T06:28:05Z"
     },
     {
       "key": "javstash:3c47d7b8-468f-454a-9c02-03f257d16f82",
@@ -181082,15 +181132,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "stashdb": true,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:22:52Z",
-      "scraped_at": "2026-11-21T03:12:21Z"
+      "scraped_at": "2026-11-21T06:27:56Z"
     },
     {
       "key": "javstash:3dfb424a-731b-451e-8f71-e30efad417e4",
@@ -192056,8 +192107,8 @@
         "膨大乳晕",
         "美爪"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "中山亜樹，出生于 1977 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Aki Nakayama 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%B5%81%E3%83%80%E3%82%A4%E3%83%A4.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E6%B5%81%E3%83%80%E3%82%A4%E3%83%A4.jpg",
       "avatar_source_site": "gfriends",
@@ -192077,12 +192128,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:06:10Z",
-      "scraped_at": "2026-11-21T03:16:05Z"
+      "scraped_at": "2026-11-21T06:39:45Z"
     },
     {
       "key": "javstash:419df2fb-ea5e-49fe-b514-4a56bedc339a",
@@ -206030,8 +206081,8 @@
       "tags": [
         "E罩杯"
       ],
-      "bio": "AIKA（あいか），是一位日本的AV女演员，现隶属于Television Powers公司。 她的职业生涯始于2011年，当时她以AV女演员的身份正式出道。然而，在踏入成人娱乐行业之前，她曾是一名美容师。她的职业生涯是在她在渋谷被星探发掘后开始的，这个机缘使她踏入了成人娱乐领域。尽管一度兼职美容师长达4年，但最终她选择放弃了美容师的工作，成为了一名黑皮肤的AV女演员，她的职业生涯也因此腾飞，成为知名AV女演员。 在她担任黑皮肤AV女演员时，她于2016年5月4日荣获DMM.R18成人奖2016年度最佳女演员奖。之后，她于2016年8月从Five Promotion公司转投了Television Powers公司。 2017年3月3日，她在“スカパー!アダルト放送大賞2017”颁奖典礼上获得了女演员奖（最高奖）。她在颁奖典礼上表示：“在这么多活跃的女演员中，我感到了巨大的压力。非常感谢大家！”并且受到了主持人中尾彬的高度评价，他说：“这是一位很棒的女演员诞生了，她甚至可能在大制作电影中有所斩获。”随后，她积极尝试了电影演出，而且也频繁亮相于综艺节目。 在2019年10月，她被提名为“ゲオTV×メンズサイゾー ADULT AWARD 2019・淫语明星类别”。她的代名词是“国民性感黑皮肤”。 2020年12月，她在“FLASH 2020年现役最强性感女演员BEST100”读者投票中名列第六位。 2021年4月，她在“アサヒ芸能 2021现役AV女演员SEXY综选”中排名第15位。同年8月，她在“读者300人选出的FLASH 2021性感女演员排名”读者投票中名列第40位。 截至2023年1月，她的三维立体数据已被用于制作1/20比例的PLAMAX Naked Angel系列模型，由Good Smile Company推出。 截至2023年5月15日，她参演的作品《【庆祝春季礼物】【福袋】》（发行：かつお物产/妄想族）在FANZA视频排行榜上名列第一。同作品于同年8月14日一周内再次跻身第一位。 AIKA有丰富多彩的个人生活。根据官方资料，她出生在兵库县。然而，在2022年5月1日的一次采访中，她却表示自己是三重县出生，中学和高中在栃木上学。之后，她搬到了东京的小岩居住。她的爱好包括时尚和旅行。 她有一个比她小5岁的弟弟和一个比她小6岁的妹妹。 在她刚开始职业生涯时，尽管她被视为典型的“黑皮肤女演员”，但她本人并没有自我认同为黑皮肤女演员。在2019年的一次采访中，她提到：“只是因为我喜欢特定的化妆、发色、小饰品和服装，然后不知不觉间就被称为‘黑皮肤’了。”她在学生时代是“Zipper”等杂志的忠实读者，被认为是“裏原宿风格”的粉丝。 尽管因声音嘶哑而被认为能喝酒，但她实际上对酒精并不抵抗，但通常情况下，她会礼貌地拒绝酒精，并选择将送来的酒品转赠给她的朋友。然而，她喜欢吃零食。 她备受赞誉，获得了众多名人的粉丝，如极乐凤凰节目主持人加藤浩次和鬼越トマホーク的金ちゃん等。 AIKA以其独特的魅力、坚韧不拔的个性和出色的表现在AV行业中崭露头角，成为备受喜爱和尊敬的AV女演员之一。她的职业生涯仍在不断发展，相信她会继续带给观众更多精彩的作品和表演。无论是她的职业生涯还是个人生活，AIKA都是一个备受瞩目的人物，她的故事和成就令人印象深刻，继续为日本成人娱乐行业注入新的活力。",
-      "bio_lang": "ja",
+      "bio": null,
+      "bio_lang": null,
       "avatar": "https://javstash.org/images/9d44b2f3-dae6-4fb2-b08c-9cf7d43f265d",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -215186,8 +215237,8 @@
         "货真价实的素人姑娘",
         "美人"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "みづき伊織，出生于 1989 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Iori Mizuki 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%8C%97%E5%B3%B6%E3%82%86%E3%82%8A.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%8C%97%E5%B3%B6%E3%82%86%E3%82%8A.jpg",
       "avatar_source_site": "gfriends",
@@ -215195,25 +215246,28 @@
       "provider_ids": {
         "JavStash": "4a664b24-85d5-4677-93f8-8f4b2b9700c4",
         "StashDB": "6e05bb48-3441-4065-9835-c453e7c200a2",
-        "TPDB": "591b4253-4b9f-4843-b3ac-708fa685cff4"
+        "TPDB": "591b4253-4b9f-4843-b3ac-708fa685cff4",
+        "Wikidata": "Q11279035",
+        "Wikipedia": "ja.wikipedia.org/wiki/みづき伊織"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:26Z",
-      "scraped_at": "2026-11-21T02:05:46Z"
+      "scraped_at": "2026-11-21T06:30:10Z"
     },
     {
       "key": "javstash:4a7246d9-f6e2-443e-a724-2478e0d64027",
@@ -222336,7 +222390,9 @@
       "provider_ids": {
         "JavStash": "4cf703a5-8548-43b9-aa7d-06841f7901c0",
         "StashDB": "005483bb-8be7-4347-be8f-3310d3f3295f",
-        "TPDB": "6826f97d-a1d4-4b94-b4cb-726fa8a9b24b"
+        "TPDB": "6826f97d-a1d4-4b94-b4cb-726fa8a9b24b",
+        "Wikidata": "Q11232779",
+        "Wikipedia": "ja.wikipedia.org/wiki/Marin."
       },
       "status": "ok",
       "sources": {
@@ -222346,15 +222402,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:09:25Z",
-      "scraped_at": "2026-11-21T02:53:57Z"
+      "scraped_at": "2026-11-21T06:28:06Z"
     },
     {
       "key": "javstash:4cfba041-441a-446c-9f6f-3840c0f62507",
@@ -236343,8 +236400,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "のあういか，出生于 2001 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Uika Noa 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E9%BB%92%E5%B4%8E%E5%BD%A9.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E9%BB%92%E5%B4%8E%E5%BD%A9.jpg",
       "avatar_source_site": "gfriends",
@@ -236361,16 +236418,16 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:01:21Z",
-      "scraped_at": "2026-11-21T04:10:33Z"
+      "scraped_at": "2026-11-21T06:29:36Z"
     },
     {
       "key": "javstash:51c7943e-7010-45b2-aa8b-dd7d427cfaaf",
@@ -237036,14 +237093,15 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "KYOKO，出生于 1987 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Kyoko 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%B0%8F%E6%B3%89%E5%84%AA%E5%AD%90.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%B0%8F%E6%B3%89%E5%84%AA%E5%AD%90.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/5203734d-358a-421a-bb80-51a8c99fdd14",
       "provider_ids": {
         "JavStash": "5203734d-358a-421a-bb80-51a8c99fdd14",
+        "StashDB": "5e3b615f-8535-45b1-b1bc-5653ffafb60f",
         "TPDB": "54a1d9b7-c50d-40b4-90fb-e2c13be45cf8",
         "Wikidata": "Q11462487",
         "Wikipedia": "ja.wikipedia.org/wiki/小泉優子"
@@ -237053,14 +237111,16 @@
         "gfriends": true,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false
+        "wiki": false,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:44:36Z",
-      "scraped_at": "2026-11-20T08:44:36Z"
+      "scraped_at": "2026-11-21T06:28:00Z"
     },
     {
       "key": "javstash:520cbc31-1616-4bdb-9424-fb4a46c10370",
@@ -245615,8 +245675,8 @@
       "tags": [
         "D罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "仙道春奈，公开出生年份待补充。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Haruna Sendō 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/9-Javrave/AI-Fix-%E9%99%BD%E8%8F%9C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/9-Javrave/AI-Fix-%E9%99%BD%E8%8F%9C.jpg",
       "avatar_source_site": "gfriends",
@@ -245624,7 +245684,9 @@
       "provider_ids": {
         "JavStash": "b9ec52cd-0990-4b46-8dff-93718306fabf",
         "StashDB": "8dbdf0f7-16a2-41ff-9312-87142c1f50ca",
-        "TPDB": "ba1b82a4-5537-4472-b01a-f01c5fecca99"
+        "TPDB": "ba1b82a4-5537-4472-b01a-f01c5fecca99",
+        "Wikidata": "Q10884356",
+        "Wikipedia": "ja.wikipedia.org/wiki/仙道春奈"
       },
       "status": "ok",
       "sources": {
@@ -245634,15 +245696,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:39:07Z",
-      "scraped_at": "2026-11-21T04:01:38Z"
+      "scraped_at": "2026-11-21T06:27:56Z"
     },
     {
       "key": "javstash:54f4a3ae-82d6-4f4c-a63d-20a3725e1e94",
@@ -254487,8 +254550,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "丘咲エミリ（おかざき エミリ）是日本的实业家、艺人、模特儿、艺术家和前AV女演员，神奈川县出生。她是由篠山纪信担任摄影制作的五人偶像团体\"PINKEY\"的前成员和前队长。2005年，她在时尚杂志《Ranzuki（ランズキ）》中开始担任模特儿。2011年，她在写真周刊杂志《FLASH》的文章中受到关注。同年10月10日，《週刊大衆》杂志刊登……",
+      "bio_lang": "ja",
       "avatar": "https://javstash.org/images/8d39facf-4704-4498-8dbb-ddb2da6f14b9",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -254496,25 +254559,28 @@
       "provider_ids": {
         "JavStash": "581bd5d4-c21a-40a2-96d5-a24dc2318f96",
         "StashDB": "d7edafe8-345c-4da3-a185-f676f33fa2d5",
-        "TPDB": "8e4b51d1-e73a-4b43-b19e-ca69a998b279"
+        "TPDB": "8e4b51d1-e73a-4b43-b19e-ca69a998b279",
+        "Wikidata": "Q11362569",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E4%B8%98%E5%92%B2%E3%82%A8%E3%83%9F%E3%83%AA"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
-        "dramaface": false,
-        "gfriends": false,
+        "dramaface": true,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
-        "yinrenlu": false
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:56Z",
-      "scraped_at": "2026-11-21T02:54:57Z"
+      "scraped_at": "2026-11-21T06:39:29Z"
     },
     {
       "key": "javstash:581dcbd5-54b3-44ad-bb71-1d7ea55b29a1",
@@ -268832,7 +268898,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
+        "theactorbase": true,
         "tpdb": true,
         "wiki": false,
         "yinrenlu": false
@@ -268840,7 +268906,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:15:37Z",
-      "scraped_at": "2026-11-21T01:53:50Z"
+      "scraped_at": "2026-11-21T06:28:01Z"
     },
     {
       "key": "javstash:5d5af38c-469a-4920-9f15-9431bd3a6934",
@@ -274172,8 +274238,8 @@
         "勃起乳首大",
         "幼儿体型"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "三好佑香，出生于 2001 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Yuka Miyoshi 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/6-Tpowers/%E7%BE%8E%E5%A5%BD%E6%9F%9A%E4%BC%BD.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/6-Tpowers/%E7%BE%8E%E5%A5%BD%E6%9F%9A%E4%BC%BD.jpg",
       "avatar_source_site": "gfriends",
@@ -274181,7 +274247,8 @@
       "provider_ids": {
         "JavStash": "5f9dd8ac-12fc-4d03-ad26-815b66827b62",
         "StashDB": "a2d14628-46a1-49d8-97e3-d2e13127aa2a",
-        "TPDB": "46687247-8201-45b2-ac65-a868ddc5b798"
+        "TPDB": "46687247-8201-45b2-ac65-a868ddc5b798",
+        "Wikipedia": "ja.wikipedia.org/wiki/三好佑香"
       },
       "status": "ok",
       "sources": {
@@ -274194,12 +274261,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:46:46Z",
-      "scraped_at": "2026-11-21T03:41:53Z"
+      "scraped_at": "2026-11-21T06:38:05Z"
     },
     {
       "key": "javstash:5fa33c58-a029-4bab-8cdc-d07fc1e0e48c",
@@ -278882,8 +278949,8 @@
       "tags": [
         "E罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "もりの小鳥，出生于 1998 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Kotori Morino 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E6%A3%AE%E9%87%8E%E7%90%B4%E6%A2%A8.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E6%A3%AE%E9%87%8E%E7%90%B4%E6%A2%A8.jpg",
       "avatar_source_site": "gfriends",
@@ -278892,7 +278959,8 @@
         "JavStash": "61759188-cd60-444c-8143-e74d3b311440",
         "StashDB": "e45c21a0-0702-4c55-a091-a92f3497690b",
         "TPDB": "55484740-4cda-4979-9980-30aaaec7674c",
-        "Wikidata": "Q11540404"
+        "Wikidata": "Q11540404",
+        "Wikipedia": "ja.wikipedia.org/wiki/もりの小鳥"
       },
       "status": "ok",
       "sources": {
@@ -278905,12 +278973,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:17:22Z",
-      "scraped_at": "2026-11-21T03:04:34Z"
+      "scraped_at": "2026-11-21T06:30:20Z"
     },
     {
       "key": "javstash:617a7e68-755b-455c-9e12-e2a69dab8208",
@@ -280082,8 +280150,8 @@
         "肛门",
         "刚毛"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "乃南ゆい，出生于 1998 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Yui Nonami 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B9%83%E5%8D%97%E3%82%86%E3%81%84.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%B9%83%E5%8D%97%E3%82%86%E3%81%84.jpg",
       "avatar_source_site": "gfriends",
@@ -280107,7 +280175,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:48Z",
-      "scraped_at": "2026-11-21T01:55:07Z"
+      "scraped_at": "2026-11-21T06:41:03Z"
     },
     {
       "key": "javstash:621658e5-5672-4ae5-a9eb-f1304e7c9625",
@@ -284854,8 +284922,8 @@
         "F罩杯",
         "."
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "ゆうきりり，出生于 1982 年。公开人物资料记录了其成人影视表演职业经历；资料描述标注其已退出该行业。资料中的国籍／地区记录为日本。\n\n姓名另有 Riri Yūki 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E3%82%86%E3%81%86%E3%81%8D%E3%82%8A%E3%82%8A.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E3%82%86%E3%81%86%E3%81%8D%E3%82%8A%E3%82%8A.jpg",
       "avatar_source_site": "gfriends",
@@ -284880,7 +284948,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:48Z",
-      "scraped_at": "2026-11-21T01:34:59Z"
+      "scraped_at": "2026-11-21T06:30:23Z"
     },
     {
       "key": "javstash:639c5789-6165-4984-a777-a4caa3388933",
@@ -286196,32 +286264,33 @@
       "tags": [
         "B罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "ERIKA，出生于 1988 年。公开人物资料记录了其成人影视表演职业经历；资料描述标注其已退出该行业。资料中的国籍／地区记录为日本。",
+      "bio_lang": "zh",
       "avatar": "https://javstash.org/images/1e0f0370-5211-4e44-a798-d68a7c666c13",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/6408d2e7-eb8d-43cb-a664-4a7f797dcbd2",
       "provider_ids": {
-        "JavStash": "6408d2e7-eb8d-43cb-a664-4a7f797dcbd2"
+        "JavStash": "6408d2e7-eb8d-43cb-a664-4a7f797dcbd2",
+        "TPDB": "b47f9a3f-5a3c-4395-8307-957a5d842b16"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:09:44Z",
-      "scraped_at": "2026-11-21T02:30:39Z"
+      "scraped_at": "2026-11-21T06:36:07Z"
     },
     {
       "key": "javstash:640d0849-c3da-46c2-99b1-4df46bef91f0",
@@ -289557,35 +289626,37 @@
         "巨乳",
         "美人"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "一花琴音（日語：宝生 リリー，1991年10月2日—），是一位出身於日本宮城縣的AV女優、模特兒 ，出道於2013年，隸屬於經紀公司T-powers。其後改名朝日奈留美奈隸屬於經紀公司Eve-Rest Model Agency。於2017年5月轉至現經紀公司LINX。",
+      "bio_lang": "ja",
       "avatar": "https://stashdb.org/images/e8cb91cc-865f-4ddc-8cd5-8b04b25f99a0",
       "avatar_cn": null,
       "avatar_source_site": "stashdb",
       "homepage_url": "https://theporndb.net/performers/4b3207ed-7934-4b5c-8645-4de7e1a913fa",
       "provider_ids": {
+        "JavStash": "65399cb5-939a-43ab-ac49-d579040f42be",
         "StashDB": "4b1b4f49-27da-4d69-bd7b-99badfd1b638",
         "TPDB": "4b3207ed-7934-4b5c-8645-4de7e1a913fa",
+        "Wikidata": "Q23948743",
         "Wikipedia": "ja.wikipedia.org/wiki/%E5%AE%9D%E7%94%9F%E3%83%AA%E3%83%AA%E3%83%BC"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
-        "javstash": false,
+        "javstash": true,
         "mdcx": true,
         "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
-        "yinrenlu": false
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:11:33Z",
-      "scraped_at": "2026-11-21T03:45:38Z"
+      "scraped_at": "2026-11-21T06:37:12Z"
     },
     {
       "key": "javstash:65416fd1-6d6b-4a0a-aacc-aa6d9d0a1588",
@@ -320697,32 +320768,33 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Mihiro（日語：みひろ；1982年5月19日—），藝名全稱「金子美廣」（日語：金子 みひろ，Kaneko Mihiro），本名「山瀬廣美」（日語：山瀬 ひろみ，Yamase Hiromi），另有中文名「朝美惠香」或「朝美穗香」，日本女藝人，前AV女優及前寫真女星。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%86%85%E7%94%B0%E3%82%8B%E3%81%84.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%86%85%E7%94%B0%E3%82%8B%E3%81%84.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/6fe1abbc-99d4-4fd6-974f-ed6c69c47d07",
       "provider_ids": {
-        "JavStash": "6fe1abbc-99d4-4fd6-974f-ed6c69c47d07"
+        "JavStash": "6fe1abbc-99d4-4fd6-974f-ed6c69c47d07",
+        "TPDB": "19793ffc-04f3-4ade-807f-ed19be9941b6"
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
-        "wiki": false,
+        "tpdb": true,
+        "wiki": true,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:39Z",
-      "scraped_at": "2026-11-21T02:03:08Z"
+      "scraped_at": "2026-11-21T06:30:14Z"
     },
     {
       "key": "javstash:6fe87e43-e151-4c3c-b4ca-9002cd75e945",
@@ -334496,8 +334568,8 @@
         "苗条",
         "肚脐环"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Allie Addison，出生于 2000 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n姓名另有 アリー・アディソン 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://javstash.org/images/c6c3a66b-babe-4705-82f7-26a5791dcfaa",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -334506,6 +334578,7 @@
         "JavStash": "747af4b8-c636-4665-9e64-2b17edfe2e23",
         "StashDB": "d7c0b4f9-0252-4709-a429-3147350f5c00",
         "TPDB": "610a1e07-f520-482b-b4fe-8fc66067e1e0",
+        "Tmdb": "2462865",
         "Wikidata": "Q111905497"
       },
       "status": "ok",
@@ -334516,6 +334589,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
@@ -334524,7 +334598,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:03:30Z",
-      "scraped_at": "2026-11-21T01:36:04Z"
+      "scraped_at": "2026-11-21T06:30:59Z"
     },
     {
       "key": "javstash:747b9872-2333-4159-9023-d1ce55557197",
@@ -337212,6 +337286,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": true,
         "wiki": false,
@@ -337220,7 +337295,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T09:34:17Z",
-      "scraped_at": "2026-11-21T03:45:10Z"
+      "scraped_at": "2026-11-21T06:29:46Z"
     },
     {
       "key": "javstash:75a79bc5-b7c1-4884-9385-935131f76e90",
@@ -356836,8 +356911,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Janice Griffith，出生于 1995 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2013 年。姓名另有 ジャニス・グリフィス 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://javstash.org/images/23a6d0c9-6d3d-4124-b432-c6f8d30eec08",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -356862,7 +356937,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:05:52Z",
-      "scraped_at": "2026-11-21T01:40:35Z"
+      "scraped_at": "2026-11-21T06:33:19Z"
     },
     {
       "key": "javstash:7bdea146-562b-469c-a6e5-e0fb3653e29b",
@@ -369968,8 +370043,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "MAYUKA，出生于 1963 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Mayuka 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://javstash.org/images/49275aee-d545-4d87-8516-0fc9b91aa2e0",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -369983,19 +370058,20 @@
       "sources": {
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:23Z",
-      "scraped_at": "2026-11-21T02:46:19Z"
+      "scraped_at": "2026-11-21T06:29:57Z"
     },
     {
       "key": "javstash:800866ee-7551-45fe-8a6a-0cb05fc3cc88",
@@ -437244,8 +437320,8 @@
         "E罩杯",
         "街头天使"
       ],
-      "bio": "みお，出生于 1982 年。公开人物资料记录了其成人影视表演职业经历；资料描述标注其已退出该行业。资料中的国籍／地区记录为日本。\n\n姓名另有 Mio 等公开写法，可用于对照不同语言的人物条目。",
-      "bio_lang": "ja",
+      "bio": null,
+      "bio_lang": null,
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E9%95%B7%E6%B2%A2%E3%81%BF%E3%81%8A.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E9%95%B7%E6%B2%A2%E3%81%BF%E3%81%8A.jpg",
       "avatar_source_site": "gfriends",
@@ -462871,8 +462947,8 @@
         "美少女",
         "美人"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "上原麻衣（日語：上原 麻衣／うえはら　まい，羅馬化：Uehara Mai，1993年12月4日—），日本東京都出身的AV女優，拍攝不同題材的成人影片，部分作品有女性射液。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%8F%8C%E8%91%89%E3%82%86%E3%81%AA.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%8F%8C%E8%91%89%E3%82%86%E3%81%AA.jpg",
       "avatar_source_site": "gfriends",
@@ -462890,15 +462966,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
+        "wiki": true,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:56Z",
-      "scraped_at": "2026-11-21T02:08:39Z"
+      "scraped_at": "2026-11-21T06:39:05Z"
     },
     {
       "key": "javstash:a156387d-a697-400c-a62a-bacc60acf681",
@@ -470738,25 +470815,28 @@
       "provider_ids": {
         "JavStash": "a443048f-77fa-487d-95e2-19f863709392",
         "StashDB": "32cf49e3-a77f-40af-bbac-917c00db9b89",
-        "TPDB": "20fb6e09-6895-45f4-84f8-ae985694201f"
+        "TPDB": "20fb6e09-6895-45f4-84f8-ae985694201f",
+        "Wikidata": "Q18048184",
+        "Wikipedia": "ja.wikipedia.org/wiki/%E3%81%82%E3%82%84%E3%81%AD%E9%81%A5%E8%8F%9C"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:58:19Z",
-      "scraped_at": "2026-11-21T01:28:38Z"
+      "scraped_at": "2026-11-21T06:28:41Z"
     },
     {
       "key": "javstash:a443a20f-1291-488f-995f-a8d1d5a3707a",
@@ -540032,8 +540112,8 @@
         "美少女",
         "萝莉"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "ひかり唯（Hikari Yui），1997年11月27日出生，2022年8月下海拍片。之前是幼儿园老师。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%81%B2%E3%81%8B%E3%82%8A%E5%94%AF.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%81%B2%E3%81%8B%E3%82%8A%E5%94%AF.jpg",
       "avatar_source_site": "gfriends",
@@ -540058,7 +540138,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:08Z",
-      "scraped_at": "2026-11-21T01:33:45Z"
+      "scraped_at": "2026-11-21T06:29:42Z"
     },
     {
       "key": "javstash:bda41ddf-e1c6-4afc-a279-33c99f14a5a4",
@@ -546847,32 +546927,33 @@
       "tags": [
         "E罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "中城葵（Aoi Nakajo）是一位日本的AV女优。所属于PRODUCTION ALIVE（ALIVE事务所）。需要注意，与同音异字的AV女优中条葵（2019年6月出道）不是同一人。 简历 出生于日本长野县松本市。在出道之前只有一次与同窗会认识的性交经历。由于没有恋爱经历而感到自卑，决定出演AV，并于2019年12月从SOD Create的青春时代厂牌出道。首部作品在FANZA（DMM成人网站）的周排名中获得第49名。 2020年4月，作品《「我只要成为情人，让我靠近你吧……」在婚外恋中被教え子要求中出怀孕的疯狂爱情日常＜第4章＞ 中城葵》在FANZA网店的日销售榜上获得第1名。 2023年7月3日的FANZA动画区排行榜中，由她在2022年12月参演的题为《【福袋】S-Cute 可爱的孩子们15部作品无删减录38小时!》的作品获得第1名。8月7日的FANZA动画区排行榜中，该作再次上升至第3名。 个人经历 从小开始就参加游泳课程，并且在学生时代一直是游泳部的一员。她的出道作封面照也是以游泳部形象为设计灵感。 她并不追求成为有名人物，她的方针是希望作品本身能畅销，不过对于媒体采访她仍然回应，但她没有透露自己的社交媒体和详细资料，并且拒绝出演活动等。她没有透露自己的出生年月日，但在2019年12月发售（拍摄实际上是在9月）的出道作中回答说她是20岁。",
+      "bio_lang": "ja",
       "avatar": "https://javstash.org/images/348d4b7d-3528-4a90-806d-8b90dacfb4b0",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/30b99e40-82b6-4dc3-9a51-fe59a48e2fad",
       "provider_ids": {
-        "JavStash": "30b99e40-82b6-4dc3-9a51-fe59a48e2fad"
+        "JavStash": "30b99e40-82b6-4dc3-9a51-fe59a48e2fad",
+        "TPDB": "06356755-78a2-4145-8c73-b970ea2e44e4"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
-        "theactorbase": false,
-        "tpdb": false,
+        "mdcx": true,
+        "theactorbase": true,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:14:55Z",
-      "scraped_at": "2026-11-21T02:14:41Z"
+      "scraped_at": "2026-11-21T06:40:24Z"
     },
     {
       "key": "javstash:bff7bae6-838a-47e3-afc6-5121f8a27e7e",
@@ -643033,8 +643114,8 @@
         "色色乳头",
         "美乳轮"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "Maika（MEW），出生于 1987 年。公开人物资料记录了其成人影视表演职业经历；资料描述标注其已退出该行业。资料中的国籍／地区记录为日本。\n\n姓名另有 MEW 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%BC%8A%E5%90%B9%E5%BD%A9.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%BC%8A%E5%90%B9%E5%BD%A9.jpg",
       "avatar_source_site": "gfriends",
@@ -643052,15 +643133,16 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
-        "yinrenlu": false
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:19:11Z",
-      "scraped_at": "2026-11-21T01:58:24Z"
+      "scraped_at": "2026-11-21T06:28:07Z"
     },
     {
       "key": "javstash:e2037f24-ab73-42d0-b971-17ce20d126a9",
@@ -646840,8 +646922,8 @@
       "tags": [
         "C罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "上原綾（1985年2月14日—）是日本人氣而神秘的寫真集和DVD影片模特兒。在她三套寫真DVD影片中皆是賣肉不賣身，雖然她曾為著名AV廠商Moodyz出碟，但還不能說她正式AV出道。她樣子甜美，上圍驕人，因而在日本極受歡迎，更被喻為日本最亮麗的水著偶像之一。",
+      "bio_lang": "zh",
       "avatar": "https://javstash.org/images/210d5899-f697-43c7-8d55-639bb20ce0d4",
       "avatar_cn": null,
       "avatar_source_site": "javstash",
@@ -646855,19 +646937,20 @@
       "sources": {
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
-        "wiki": false,
-        "yinrenlu": false
+        "wiki": true,
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:53Z",
-      "scraped_at": "2026-11-21T02:23:21Z"
+      "scraped_at": "2026-11-21T06:39:04Z"
     },
     {
       "key": "javstash:e3624b17-2c6c-4bc3-918c-e488af76850c",
@@ -650013,8 +650096,8 @@
         "D罩杯",
         "着衣色情"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "一色れな，出生于 1984 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Rena Isshiki 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%95%E6%A8%B9%E3%81%82%E3%81%95%E3%81%B2.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%95%E6%A8%B9%E3%81%82%E3%81%95%E3%81%B2.jpg",
       "avatar_source_site": "gfriends",
@@ -650028,7 +650111,7 @@
       },
       "status": "ok",
       "sources": {
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
@@ -650037,12 +650120,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:47Z",
-      "scraped_at": "2026-11-21T02:16:14Z"
+      "scraped_at": "2026-11-21T06:37:07Z"
     },
     {
       "key": "javstash:e468532b-6893-439a-9140-7c542bc4feb5",
@@ -651948,8 +652031,8 @@
         "美人",
         "美巨乳"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "立花日菜（たちばなひな）是一位日本的AV女优。 【立花日菜的特点】 立花日菜是一位超敏感的女性，她拥有纤细白皙的身体，并且渴望被欺负的愿望非常强烈。是一位受虐倾向才女。她以纤细的F罩杯身材进行了出色的首次亮相，年仅20岁。 【立花日菜的经历】 这位素雅的女性之前在甜品店工作，但她却向E-BODY投递了出演申请。她极度害羞，然而她却选择了拍AV的道路。当被问及为什么要拍AV时，她给出了令人意外的回答：“因为我想被欺负很多次……”。她的身材纤细，她展现出了令人难以置信的特质，给人留下了深刻的印象。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%81%9F%E3%81%A1%E3%81%B0%E3%81%AA%E6%97%A5%E8%8F%9C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%81%9F%E3%81%A1%E3%81%B0%E3%81%AA%E6%97%A5%E8%8F%9C.jpg",
       "avatar_source_site": "gfriends",
@@ -651967,6 +652050,7 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
+        "stashdb": true,
         "theactorbase": true,
         "tpdb": true,
         "wiki": false,
@@ -651975,7 +652059,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:51Z",
-      "scraped_at": "2026-11-21T01:33:07Z"
+      "scraped_at": "2026-11-21T06:29:26Z"
     },
     {
       "key": "javstash:e5228d1e-3ff8-40b0-99de-3c07413f3127",
@@ -679872,34 +679956,37 @@
       "tags": [
         "F罩杯"
       ],
-      "bio": null,
-      "bio_lang": null,
+      "bio": "乙葉カレン，公开出生年份待补充。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Karen Otoha 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://stashdb.org/images/32586390-15f7-421a-9854-895c9b01582f",
       "avatar_cn": null,
       "avatar_source_site": "stashdb",
       "homepage_url": "https://theporndb.net/performers/4cac383b-be62-4ef1-8e8a-53ffa29dee42",
       "provider_ids": {
+        "JavStash": "f0d4c3bd-f08b-4d9e-bc5a-f104ea7b347a",
         "StashDB": "e5db5bfe-4d35-4faa-be4f-4c0831cf7423",
-        "TPDB": "4cac383b-be62-4ef1-8e8a-53ffa29dee42"
+        "TPDB": "4cac383b-be62-4ef1-8e8a-53ffa29dee42",
+        "Wikidata": "Q103820483",
+        "Wikipedia": "ja.wikipedia.org/wiki/乙葉カレン"
       },
       "status": "ok",
       "sources": {
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
-        "javstash": false,
+        "javstash": true,
         "mdcx": true,
         "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:17:14Z",
-      "scraped_at": "2026-11-21T02:15:20Z"
+      "scraped_at": "2026-11-21T06:41:23Z"
     },
     {
       "key": "javstash:f0d99264-1b4e-41ec-8a2f-0901aa724c6a",
@@ -731248,8 +731335,8 @@
         "浓密阴部",
         "胸中央纹身"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Jane Wilde，出生于 1998 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2017 年。姓名另有 ジェーン・ワイルド 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/17/88/f4/236bfce90b3873f7a37ea81d0a67cc7/poster/jane-wilde.jpg",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
@@ -731274,7 +731361,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:05:45Z",
-      "scraped_at": "2026-11-21T01:40:21Z"
+      "scraped_at": "2026-11-21T06:33:12Z"
     },
     {
       "key": "name:15ce44525554299b9dfb4065f45c96d448007f41",
@@ -752766,8 +752853,8 @@
         "匈牙利人",
         "洋物"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Cathy Heaven，出生于 1980 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为匈牙利。\n\n公开职业活动的起始年份记录为 2009 年。姓名另有 キャシー・ヘブン 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E3%82%AD%E3%83%A3%E3%82%B7%E3%83%BC%E3%83%BB%E3%83%98%E3%83%96%E3%83%B3.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E3%82%AD%E3%83%A3%E3%82%B7%E3%83%BC%E3%83%BB%E3%83%98%E3%83%96%E3%83%B3.jpg",
       "avatar_source_site": "gfriends",
@@ -752792,7 +752879,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:04:44Z",
-      "scraped_at": "2026-11-21T01:38:22Z"
+      "scraped_at": "2026-11-21T06:32:11Z"
     },
     {
       "key": "name:3a6ed35dd6088cca6153a495fdf26e7968366fbe",
@@ -783998,8 +784085,8 @@
         "洋物",
         "无毛"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Sarah Banks，出生于 1997 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2016 年。姓名另有 サラ・バンクス 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/19/41/fc/d267c21e71f91de41b61b8113d696b8/poster/sarah-banks.webp",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
@@ -784024,7 +784111,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:05:21Z",
-      "scraped_at": "2026-11-21T01:39:35Z"
+      "scraped_at": "2026-11-21T06:32:49Z"
     },
     {
       "key": "name:758e9251eb56c675414cc0cbec600163b06b9653",
@@ -817643,7 +817730,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:05:30Z",
-      "scraped_at": "2026-11-21T01:39:52Z"
+      "scraped_at": "2026-11-21T06:33:09Z"
     },
     {
       "key": "name:b1794d75394a8a7cca8b79f07dcc3b78427e45b2",
@@ -857446,7 +857533,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:27Z",
-      "scraped_at": "2026-11-21T01:30:43Z"
+      "scraped_at": "2026-11-21T06:28:22Z"
     },
     {
       "key": "stashdb:067c9aa9-293c-4e88-9410-daff94b5799f",
@@ -863701,8 +863788,8 @@
         "洋物",
         "俄罗斯人"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "曼蒂·迪伊（Mandy Dee），出生于 1988 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为俄罗斯。\n\n公开职业活动的起始年份记录为 2008 年。姓名另有 マンディ・ディー、Mandy Dee 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/f8/d9/9a/bd19c2a529f185845ab534a99968a98/poster/mandy-dee.jpg",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
@@ -863727,7 +863814,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:09:06Z",
-      "scraped_at": "2026-11-21T01:45:27Z"
+      "scraped_at": "2026-11-21T06:35:46Z"
     },
     {
       "key": "tpdb:007684db-e3d6-43aa-b61b-00ba4671e5f6",
@@ -865203,7 +865290,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:17:33Z",
-      "scraped_at": "2026-11-21T01:56:08Z"
+      "scraped_at": "2026-11-21T06:41:37Z"
     },
     {
       "key": "tpdb:06430030-2d51-4a89-acb6-314f6c8b3190",
@@ -897742,7 +897829,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:06:49Z",
-      "scraped_at": "2026-11-21T01:42:27Z"
+      "scraped_at": "2026-11-21T06:34:15Z"
     },
     {
       "key": "tpdb:8e76252b-b50f-4a66-af73-d3d82ee635f2",
@@ -907983,8 +908070,8 @@
         "贫乳",
         "苗条"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Cayenne Klein，出生于 1986 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为匈牙利。\n\n公开职业活动的起始年份记录为 2005 年。姓名另有 カイエン・クライン 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/eb/90/2a/3e15d2dc6f0aaf0544a70fcd2ee93e5/poster/cayenne-klein.png",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
@@ -908009,7 +908096,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:04:18Z",
-      "scraped_at": "2026-11-21T01:37:29Z"
+      "scraped_at": "2026-11-21T06:31:45Z"
     },
     {
       "key": "tpdb:b4ed36f4-e055-4cb2-b507-0aba0a7c300f",
@@ -911338,8 +911425,8 @@
         "委内瑞拉人",
         "巨尻"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Agatha Vega，出生于 1997 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。\n\n公开职业活动的起始年份记录为 2019 年。姓名另有 アガサ・ベガ 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://cdn.theporndb.net/performer/6d/98/3a/7cd6444fc293d02b9a1502759856a62/poster/agatha-vega.jpg",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
@@ -911364,7 +911451,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:03:08Z",
-      "scraped_at": "2026-11-21T01:35:29Z"
+      "scraped_at": "2026-11-21T06:30:40Z"
     },
     {
       "key": "tpdb:bff967d7-6b45-411e-b319-40e11df38d7d",
@@ -920971,8 +921058,8 @@
         "E罩杯",
         "USA出身"
       ],
-      "bio": null,
-      "bio_lang": "zh",
+      "bio": "Melissa Moore，出生于 1996 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2015 年。姓名另有 メリッサ・ムーア 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%83%A1%E3%83%AA%E3%83%83%E3%82%B5%E3%83%BB%E3%83%A2%E3%82%A2.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%83%A1%E3%83%AA%E3%83%83%E3%82%B5%E3%83%BB%E3%83%A2%E3%82%A2.jpg",
       "avatar_source_site": "gfriends",
@@ -920997,7 +921084,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:09:39Z",
-      "scraped_at": "2026-11-21T01:46:06Z"
+      "scraped_at": "2026-11-21T06:36:04Z"
     },
     {
       "key": "tpdb:e5b61b85-345d-4cff-9259-1e6c18292e40",
