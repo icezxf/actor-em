@@ -82,6 +82,15 @@ python3 scripts/check_quality.py actors.jsonl --baseline 上次的.json   # 顺�
 有硬性问题（生日/三围格式非法、罩杯非法、出生地未带国家、站点 ID 冲突）时退出码为 1。
 `actor-sync.yml` 每轮跑完会自动执行一遍，报告写进该次运行的 Summary，并挂成 `quality-report` artifact。
 
+### 数据质量自愈
+
+同步与补值（`--backfill`）的收尾会自动跑两步幂等治理（`internal/actorsync/dedup.go`），修「同一站点 ID 指向多人」：
+
+1. **修主键串号**：`key` 写着 `javstash:A`，`provider_ids.JavStash` 却是 `B`（refresh 用被污染的别名命中了别人）。以 `key` 为准——库里有 `B` 就抹掉借来的值，没有就恢复成 `A`。
+2. **合并重复记录**：共享 provider ID、且**生日/身高/出道年/JavStash ID 都不冲突**的才合并成一条（字段取并集、简介取更长的）。实测可安全合并约 53 组。
+
+**绝不合并**生日或身高对不上的记录——那多半是字典把两个真人混并了（如 1990-08-31/152cm 与 1990-11-03/163cm 是两个人）。这类残余冲突（约 434 条）会在体检报告里继续列出，等人工核对字典，不自作主张删数据。实测一轮治理后：站点 ID 冲突 642→434、重名 102→60、重复头像 81→37，无任何检查项恶化。
+
 ### 静态站（GitHub Pages）
 
 `scripts/build_site.py` 把 `actors.jsonl` 派生成一个纯静态的搜索页，`pages.yml` 负责生成与发布；

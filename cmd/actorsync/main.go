@@ -465,6 +465,19 @@ func main() {
 	if n := actorsync.PurgeSharedBios(db.Actors); n > 0 {
 		logger.Printf("清理串号简介：%d 条（同一段文字挂在多人身上，已清空待重抓）", n)
 	}
+	// 数据质量自愈：主键串号 + 重复记录合并。都是幂等纯离线操作。
+	// 合并只动「生日/身高/出道年/JavStash ID 都不冲突」的真重复；
+	// 生日身高都不同的两个人（字典混并的受害者）绝不合并，留档待人工核对。
+	if n := actorsync.FixKeyProviderMismatch(db.Actors); n > 0 {
+		logger.Printf("修主键串号：%d 条（key 与 JavStash ID 矛盾）", n)
+	}
+	if merged, removed := func() (int, int) {
+		var g, r int
+		db.Actors, g, r = actorsync.MergeDuplicateActors(db.Actors)
+		return g, r
+	}(); merged > 0 {
+		logger.Printf("合并重复记录：%d 组、移除 %d 条（身份锚点完全一致）", merged, removed)
+	}
 	if err := db.Save(cfg.DataFile); err != nil {
 		logger.Fatalf("保存 %s 失败: %v", cfg.DataFile, err)
 	}
@@ -702,7 +715,18 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 		logger.Printf("清理串号简介：%d 条（同一段文字挂在多人身上，已清空待重抓）", nBioPurged)
 	}
 
-	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix + nCupTag + nBioPurged
+	// 数据质量自愈：主键串号 + 重复记录合并（幂等，只并身份锚点一致的真重复）。
+	nKeyFix := actorsync.FixKeyProviderMismatch(db.Actors)
+	if nKeyFix > 0 {
+		logger.Printf("修主键串号：%d 条（key 与 JavStash ID 矛盾）", nKeyFix)
+	}
+	nMerge, nMerged := 0, 0
+	db.Actors, nMerge, nMerged = actorsync.MergeDuplicateActors(db.Actors)
+	if nMerge > 0 {
+		logger.Printf("合并重复记录：%d 组、移除 %d 条（身份锚点完全一致）", nMerge, nMerged)
+	}
+
+	total := nBirth + nMeas + nTags + nHeight + nCup + nCareer + nPlace + nAlias + unitTag + fakeDate + upgraded + nPlaceFix + nCupTag + nBioPurged + nKeyFix + nMerged
 	if total == 0 {
 		logger.Printf("字段没有需要补的改动，仍重新派生 actors.json")
 	}
