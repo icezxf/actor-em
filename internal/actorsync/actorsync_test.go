@@ -12,44 +12,6 @@ import (
 	"time"
 )
 
-func TestBucketOf(t *testing.T) {
-	cases := map[string]string{
-		"小凑四叶":       "小",
-		"あい":         "あ",
-		"John Smith": "J",
-		"123":        "1",
-		"":           "_",
-		"🎬actor":     "_",
-	}
-	for in, want := range cases {
-		if got := BucketOf(in); got != want {
-			t.Errorf("BucketOf(%q) = %q, want %q", in, got, want)
-		}
-	}
-}
-
-func TestSanitizeFileName(t *testing.T) {
-	cases := map[string]string{
-		"A/B:C":     "A_B_C",
-		"  name.  ": "name",
-		"CON":       "_CON",
-		"小凑四叶":      "小凑四叶",
-	}
-	for in, want := range cases {
-		if got := SanitizeFileName(in); got != want {
-			t.Errorf("SanitizeFileName(%q) = %q, want %q", in, got, want)
-		}
-	}
-	// 超长按 rune 截断，不能切坏 UTF-8
-	long := ""
-	for i := 0; i < 100; i++ {
-		long += "あ"
-	}
-	if got := SanitizeFileName(long); len(got) > 80 || len([]rune(got)) == 0 {
-		t.Errorf("截断结果异常: %d 字节, %d rune", len(got), len([]rune(got)))
-	}
-}
-
 func TestBuildKey(t *testing.T) {
 	ids := map[string]string{"JavStash": "8F2C", "TPDB": "123"}
 	if got := BuildKey(ids, "某人"); got != "javstash:8f2c" {
@@ -393,14 +355,6 @@ func TestBWHInches(t *testing.T) {
 	}
 }
 
-func TestEncodePath(t *testing.T) {
-	got := encodePath("/actors/小/小凑四叶.jpg")
-	want := "/actors/%E5%B0%8F/%E5%B0%8F%E5%87%91%E5%9B%9B%E5%8F%B6.jpg"
-	if got != want {
-		t.Errorf("encodePath = %s, want %s", got, want)
-	}
-}
-
 func TestNormalizeDate(t *testing.T) {
 	cases := map[string]string{
 		"1996/5/10":            "1996-05-10",
@@ -514,47 +468,6 @@ func TestLoadNamesFile(t *testing.T) {
 	}
 	if got[1] != "三上悠亚" {
 		t.Fatalf("应去掉首尾空格，实际 %q", got[1])
-	}
-}
-
-func TestSaveNamesFileRoundTrip(t *testing.T) {
-	p := filepath.Join(t.TempDir(), "actors.txt")
-	if err := SaveNamesFile(p, []string{"b", "a", "a", " "}); err != nil {
-		t.Fatal(err)
-	}
-	got, err := LoadNamesFile(p)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
-		t.Fatalf("应去重并排序，实际 %+v", got)
-	}
-}
-
-func TestParseNFOActors(t *testing.T) {
-	nfo := []byte(`<?xml version="1.0" encoding="utf-8"?>
-<movie>
-  <title>某部作品</title>
-  <name>片名不应被当成演员</name>
-  <actor>
-    <name>小湊よつ葉</name>
-    <role>主演</role>
-  </actor>
-  <actor><name> 三上悠亜 </name></actor>
-  <actor><name></name></actor>
-</movie>`)
-	got := ParseNFOActors(nfo)
-	if len(got) != 2 {
-		t.Fatalf("期望 2 个演员，实际 %d: %v", len(got), got)
-	}
-	if got[0] != "小湊よつ葉" || got[1] != "三上悠亜" {
-		t.Fatalf("解析结果不对: %v", got)
-	}
-}
-
-func TestParseNFOInvalid(t *testing.T) {
-	if got := ParseNFOActors([]byte("not xml at all")); got != nil {
-		t.Fatalf("非 xml 应返回空，实际 %v", got)
 	}
 }
 

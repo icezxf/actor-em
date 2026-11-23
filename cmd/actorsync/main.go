@@ -27,7 +27,6 @@ func main() {
 		fillFields  string
 		fillOrder   string
 		fillMinAge  int
-		scanNFO     bool
 		noXlsx      bool
 		serveBot    bool
 		tgOnce      string
@@ -48,12 +47,9 @@ func main() {
 	flag.StringVar(&cfg.NamesFile, "names", cfg.NamesFile, "演员清单 txt 路径，一行一个名字")
 	flag.StringVar(&cfg.XlsxFile, "xlsx", cfg.XlsxFile, "导出的 Excel 路径")
 	flag.BoolVar(&noXlsx, "no-xlsx", false, "不导出 Excel")
-	flag.BoolVar(&scanNFO, "scan-nfo", false, "只扫描 alist 里的 nfo 生成演员清单，不刮削")
 	flag.BoolVar(&backfill, "backfill", false, "只用 MDCx 离线档案补空字段（生日/三围/标签/身高/罩杯/出道年），不联网、不需要 API Key")
 	// 老名字保留，脚本里还在用
 	flag.BoolVar(&backfill, "backfill-birthday", false, "同 --backfill（旧名）")
-	flag.StringVar(&cfg.NFODir, "nfo-dir", cfg.NFODir, "nfo 所在的 alist 目录")
-	flag.IntVar(&cfg.NFOMaxFiles, "nfo-max", cfg.NFOMaxFiles, "最多读取多少个 nfo（0 = 不限）")
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
 	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
 	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
@@ -99,14 +95,6 @@ func main() {
 		ctx, cancel = context.WithTimeout(context.Background(), 5*time.Hour)
 	}
 	defer cancel()
-
-	// 只扫描 nfo 生成清单，不抓数据
-	if scanNFO {
-		if err := runScanNFO(ctx, cfg, logger); err != nil {
-			logger.Fatalf("扫描 nfo 失败: %v", err)
-		}
-		return
-	}
 
 	// 只做离线补值：不联网、不需要任何 API Key
 	if backfill {
@@ -752,43 +740,6 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	return nil
 }
 
-// runScanNFO 递归读 alist 目录下的 nfo，把演员名写成待抓清单。
-func runScanNFO(ctx context.Context, cfg *Config, logger *log.Logger) error {
-	if cfg.AlistURL == "" || cfg.AlistUser == "" {
-		return fmt.Errorf("扫描 nfo 需要配置 ALIST_URL / ALIST_USER / ALIST_PASS")
-	}
-	if cfg.NFODir == "" {
-		return fmt.Errorf("缺少 nfo 目录：设置 ALIST_NFO_DIR 或传 --nfo-dir")
-	}
-
-	alist := actorsync.NewAlistClient(cfg.AlistURL, cfg.AlistUser, cfg.AlistPass)
-	if err := alist.Login(ctx); err != nil {
-		return fmt.Errorf("alist 登录失败: %w", err)
-	}
-	logger.Printf("开始扫描：%s（最多 %d 个 nfo，0 = 不限）", cfg.NFODir, cfg.NFOMaxFiles)
-
-	names, st, err := actorsync.ScanNFODirectory(ctx, alist, cfg.NFODir, cfg.NFOMaxFiles, func(s actorsync.ScanStats) {
-		logger.Printf("  已读 %d 个目录 / %d 个 nfo", s.Dirs, s.NFOCount)
-	})
-	if err != nil {
-		return err
-	}
-	logger.Printf("扫描完成：目录 %d，nfo %d，读取失败 %d，演员 %d", st.Dirs, st.NFOCount, st.ParseFail, len(names))
-
-	if cfg.DryRun {
-		logger.Printf("dry-run：不写 %s，前 5 个：%v", cfg.NamesFile, firstN(names, 5))
-		return nil
-	}
-	if len(names) == 0 {
-		return fmt.Errorf("一个演员都没解析到，检查目录是否正确、nfo 里是否有 <actor><name>")
-	}
-	if err := actorsync.SaveNamesFile(cfg.NamesFile, names); err != nil {
-		return fmt.Errorf("写入 %s 失败: %w", cfg.NamesFile, err)
-	}
-	logger.Printf("已写入 %s（%d 个演员）", cfg.NamesFile, len(names))
-	return nil
-}
-
 // newTelegram 组装客户端；配了 TELEGRAM_API_BASE 就走反代
 // （国内直连 api.telegram.org 基本不通，常驻服务尤其需要这一点）。
 func newTelegram(cfg *Config) *actorsync.TelegramClient {
@@ -1067,13 +1018,6 @@ func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw s
 	}
 	logger.Printf("本次 update 处理完毕：库内 %d 条", len(db.Actors))
 	return nil
-}
-
-func firstN(s []string, n int) []string {
-	if len(s) < n {
-		return s
-	}
-	return s[:n]
 }
 
 func writeManifest(logger *log.Logger, cfg *Config, db *actorsync.Db, stats actorsync.RunStats, srcStats map[string]map[string]int, start time.Time) {

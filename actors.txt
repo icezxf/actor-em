@@ -2,6 +2,3 @@
 #
 # 主清单不在这里——它是 actor_dict.csv 里的全部演员（约 2.1 万），
 # 这个文件只用来临时追加字典里没有的人，留空也能正常跑。
-#
-# 从 alist 的 nfo 反查演员名（可选，需要本机配 ALIST_URL/ALIST_USER/ALIST_PASS）：
-#   ./bin/actorsync --scan-nfo --nfo-dir /media

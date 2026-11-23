@@ -13,15 +13,15 @@ set -euo pipefail
 REPO="${REPO:-icezxf/actor-em}"
 
 # 已经不再使用、应该从仓库里清掉的 Secret。
-# 留着不会出错，但会让人以为这些还得配（尤其 ALIST_* 在新链路里完全没用）。
+# 代码侧已整体移除，这里保留清单是为了用 --prune 清掉远端的残留项。
 OBSOLETE=(
   DEEPL_API_KEY      # 英文简介不再翻译
-  ALIST_URL          # 头像不转存到 alist，--scan-nfo 只在本地跑
+  ALIST_URL          # alist / nfo 扫描链路已整体移除
   ALIST_USER
   ALIST_PASS
-  ALIST_PUBLIC_BASE  # 不再上传，没有直链要拼
+  ALIST_PUBLIC_BASE
   ALIST_DIR
-  ALIST_NFO_DIR      # build-actor-list 已停用
+  ALIST_NFO_DIR
   ALIST_NFO_MAX
 )
 

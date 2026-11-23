@@ -381,3 +381,31 @@ func (c *TelegramClient) Notify(ctx context.Context, text string) error {
 	_, err := c.call(ctx, "sendMessage", payload)
 	return err
 }
+
+// DownloadImage 下载头像原图，限制 12MB 防止被超大图拖死。
+// 发候选图时直接用数据源给的直链，不再经 alist 转存。
+func DownloadImage(ctx context.Context, hc *http.Client, imageURL string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, imageURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+	req.Header.Set("Referer", imageURL)
+
+	resp, err := hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("下载头像 HTTP %d", resp.StatusCode)
+	}
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 12<<20))
+	if err != nil {
+		return nil, err
+	}
+	if len(data) < 512 {
+		return nil, fmt.Errorf("图片过小（%d 字节），可能不是有效图片", len(data))
+	}
+	return data, nil
+}

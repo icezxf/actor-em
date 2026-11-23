@@ -46,9 +46,8 @@
 - MDCx：比对 Release asset 的 `digest`（sha256）
 - 两源都没变 → `exit 0`，不产生空提交
 
-> `build-actor-list.yml`（扫 alist nfo 生成 `actors.txt`）已**删除**——清单现在直接来自
-> `actor_dict.csv` 的全量演员。`--scan-nfo` 命令还在，需要时本地手工跑一次即可，
-> 不用再为它配 `ALIST_*` 那套 Secret。
+> alist / nfo 扫描链路（`build-actor-list.yml`、`--scan-nfo`、`ALIST_*`）已**整体移除**，
+> 清单现在直接来自 `actor_dict.csv` 的全量演员，头像用数据源直链、不经 alist 转存。
 
 ## 产物
 
@@ -191,7 +190,6 @@ MDCX_CSV=/tmp/mdcx_profiles.csv GFRIENDS=1 THEACTORBASE=1 ACTORS_CONCURRENCY=10 
 | `ACTORS_CONCURRENCY` | `1` | 并发抓取数，首铺调到 10；**没有对应 flag，只能走环境变量** |
 | `ACTORS_DRY_RUN` | — | `1` = 只打印不写盘 |
 | `ACTORS_VERBOSE` | — | `1` = 打印每个源的命中情况 |
-| `ACTORS_NFO_DIR` / `ALIST_*` | — | 仅 `--scan-nfo` 用；头像不转存，不需要 alist |
 
 ### Secrets 一次性配置
 
@@ -223,9 +221,6 @@ actorsync [flags]
   --no-xlsx            不导出 Excel
   --verbose            打印每个源的命中情况
   --data / --manifest  自定义文件路径
-
-  # 只扫描 nfo，生成 actors.txt，不抓数据
-  --scan-nfo --nfo-dir /media [--nfo-max 500]
 
   # 常驻交互服务：在 Telegram 里发名字即时刮削（Ctrl+C 退出）
   --tg-serve

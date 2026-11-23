@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"regexp"
 	"strings"
-	"unicode"
 )
 
 // ---------- 指针小工具 ----------
@@ -65,35 +64,7 @@ func BuildKey(providerIDs map[string]string, name string) string {
 	return NameHashKey(name)
 }
 
-// ---------- 文件名 ----------
-
-var (
-	illegalFileChars = regexp.MustCompile(`[\\/:*?"<>|\x00-\x1f]`)
-	reservedNames    = map[string]bool{
-		"CON": true, "PRN": true, "AUX": true, "NUL": true,
-		"COM1": true, "COM2": true, "COM3": true, "COM4": true, "COM5": true,
-		"COM6": true, "COM7": true, "COM8": true, "COM9": true,
-		"LPT1": true, "LPT2": true, "LPT3": true, "LPT4": true, "LPT5": true,
-		"LPT6": true, "LPT7": true, "LPT8": true, "LPT9": true,
-	}
-)
-
-// SanitizeFileName 只做必要处理：非法字符换 _、去首尾空白与尾部点、超长按 rune 截断。
-// 不做翻译/转写——清单里叫什么就是什么。
-func SanitizeFileName(name string) string {
-	s := illegalFileChars.ReplaceAllString(name, "_")
-	s = strings.TrimSpace(s)
-	s = strings.TrimRight(s, ".")
-	if s == "" {
-		s = "_"
-	}
-	// 按 rune 截断到 80 字节，避免切坏 UTF-8
-	s = TruncateUTF8(s, 80)
-	if reservedNames[strings.ToUpper(s)] {
-		s = "_" + s
-	}
-	return s
-}
+// ---------- 文本截断 ----------
 
 // TruncateUTF8 按字节上限截断，但不切断 rune。
 func TruncateUTF8(s string, maxBytes int) string {
@@ -108,30 +79,6 @@ func TruncateUTF8(s string, maxBytes int) string {
 		b.WriteRune(r)
 	}
 	return b.String()
-}
-
-// BucketOf 返回头像分桶目录名：取名字首字符。
-// 中日韩字符用原字符，拉丁字母转大写，数字原样，其余归到 _。
-func BucketOf(name string) string {
-	r := []rune(strings.TrimSpace(name))
-	if len(r) == 0 {
-		return "_"
-	}
-	c := r[0]
-	switch {
-	case c >= 'a' && c <= 'z':
-		return strings.ToUpper(string(c))
-	case c >= 'A' && c <= 'Z':
-		return string(c)
-	case c >= '0' && c <= '9':
-		return string(c)
-	case unicode.Is(unicode.Han, c),
-		unicode.Is(unicode.Hiragana, c),
-		unicode.Is(unicode.Katakana, c),
-		unicode.Is(unicode.Hangul, c):
-		return string(c)
-	}
-	return "_"
 }
 
 // ---------- 头像地址 ----------

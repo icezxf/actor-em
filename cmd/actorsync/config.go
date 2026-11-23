@@ -29,11 +29,6 @@ type Config struct {
 	IdolDB        bool   // IDOLDB=0 关闭；MagicBude/jav-idol-db 档案补充
 	CastWiki      bool   // CASTWIKI=0 关闭；卡司Wiki 中文简介（整段，最长）
 
-	// alist（仅 --scan-nfo 读 nfo 用；头像不转存）
-	AlistURL  string
-	AlistUser string
-	AlistPass string
-
 	// 演员清单（唯一来源，一行一个名字）
 	NamesFile string
 
@@ -51,10 +46,6 @@ type Config struct {
 	DictFile      string
 	DictLocalFile string // 手工补充字典，覆盖主字典
 	XlsxFile      string // 导出的 Excel（派生产物）
-
-	// NFO 扫描（--scan-nfo）
-	NFODir      string
-	NFOMaxFiles int
 
 	// 行为
 	Limit       int
@@ -116,9 +107,6 @@ func applyEnv(c *Config) {
 	c.Cinewho = !(os.Getenv("CINEWHO") == "0" || strings.EqualFold(os.Getenv("CINEWHO"), "false"))
 	c.IdolDB = !(os.Getenv("IDOLDB") == "0" || strings.EqualFold(os.Getenv("IDOLDB"), "false"))
 	c.CastWiki = !(os.Getenv("CASTWIKI") == "0" || strings.EqualFold(os.Getenv("CASTWIKI"), "false"))
-	set(&c.AlistURL, "ALIST_URL")
-	set(&c.AlistUser, "ALIST_USER")
-	set(&c.AlistPass, "ALIST_PASS")
 	set(&c.DataFile, "ACTORS_FILE")
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
 	set(&c.DictFile, "ACTOR_DICT")
@@ -135,13 +123,6 @@ func applyEnv(c *Config) {
 			c.ReviewMax = n
 		}
 	}
-	set(&c.NFODir, "ALIST_NFO_DIR")
-	if v := os.Getenv("ALIST_NFO_MAX"); v != "" {
-		if n, err := strconv.Atoi(v); err == nil {
-			c.NFOMaxFiles = n
-		}
-	}
-
 	if v := os.Getenv("ACTORS_LIMIT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
 			c.Limit = n
