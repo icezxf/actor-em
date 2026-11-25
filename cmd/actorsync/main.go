@@ -31,6 +31,7 @@ func main() {
 		serveBot    bool
 		tgOnce      string
 		backfill    bool
+		stashList   string
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -53,6 +54,7 @@ func main() {
 	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
 	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
 	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
+	flag.StringVar(&stashList, "stash-list", "", "StashDB 欧美模式：UUID 清单文件（一行一个 UUID）；只用这份清单，不掺日系字典。配合 --data 写独立库")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
@@ -136,16 +138,27 @@ func main() {
 	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
 
 	// ---------- 2. 读待抓清单 ----------
-	// 清单主体来自工作流 1 产出的字典（它才是演员总表），
-	// actors.txt 只作为手工追加通道，可以是空文件或不存在。
-	names, err := collectNames(fetcher.Dict, cfg.NamesFile, logger)
-	if err != nil {
-		logger.Fatalf("读取演员清单失败: %v", err)
+	// 两种模式：
+	//   - 默认：清单主体来自工作流 1 产出的字典（它才是演员总表），actors.txt 只作手工追加通道。
+	//   - --stash-list：StashDB 欧美模式，清单只来自 UUID 文件，完全不掺日系字典。
+	var names []string
+	if stashList != "" {
+		names, err = actorsync.LoadNamesFile(stashList)
+		if err != nil {
+			logger.Fatalf("读取 StashDB 清单 %s 失败: %v", stashList, err)
+		}
+		logger.Printf("StashDB 欧美模式：清单 %d 个 UUID（%s）", len(names), stashList)
+	} else {
+		names, err = collectNames(fetcher.Dict, cfg.NamesFile, logger)
+		if err != nil {
+			logger.Fatalf("读取演员清单失败: %v", err)
+		}
+		logger.Printf("演员清单：%d 个（%s）", len(names), cfg.NamesFile)
 	}
-	logger.Printf("演员清单：%d 个（%s）", len(names), cfg.NamesFile)
 
 	// ---------- 2.5 Telegram 人工选图：先把上一轮攒下的点击收回来 ----------
-	reviewOn := cfg.TelegramToken != "" && cfg.TelegramChatID != "" && cfg.ReviewMax > 0
+	// StashDB 欧美模式不参与人工选图（清单是 UUID、独立库，避免和日系 update 队列串台）。
+	reviewOn := cfg.TelegramToken != "" && cfg.TelegramChatID != "" && cfg.ReviewMax > 0 && stashList == ""
 	var (
 		tg          *actorsync.TelegramClient
 		reviewState *actorsync.ReviewState

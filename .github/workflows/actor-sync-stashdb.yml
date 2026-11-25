@@ -1,5 +1,8 @@
 name: actor-sync-stashdb
 
+# 每次运行显示的名字：在 Actions 列表里一眼看出这批跑了什么参数
+run-name: "[欧美库] limit=${{ inputs.limit }}并发=${{ inputs.concurrency }} dry=${{ inputs.dry_run }}${{ inputs.refresh_list == true && ' 刷新清单' || '' }}"
+
 # 独立工作流：StashDB 欧美演员库（与日系 actor-sync 完全隔离）
 #
 # 清单：从 StashDB 分页拉取女性演员 UUID（排除亚洲国家码）→ actors_stashdb.txt
@@ -55,11 +58,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build
+      - name: ① 编译刮削程序
         run: go build -o /tmp/actorsync ./cmd/actorsync
 
       # 清单：默认用仓库里已有的 actors_stashdb.txt；勾了 refresh_list 才重新拉。
-      - name: Refresh StashDB UUID list
+      - name: ② 刷新 StashDB 清单（仅勾选时）
         if: ${{ github.event.inputs.refresh_list == 'true' }}
         env:
           STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
@@ -69,7 +72,7 @@ jobs:
           python3 scripts/export_stashdb_list.py -o actors_stashdb.txt --per-page 200 $ARGS
           echo "清单行数：$(wc -l < actors_stashdb.txt)"
 
-      - name: Check list
+      - name: ③ 检查清单文件
         run: |
           if [ ! -f actors_stashdb.txt ]; then
             echo "::error::缺少 actors_stashdb.txt，请先勾选 refresh_list 跑一次"
@@ -79,7 +82,7 @@ jobs:
 
       # 欧美库不依赖 MDCx / gfriends / 中文人物站：关闭它们，省时省请求。
       # 只留 StashDB（主力）+ TPDB（补生日/三围/图）+ JavStash（权威生日兜底）。
-      - name: Sync StashDB actors
+      - name: ④ 刮削欧美演员（写独立库 actors_eu）
         env:
           STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
           TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
@@ -110,7 +113,7 @@ jobs:
           echo "运行参数：${ARGS[*]}"
           ACTORS_CONCURRENCY="$CONC_INPUT" /tmp/actorsync "${ARGS[@]}"
 
-      - name: Commit
+      - name: ⑤ 提交独立库到仓库（仅非 dry-run）
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
           git config user.name  "actor-bot"
@@ -146,7 +149,7 @@ jobs:
           done
           echo "连续 3 次推送失败，放弃"; exit 1
 
-      - name: 质量体检
+      - name: ⑥ 数据质量体检（仅非 dry-run）
         if: ${{ always() && github.event.inputs.dry_run != 'true' }}
         continue-on-error: true
         run: |
@@ -164,7 +167,7 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Upload quality report
+      - name: ⑦ 上传体检报告
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
@@ -175,7 +178,7 @@ jobs:
           retention-days: 90
           if-no-files-found: ignore
 
-      - name: Summary
+      - name: ⑧ 运行摘要
         if: always()
         run: |
           echo "### 欧美演员库（StashDB）" >> "$GITHUB_STEP_SUMMARY"
