@@ -41,11 +41,12 @@ AVATAR_PREFIXES = [
 ]
 
 # 行字段顺序，前端 app.js 里按同样顺序解包
+# src 标记来源：jp=日系（actors.jsonl）/ eu=欧美（actors_eu.jsonl）
 FIELDS = [
     "id", "name", "name_original", "avatar", "birth_date", "height_cm",
     "cup_size", "measurements", "career_start", "tags", "aliases", "birth_place",
     # country 是 ISO 码（JP/US/TW…），前端翻成中文并做「日本 / 其他 → 具体国家」两级筛选
-    "country",
+    "country", "src",
 ]
 
 # 别名给搜索用，个别人有上百条（含各种活动名），全带上会把索引撑大 0.5MB，取前 12 条足够。
@@ -174,8 +175,13 @@ def compact_avatar(url: str) -> str:
     return url
 
 
-def build_rows(rows: list[dict]):
-    """返回 (索引行, 详情分片)。详情分片只存 [简介, 主页]，按 id 取模分桶。"""
+def build_rows(rows: list[dict], src: str = "jp"):
+    """返回 (索引行, 详情分片)。详情分片只存 [简介, 主页]，按 id 取模分桶。
+
+    src: jp / eu，写进每行末列供前端筛选。两批数据合并时 id 要错开，
+    否则详情分片按 id 取模会撞——用 (src 前缀 + 序号) 不行（前端按数字取模），
+    所以改成全局递增的连续 id（由调用方保证两批 id 不重叠）。
+    """
     out = []
     details: list[dict] = [{} for _ in range(DETAIL_SHARDS)]
     for a in rows:
@@ -197,6 +203,7 @@ def build_rows(rows: list[dict]):
             "|".join((a.get("aliases") or [])[:MAX_ALIASES]),  # 10
             a.get("birth_place") or "",                 # 11
             a.get("country") or "",                     # 12
+            src,                                        # 13 来源 jp/eu
         ])
         bio = a.get("bio") or ""
         home = a.get("homepage_url") or ""
@@ -212,7 +219,28 @@ def main() -> int:
         return 1
 
     rows = load_rows(src)
-    data_rows, details = build_rows(rows)
+    data_rows, details = build_rows(rows, src="jp")
+
+    # 欧美库：存在就并进同一份索引，标 src=eu，前端可单独筛选。
+    # id 必须全局连续（build_rows 内部按 len(out) 生成），所以先记录当前数量，
+    # 欧洲批次的 id 偏移由合并函数统一处理。
+    eu_path = os.path.join(ROOT, "actors_eu.jsonl")
+    eu_count = 0
+    if os.path.exists(eu_path):
+        eu_rows = load_rows(eu_path)
+        eu_data, eu_details = build_rows(eu_rows, src="eu")
+        offset = len(data_rows)
+        for r in eu_data:
+            r[0] = r[0] + offset                 # id 全局递增，避免分片 key 撞车
+        data_rows.extend(eu_data)
+        for i, bucket in enumerate(eu_details):
+            remapped = {str(int(k) + offset): v for k, v in bucket.items()}
+            for k, v in remapped.items():
+                details[i][k] = v
+        eu_count = len(eu_data)
+        print(f"欧美库 {eu_count} 条并入（源 {len(eu_rows)} 条）→ {eu_path}")
+    else:
+        print(f"跳过欧美库：找不到 {eu_path}", file=sys.stderr)
 
     # 原地覆盖，不删目录：产物是固定文件名，旧文件会被同名覆盖，
     # 分片数量也是固定的 16 个，不需要清理。

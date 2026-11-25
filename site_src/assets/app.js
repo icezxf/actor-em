@@ -9,6 +9,15 @@
     '~s/': 'https://stashdb.org/'
   };
   var CUPS = 'ABCDEFGHIJKLMNO'.split('');
+  // 欧美双字母杯（AA/DD/JJ）排序时排在同名单字母之后
+  function cupRank(c) {
+    if (!c) return -1;
+    if (c.length === 2 && c[0] === c[1]) {
+      var i = CUPS.indexOf(c[0]);
+      return i < 0 ? -1 : i + 0.5;
+    }
+    return CUPS.indexOf(c);
+  }
   var PAGE = 60;
 
   // country 字段存的是 ISO 码（JP/US/TW…），页面上统一显示中文名。
@@ -26,6 +35,7 @@
 
   var el = {
     q: document.getElementById('q'),
+    source: document.getElementById('source'),
     cup: document.getElementById('cup'),
     height: document.getElementById('height'),
     region: document.getElementById('region'),
@@ -53,7 +63,7 @@
     mXref: document.getElementById('m-xref')
   };
 
-  var state = { q: '', cup: '', height: '', region: '', country: '', sort: 'name', tag: '', onlyAvatar: false };
+  var state = { q: '', source: '', cup: '', height: '', region: '', country: '', sort: 'name', tag: '', onlyAvatar: false };
   var all = [];
   var view = [];
   var shown = 0;
@@ -72,6 +82,7 @@
       id: r[0], name: r[1], orig: r[2], avatar: avatarUrl(r[3]),
       birth: r[4], height: r[5], cup: r[6], meas: r[7], career: r[8],
       tags: tags, aliases: aliases, place: r[11], country: (r[12] || '').toUpperCase(),
+      src: r[13] || 'jp',
       search: (r[1] + ' ' + r[2] + ' ' + aliases.join(' ') + ' ' + tags.join(' ')).toLowerCase()
     };
   }
@@ -109,11 +120,6 @@
         if (k && !nameIndex[k]) nameIndex[k] = a;
       });
     });
-  }
-
-  function cupRank(c) {
-    var i = CUPS.indexOf(c);
-    return i < 0 ? -1 : i;
   }
 
   function year(v) {
@@ -157,6 +163,7 @@
   function current() {
     var q = state.q.trim().toLowerCase();
     var out = all.filter(function (a) {
+      if (state.source && a.src !== state.source) return false;
       if (state.onlyAvatar && !a.avatar) return false;
       if (state.cup && a.cup !== state.cup) return false;
       if (state.tag && a.tags.indexOf(state.tag) < 0) return false;
@@ -212,6 +219,12 @@
     name.className = 'name';
     name.textContent = a.name;
     info.appendChild(name);
+    if (a.src === 'eu') {
+      var euTag = document.createElement('span');
+      euTag.className = 'srctag';
+      euTag.textContent = '欧美';
+      name.appendChild(euTag);
+    }
 
     if (a.orig && a.orig !== a.name) {
       var sub = document.createElement('div');
@@ -323,7 +336,9 @@
       link.href = home;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = home.indexOf('javstash') >= 0 ? 'JavStash 主页' : 'TPDB 主页';
+      var label = home.indexOf('javstash') >= 0 ? 'JavStash 主页'
+        : home.indexOf('stashdb') >= 0 ? 'StashDB 主页' : 'TPDB 主页';
+      link.textContent = label;
       el.mLinks.appendChild(link);
     });
 
@@ -441,6 +456,7 @@
       reset();
     }, 120);
   });
+  el.source.addEventListener('change', function () { state.source = el.source.value; reset(); });
   el.cup.addEventListener('change', function () { state.cup = el.cup.value; reset(); });
   el.height.addEventListener('change', function () { state.height = el.height.value; reset(); });
   el.region.addEventListener('change', function () {

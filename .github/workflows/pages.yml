@@ -11,8 +11,9 @@ on:
       - "site_src/**"
       - "scripts/build_site.py"
       - ".github/workflows/pages.yml"
+      - "actors_eu.jsonl"       # 欧美库更新后重建页面
   workflow_run:
-    workflows: [actor-sync]
+    workflows: [actor-sync, actor-sync-stashdb]
     types: [completed]
   workflow_dispatch:
 
