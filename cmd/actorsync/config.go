@@ -28,6 +28,7 @@ type Config struct {
 	Cinewho       bool   // CINEWHO=0 关闭；影中人中文简介+生日/身高/三围
 	IdolDB        bool   // IDOLDB=0 关闭；MagicBude/jav-idol-db 档案补充
 	CastWiki      bool   // CASTWIKI=0 关闭；卡司Wiki 中文简介（整段，最长）
+	WikiEN        bool   // WIKI_EN=1：英文维基简介兜底（欧美演员，严格身份对账）
 
 	// 演员清单（唯一来源，一行一个名字）
 	NamesFile string
@@ -107,6 +108,8 @@ func applyEnv(c *Config) {
 	c.Cinewho = !(os.Getenv("CINEWHO") == "0" || strings.EqualFold(os.Getenv("CINEWHO"), "false"))
 	c.IdolDB = !(os.Getenv("IDOLDB") == "0" || strings.EqualFold(os.Getenv("IDOLDB"), "false"))
 	c.CastWiki = !(os.Getenv("CASTWIKI") == "0" || strings.EqualFold(os.Getenv("CASTWIKI"), "false"))
+	// 英文维基默认关（日系用不到，且有同名误配风险）；欧美工作流显式 WIKI_EN=1 开
+	c.WikiEN = os.Getenv("WIKI_EN") == "1" || strings.EqualFold(os.Getenv("WIKI_EN"), "true")
 	set(&c.DataFile, "ACTORS_FILE")
 	set(&c.ManifestFile, "ACTORS_MANIFEST")
 	set(&c.DictFile, "ACTOR_DICT")

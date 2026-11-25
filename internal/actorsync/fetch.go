@@ -74,6 +74,7 @@ type Fetcher struct {
 	Cinewho      *CinewhoClient
 	IdolDB       *IdolDBClient
 	CastWiki     *CastWikiClient
+	WikiEN       *WikiENClient // 英文维基，欧美演员简介兜底（严格身份对账）
 	Gfriends     *Gfriends
 	MDCx         *MDCxDB
 	Dict         *Dict
@@ -360,14 +361,34 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 			name, BioHeightCm(res.Bio), res.HeightCm)
 		res.Bio = ""
 	}
-	// 中文简介链全部落空时，用 TPDB 英文简介兜底（欧美演员多有英文、无中文）。
-	// 标 bio_lang=en，下游可选择只显示中文；放在这里保证"中文优先"不被长英文抢占。
+	// 中文简介链全部落空时，依次用英文维基（严格身份对账）、TPDB 英文简介兜底。
+	// 都标 bio_lang=en，下游可选择只显示中文；保证"中文优先"不被长英文抢占。
+	if res.Bio == "" && f.WikiEN != nil {
+		// UUID 模式下 name 是 StashDB ID，用数据源返回的英文名搜维基
+		enName := name
+		if IsUUID(name) && res.CanonicalName != "" {
+			enName = res.CanonicalName
+		}
+		wy := wantBirthYear(res.BirthDate, res.BirthYear)
+		wctx, wcancel := context.WithTimeout(ctx, 10*time.Second)
+		if enBio := f.WikiEN.FetchBio(wctx, enName, wy); enBio != "" {
+			res.Bio = enBio
+			res.BioLang = "en"
+			f.mark(res, "wiki_en", true)
+			f.logf("[%s] 简介用英文维基兜底（%d 字，对账年份 %d）", name, len([]rune(enBio)), wy)
+		} else {
+			f.mark(res, "wiki_en", false)
+		}
+		wcancel()
+	}
 	if res.Bio == "" && res.BioEnFallback != "" {
 		res.Bio = res.BioEnFallback
 		res.BioLang = "en" // 明确标英文，不靠 DetectLanguage 猜（弯引号等会让它判 unknown）
 		f.logf("[%s] 简介用 TPDB 英文兜底（%d 字）", name, len([]rune(res.Bio)))
 	} else if res.Bio != "" {
-		res.BioLang = DetectLanguage(res.Bio)
+		if res.BioLang == "" {
+			res.BioLang = DetectLanguage(res.Bio)
+		}
 	}
 	res.Bio = TruncateUTF8(res.Bio, 6000)
 

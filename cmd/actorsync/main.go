@@ -900,6 +900,9 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	if cfg.IdolDB {
 		fetcher.IdolDB = actorsync.NewIdolDBClient(hc)
 	}
+	if cfg.WikiEN {
+		fetcher.WikiEN = actorsync.NewWikiENClient(hc, cfg.WikiEmail)
+	}
 	if cfg.CastWiki {
 		fetcher.CastWiki = actorsync.NewCastWikiClient(hc)
 	}

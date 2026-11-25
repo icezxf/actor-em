@@ -100,6 +100,7 @@ jobs:
           THEACTORBASE: "0"
           GFRIENDS: "0"
           ACTORS_REVIEW_MAX: "0"
+          WIKI_EN: "1"          # 英文维基简介兜底（欧美演员，严格身份对账）
 
           LIMIT_INPUT: ${{ github.event.inputs.limit }}
           CONC_INPUT: ${{ github.event.inputs.concurrency }}
