@@ -26,7 +26,7 @@ MIN_DEBUT_AGE = 14          # 出道时未成年 = 生日或出道年至少有�
 HEIGHT_RANGE = (130, 200)
 IN_RANGE = {"bust": (25, 55), "waist": (18, 45), "hip": (28, 55)}
 CM_RANGE = {"bust": (60, 130), "waist": (45, 110), "hip": (65, 135)}
-CUP_LETTERS = set("ABCDEFGHIJKLMNOP")
+CUP_LETTERS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 TAG_BLACKLIST = ("未成年", "幼児体型", "幼儿体型", "儿童")
 BIO_MIN, BIO_MAX = 20, 3000
 
@@ -237,7 +237,7 @@ def main():
         valid = (1 <= len(c) <= 3 and c in CUP_LETTERS) or (len(c) in (2, 3) and len(set(c)) == 1 and c[0] in CUP_LETTERS)
         if not valid:
             bad_cup.append(f"{a.get('key')} = {a.get('cup_size')}")
-    rep.check("罩杯非法", bad_cup, n, "接受 A–O 单字母或 AA/DD/JJ/DDD 重复字母")
+    rep.check("罩杯非法", bad_cup, n, "接受 A–Z 单字母或 AA/DD/JJ/DDD 重复字母")
 
     # 罩杯标签一致性
     no_tag, wrong_tag = [], []

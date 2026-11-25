@@ -138,8 +138,44 @@ func MergeDuplicateActors(actors []*Actor) ([]*Actor, int, int) {
 // identityConflict 判断一组记录里是否有「两个都有值却不一样」的核心锚点。
 // 只要有一个锚点出现两个不同的值，就认定是不同的人，拒绝合并。
 // 全部为空、或都一致都算不冲突。
+//
+// 欧美宽松例外：一组全是 stashdb:* 记录、名字相同、生日一致时，忽略 career_start /
+// height_cm 的冲突——StashDB 上同一人常有多张卡（出道年 2007 vs 2021 之类）。
+// 生日冲突或 JavStash ID 冲突仍严格拒绝，日系记录一律走严格规则。
 func identityConflict(actors []*Actor) bool {
+	// 先判生日冲突：任何时候两个不同生日都是不同的人。
+	firstBirth := ""
+	for _, a := range actors {
+		v := StrVal(a.BirthDate)
+		if v == "" {
+			continue
+		}
+		if firstBirth == "" {
+			firstBirth = v
+		} else if v != firstBirth {
+			return true
+		}
+	}
+	// JavStash ID 两边都有且不同 —— 两张不同的 performer 卡，不是同一人。
+	firstJS := ""
+	for _, a := range actors {
+		v := strings.ToLower(strings.TrimSpace(a.ProviderIDs["JavStash"]))
+		if v == "" {
+			continue
+		}
+		if firstJS == "" {
+			firstJS = v
+		} else if v != firstJS {
+			return true
+		}
+	}
+
+	// 欧美宽松：全 stashdb + 名字相同 + 生日一致 → 忽略出道年/身高冲突
+	euLoose := firstJS == "" && sameNameAndBirth(actors)
 	for _, field := range identityAnchors {
+		if euLoose && (field == "career_start" || field == "height_cm") {
+			continue
+		}
 		first := ""
 		for _, a := range actors {
 			v := actorField(a, field)
@@ -153,20 +189,21 @@ func identityConflict(actors []*Actor) bool {
 			}
 		}
 	}
-	// JavStash ID 两边都有且不同 —— 两张不同的 performer 卡，不是同一人。
-	first := ""
-	for _, a := range actors {
-		v := strings.ToLower(strings.TrimSpace(a.ProviderIDs["JavStash"]))
-		if v == "" {
-			continue
-		}
-		if first == "" {
-			first = v
-		} else if v != first {
-			return true
+	return false
+}
+
+// sameNameAndBirth 判断一组记录名字（规范化）相同、且生日一致（都空也算一致）。
+func sameNameAndBirth(actors []*Actor) bool {
+	if len(actors) < 2 {
+		return false
+	}
+	name := NormalizeName(actors[0].Name)
+	for _, a := range actors[1:] {
+		if NormalizeName(a.Name) != name {
+			return false
 		}
 	}
-	return false
+	return true // 生日一致性已由 identityConflict 上方的 firstBirth 检查保证
 }
 
 // actorField 取核心锚点字段的字符串值（空值返回空串）。

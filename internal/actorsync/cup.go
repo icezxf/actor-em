@@ -24,9 +24,9 @@ func CupTag(cup string) string {
 	return c + "罩杯"
 }
 
-// normalizeCup 接受 A~O 的罩杯。日系是单字母（A~O）；欧美常见多字母重复
-// （AA/DD/JJ/DDD），也接受——但只允许同一个字母重复 2~3 次（AA/DD/JJ/DDD），
-// 不认 ABC/DDD 之外的乱组合（如 AB/CD/DDD 中的 DDD 合法是因为三字母全同）。
+// normalizeCup 接受 A~Z 的罩杯。日系是单字母；欧美常见多字母重复
+// （AA/DD/JJ/DDD）和超大杯（R/U/T/W），也接受——但多字母只允许同一个字母重复 2~3 次，
+// 不认 AB/CD 这类乱组合。
 func normalizeCup(cup string) string {
 	s := strings.TrimSpace(cup)
 	if m := reCupOnly.FindStringSubmatch(s); len(m) > 1 {
@@ -37,7 +37,7 @@ func normalizeCup(cup string) string {
 		return ""
 	}
 	for _, r := range s {
-		if r < 'A' || r > 'O' {
+		if r < 'A' || r > 'Z' {
 			return ""
 		}
 	}
