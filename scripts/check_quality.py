@@ -200,7 +200,7 @@ def main():
     rep.check("身高越界", bad_h, n, f"不在 {HEIGHT_RANGE[0]}–{HEIGHT_RANGE[1]} cm")
 
     # ---------- 三围 ----------
-    meas_re = re.compile(r"^(\d{2,3})([A-Z]{1,2})?-(\d{2,3})-(\d{2,3})$")
+    meas_re = re.compile(r"^(\d{2,3})([A-Z]{1,3})?-(\d{2,3})-(\d{2,3})$")
     bad_meas, odd_meas, rel_meas = [], [], []
     for a in exp:
         m = a.get("measurements")
@@ -233,11 +233,11 @@ def main():
         if not c:
             continue
         c = c.strip().upper()
-        # 单字母 A-O（日标）或双字母重复（AA/DD/JJ，欧美杯型）
-        valid = (len(c) == 1 and c in CUP_LETTERS) or (len(c) == 2 and c[0] == c[1] and c[0] in CUP_LETTERS)
+        # 单字母 A-O（日标）或多字母重复（AA/DD/JJ/DDD，欧美杯型）
+        valid = (1 <= len(c) <= 3 and c in CUP_LETTERS) or (len(c) in (2, 3) and len(set(c)) == 1 and c[0] in CUP_LETTERS)
         if not valid:
             bad_cup.append(f"{a.get('key')} = {a.get('cup_size')}")
-    rep.check("罩杯非法", bad_cup, n, "接受 A–O 单字母或 AA/DD/JJ 双字母")
+    rep.check("罩杯非法", bad_cup, n, "接受 A–O 单字母或 AA/DD/JJ/DDD 重复字母")
 
     # 罩杯标签一致性
     no_tag, wrong_tag = [], []

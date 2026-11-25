@@ -9,10 +9,10 @@ import (
 // 罩杯既写 cup_size，也进 tags。Emby 的标签栏能直接按「E罩杯」筛人，
 // 否则罩杯只藏在详情字段里，看不出规律。
 var (
-	// 三围首段的「34E」：底围+杯
-	reBandCup = regexp.MustCompile(`^\s*(\d{2,3})\s*([A-Za-z]{1,2})`)
-	// 单独的罩杯：「E」「J」
-	reCupOnly = regexp.MustCompile(`^\s*([A-Za-z]{1,2})\s*(?:cup|カップ|罩杯|杯)?\s*$`)
+	// 三围首段的「34E」「42DDD」：底围+杯（杯 1~3 字母）
+	reBandCup = regexp.MustCompile(`^\s*(\d{2,3})\s*([A-Za-z]{1,3})`)
+	// 单独的罩杯：「E」「J」「DDD」
+	reCupOnly = regexp.MustCompile(`^\s*([A-Za-z]{1,3})\s*(?:cup|カップ|罩杯|杯)?\s*$`)
 )
 
 // CupTag 把罩杯转成标签文字：「E」→「E罩杯」。认不出来返回空串。
@@ -24,15 +24,16 @@ func CupTag(cup string) string {
 	return c + "罩杯"
 }
 
-// normalizeCup 接受 A~O 的罩杯。日系是单字母（A~O）；欧美常见双字母（AA/DD/JJ），
-// 也接受——但只允许同一个字母重复两次（AA/DD/JJ），不认 AB/CD 这类乱组合。
+// normalizeCup 接受 A~O 的罩杯。日系是单字母（A~O）；欧美常见多字母重复
+// （AA/DD/JJ/DDD），也接受——但只允许同一个字母重复 2~3 次（AA/DD/JJ/DDD），
+// 不认 ABC/DDD 之外的乱组合（如 AB/CD/DDD 中的 DDD 合法是因为三字母全同）。
 func normalizeCup(cup string) string {
 	s := strings.TrimSpace(cup)
 	if m := reCupOnly.FindStringSubmatch(s); len(m) > 1 {
 		s = m[1]
 	}
 	s = strings.ToUpper(strings.TrimSpace(s))
-	if len(s) < 1 || len(s) > 2 {
+	if len(s) < 1 || len(s) > 3 {
 		return ""
 	}
 	for _, r := range s {
@@ -40,9 +41,11 @@ func normalizeCup(cup string) string {
 			return ""
 		}
 	}
-	// 双字母必须两个相同（AA/DD/JJ），否则不认。
-	if len(s) == 2 && s[0] != s[1] {
-		return ""
+	// 多字母必须全部相同（AA/DD/JJ/DDD），否则不认。
+	for i := 1; i < len(s); i++ {
+		if s[i] != s[0] {
+			return ""
+		}
 	}
 	return s
 }
