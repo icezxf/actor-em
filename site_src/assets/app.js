@@ -328,18 +328,27 @@
     el.mLinks.textContent = '';
     loadDetail(a.id, function (d) {
       if (token !== detailToken) return; // 弹层已经换成别人了，别覆盖
-      el.mBio.textContent = (d && d[0]) ? d[0] : '暂无中文简介。';
+      var bio = (d && d[0]) ? d[0] : '';
+      el.mBio.textContent = bio || '暂无简介。';
+      // 英文简介标个来源，免得和中文口径混淆
+      var lang = document.getElementById('m-bio-lang');
+      if (lang) lang.textContent = bio && /^[\x00-\x7F\s]+$/.test(bio.slice(0, 200)) ? 'English (TPDB)' : '';
       el.mLinks.textContent = '';
-      var home = d && d[1];
-      if (!home) return;
-      var link = document.createElement('a');
-      link.href = home;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      var label = home.indexOf('javstash') >= 0 ? 'JavStash 主页'
-        : home.indexOf('stashdb') >= 0 ? 'StashDB 主页' : 'TPDB 主页';
-      link.textContent = label;
-      el.mLinks.appendChild(link);
+      // 新分片：d[2] 是 [[站点名, url], ...]，按 javstash → stashdb → tpdb 排
+      var links = (d && d[2]) || [];
+      if (!links.length) {
+        // 兼容旧分片：只有 home 一条
+        var home = d && d[1];
+        if (home) links = [['主页', home]];
+      }
+      links.forEach(function (pair) {
+        var link = document.createElement('a');
+        link.href = pair[1];
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = pair[0] + ' ↗';
+        el.mLinks.appendChild(link);
+      });
     });
 
     // 对照入口：跳到字典 / MDCx 表，按日文原名搜

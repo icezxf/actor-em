@@ -47,6 +47,9 @@ type FetchResult struct {
 	Tags             []string
 	Bio              string
 	BioLang          string
+	// BioEnFallback：TPDB 的英文简介，单独暂存。中文简介链全部落空时才用它兜底，
+	// 避免长英文把后来的短中文挤掉（中文优先口径不变）。
+	BioEnFallback string
 
 	CanonicalName string // 数据源返回的标准名（清单里写 UUID 时用它兜底）
 	ChineseName   string // 中文名，Emby 的 Name 用它；没有就退回清单名
@@ -357,6 +360,12 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 			name, BioHeightCm(res.Bio), res.HeightCm)
 		res.Bio = ""
 	}
+	// 中文简介链全部落空时，用 TPDB 英文简介兜底（欧美演员多有英文、无中文）。
+	// 标 bio_lang=en，下游可选择只显示中文；放在这里保证"中文优先"不被长英文抢占。
+	if res.Bio == "" && res.BioEnFallback != "" {
+		res.Bio = res.BioEnFallback
+		f.logf("[%s] 简介用 TPDB 英文兜底（%d 字）", name, len([]rune(res.Bio)))
+	}
 	if res.Bio != "" {
 		res.BioLang = DetectLanguage(res.Bio)
 	}
@@ -565,6 +574,13 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 	}
 	if res.CanonicalName == "" && p.Name != "" {
 		res.CanonicalName = p.Name
+	}
+	// TPDB 英文简介单独暂存兜底：中文简介链（wiki/中文站/theactorbase）优先，
+	// 全落空时才在收尾用这段英文，标 bio_lang=en。
+	if p.Source == "tpdb" && res.BioEnFallback == "" {
+		if b := strings.TrimSpace(p.Bio); len([]rune(b)) >= 20 {
+			res.BioEnFallback = b
+		}
 	}
 
 	// 生日来源优先级：

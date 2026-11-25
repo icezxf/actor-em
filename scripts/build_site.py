@@ -207,8 +207,19 @@ def build_rows(rows: list[dict], src: str = "jp"):
         ])
         bio = a.get("bio") or ""
         home = a.get("homepage_url") or ""
-        if bio or home:
-            details[idx % DETAIL_SHARDS][str(idx)] = [bio, home]
+        # 外部链接按 javstash → stashdb → tpdb 排（provider_ids 里存的站点 ID）
+        links = []
+        pids = a.get("provider_ids") or {}
+        for site, tmpl in (
+            ("JavStash", "https://javstash.org/performers/{}"),
+            ("StashDB", "https://stashdb.org/performers/{}"),
+            ("TPDB", "https://theporndb.net/performers/{}"),
+        ):
+            pid = (pids.get(site) or "").strip()
+            if pid:
+                links.append([site, tmpl.format(pid)])
+        if bio or home or links:
+            details[idx % DETAIL_SHARDS][str(idx)] = [bio, home, links]
     return out, details
 
 
@@ -233,10 +244,12 @@ def main() -> int:
         for r in eu_data:
             r[0] = r[0] + offset                 # id 全局递增，避免分片 key 撞车
         data_rows.extend(eu_data)
+        # 详情必须按"全局 id % 16"重新分桶，前端 loadDetail 就是这么找的。
+        # build_rows 里欧美的桶是按局部 idx 分的，offset>0 时会错位，这里重排。
         for i, bucket in enumerate(eu_details):
-            remapped = {str(int(k) + offset): v for k, v in bucket.items()}
-            for k, v in remapped.items():
-                details[i][k] = v
+            for k, v in bucket.items():
+                gid = int(k) + offset
+                details[gid % DETAIL_SHARDS][str(gid)] = v
         eu_count = len(eu_data)
         print(f"欧美库 {eu_count} 条并入（源 {len(eu_rows)} 条）→ {eu_path}")
     else:
