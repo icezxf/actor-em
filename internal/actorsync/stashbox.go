@@ -19,6 +19,7 @@ type Performer struct {
 	Name         string
 	Aliases      []string
 	BirthDate    string
+	BirthYear    int // 只有年份的生日（"2004"），完整日期走 BirthDate
 	Country      string
 	Ethnicity    string
 	Gender       string
@@ -229,6 +230,7 @@ func toPerformer(source string, p *stashPerformerJSON) *Performer {
 		Name:        p.Name,
 		Aliases:     p.Aliases,
 		BirthDate:   normalizeDate(p.BirthDate),
+		BirthYear:   birthYear(p.BirthDate),
 		Country:     p.Country,
 		Ethnicity:   p.Ethnicity,
 		Gender:      p.Gender,

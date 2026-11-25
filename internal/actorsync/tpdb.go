@@ -125,6 +125,7 @@ func (c *TPDBClient) Search(ctx context.Context, term string) (*Performer, error
 		Name:        d.Name,
 		Aliases:     d.Aliases,
 		BirthDate:   normalizeDate(d.Extras.Birthday),
+		BirthYear:   birthYear(d.Extras.Birthday),
 		Country:     strings.ToUpper(strings.TrimSpace(d.Extras.BirthplaceCode)),
 		Ethnicity:   d.Extras.Ethnicity,
 		Gender:      d.Extras.Gender,
@@ -250,6 +251,21 @@ func cupFromMeasurements(m string) string {
 		return ""
 	}
 	return extractCupLetter(parts[1])
+}
+
+// birthYear 从日期串里取 4 位年份。完整的 YYYY-MM-DD 也返回年份，
+// 但调用方只在 normalizeDate 为空（即只有年份、格式不完整）时才用它，
+// 避免和已有的精确 birth_date 冲突。
+func birthYear(s string) int {
+	s = strings.TrimSpace(s)
+	if len(s) < 4 {
+		return 0
+	}
+	y, err := strconv.Atoi(s[:4])
+	if err != nil || y < 1800 || y > 2100 {
+		return 0
+	}
+	return y
 }
 
 // normalizeDate 把 1996/5/10、1996-5-10、1996-05-10T00:00:00 统一成 1996-05-10。

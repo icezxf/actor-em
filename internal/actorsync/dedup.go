@@ -198,6 +198,9 @@ func mergeInto(keep, dup *Actor) {
 	if keep.BirthDate == nil {
 		keep.BirthDate = dup.BirthDate
 	}
+	if keep.BirthYear == nil {
+		keep.BirthYear = dup.BirthYear
+	}
 	if keep.BirthDateSource == nil {
 		keep.BirthDateSource = dup.BirthDateSource
 	}

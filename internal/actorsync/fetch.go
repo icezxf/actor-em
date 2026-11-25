@@ -30,7 +30,8 @@ type FetchResult struct {
 	Aliases      []string
 	Gender       string
 	BirthDate    string
-	// BirthDateSource 记生日是哪来的：javstash（权威）/ mdcx（兜底）。
+	BirthYear    int  // 只有年份的生日（StashDB 常见 "2004"），无法构成完整日期时存这里
+	// BirthDateSource 记生日是哪来的：javstash（权威）/ stashdb / tpdb / mdcx（兜底）。
 	// MDCx 覆盖 65.7% 但约 24% 与 JavStash 冲突，标出来下游才能自己决定信不信。
 	BirthDateSource string
 	BirthPlace      string
@@ -189,8 +190,10 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	}
 
 	// ---------- 4. JavStash：日系演员主力源，生日唯一权威 ----------
+	// UUID 清单模式（StashDB 欧美演员）：清单名是 StashDB 的 ID，JavStash 永远查不到，
+	// 白烧一次网络请求还可能 TLS 超时拖慢整轮——直接跳过。
 	var js *Performer
-	if f.JavStash != nil && f.JavStash.APIKey != "" {
+	if !IsUUID(name) && f.JavStash != nil && f.JavStash.APIKey != "" {
 		js = f.searchCandidates(ctx, res, f.JavStash, candidates)
 	}
 
@@ -201,12 +204,17 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	//       （实测 12432 个 JavStash 命中里 3817 个带，31%），用 UUID 精确反查，
 	//       这样日本演员也有 StashDB 英文名可搜 TPDB。
 	//   (b) JavStash 没命中（欧美演员）→ 按候选名查 StashDB。
+	//   (c) 清单里直接写 UUID（StashDB 欧美清单模式）→ findPerformer 精确直查。
 	// 拿到的 performer.Name 供第 6 步 tpdbTerms 排第一；
 	// 整条记录也一并应用（见下面的 applyPerformer）。
 	var sd *Performer
 	if f.StashDB != nil && f.StashDB.APIKey != "" {
 		sdUUID := ""
-		if js != nil {
+		if IsUUID(name) {
+			// (c) 清单名本身就是 StashDB UUID：精确直查，不走 searchPerformer
+			// （searchPerformer 不认 UUID，会用 UUID 当关键词乱搜）。
+			sdUUID = name
+		} else if js != nil {
 			if ids := extractProviderIDs(js.URLs); ids["StashDB"] != "" {
 				sdUUID = ids["StashDB"]
 			}
@@ -214,12 +222,15 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		if sdUUID != "" {
 			if p, err := f.StashDB.Search(ctx, sdUUID); err == nil && p != nil {
 				sd = p
-				f.logf("[%s] StashDB 按 JavStash 链接 UUID 命中：%s", name, p.Name)
+				f.logf("[%s] StashDB 按 UUID 命中：%s", name, p.Name)
+			} else {
+				f.mark(res, "stashdb", false)
+				f.countErr(res, err)
 			}
 		}
 		// (b) 走 searchCandidates 时它内部已经应用过整条记录，不用再来一次
 		applied := false
-		if sd == nil && js == nil {
+		if sd == nil && js == nil && !IsUUID(name) {
 			sd = f.searchCandidates(ctx, res, f.StashDB, candidates)
 			applied = sd != nil
 		}
@@ -243,6 +254,26 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 		res.BirthDate = mdcxBirth
 		res.BirthDateSource = "mdcx"
 		f.logf("[%s] 生日兜底用 MDCx：%s", name, mdcxBirth)
+	}
+
+	// ---------- 5.6 UUID 模式：用 StashDB 英文名回查 JavStash 补权威生日 ----------
+	// 部分欧美演员在 JavStash 也有条目（尤其拍过日本作品的），生日以它为权威。
+	// UUID 是 StashDB 的 ID，JavStash 不认，所以用 StashDB 返回的英文名查。
+	// best-effort：JavStash 常触发 Cloudflare 403/超时，失败就静默跳过，绝不阻塞主流程。
+	// 只在连 StashDB/MDCx 都没给出完整生日时才试，减少无谓请求。
+	if IsUUID(name) && js == nil && res.BirthDate == "" &&
+		f.JavStash != nil && f.JavStash.APIKey != "" && sd != nil && sd.Name != "" {
+		jctx, jcancel := context.WithTimeout(ctx, 8*time.Second)
+		if p, err := f.JavStash.Search(jctx, sd.Name); err == nil && p != nil {
+			if p.BirthDate != "" {
+				res.BirthDate = p.BirthDate
+				res.BirthDateSource = "javstash"
+				res.BirthYear = 0 // 精确生日盖掉年份占位
+				f.mark(res, "javstash", true)
+				f.logf("[%s] JavStash 按英文名补权威生日：%s → %s", name, sd.Name, p.BirthDate)
+			}
+		}
+		jcancel()
 	}
 
 	// ---------- 6. TPDB：三围兜底 + 体重 ----------
@@ -536,10 +567,28 @@ func (f *Fetcher) applyPerformer(res *FetchResult, p *Performer) {
 		res.CanonicalName = p.Name
 	}
 
-	// 生日以 JavStash 为准；其他源的生日一律丢弃（MDCx 走 5.5 步的兜底，TPDB 也偶有偏差）
-	if p.Source == "javstash" && p.BirthDate != "" {
+	// 生日来源优先级：
+	//   - javstash 是日系唯一权威，命中即写（覆盖空位）
+	//   - stashdb 是欧美主力源，只在还没有生日时兜底，标 stashdb（JavStash 命中时绝不顶掉）
+	//   - 其余源（MDCx / 中文人物站）走各自的兜底分支，同样只填空位
+	switch {
+	case p.Source == "javstash" && p.BirthDate != "":
 		res.BirthDate = p.BirthDate
 		res.BirthDateSource = "javstash"
+	case p.Source == "stashdb" && p.BirthDate != "" && res.BirthDate == "":
+		res.BirthDate = p.BirthDate
+		res.BirthDateSource = "stashdb"
+	case p.Source == "tpdb" && p.BirthDate != "" && res.BirthDate == "":
+		// TPDB 能给部分欧美演员补精确生日（StashDB 缺席时）
+		res.BirthDate = p.BirthDate
+		res.BirthDateSource = "tpdb"
+	}
+	// 只有年份、没有完整日期时记到 BirthYear（优先 stashdb，其次 tpdb）
+	// 一旦后面拿到精确生日，就把年份占位清掉，避免同一人两个字段打架。
+	if res.BirthDate != "" {
+		res.BirthYear = 0
+	} else if p.BirthYear > 0 && res.BirthYear == 0 {
+		res.BirthYear = p.BirthYear
 	}
 
 	if p.Country != "" && res.Country == "" {
@@ -655,10 +704,13 @@ func tpdbTerms(candidates []string, mdcx *MDCxDB, name string, js, sd *Performer
 	return terms
 }
 
-// buildHomePageURL 按 JavStash → TPDB 的顺序拼演员主页地址。
+// buildHomePageURL 按 JavStash → StashDB → TPDB 的顺序拼演员主页地址。
 func buildHomePageURL(ids map[string]string) string {
 	if v := strings.TrimSpace(ids["JavStash"]); v != "" {
 		return "https://javstash.org/performers/" + v
+	}
+	if v := strings.TrimSpace(ids["StashDB"]); v != "" {
+		return "https://stashdb.org/performers/" + v
 	}
 	if v := strings.TrimSpace(ids["TPDB"]); v != "" {
 		return "https://theporndb.net/performers/" + v

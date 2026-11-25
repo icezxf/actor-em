@@ -273,6 +273,7 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 		Aliases:          res.Aliases,
 		Gender:           StrPtr(res.Gender),
 		BirthDate:        StrPtr(res.BirthDate),
+		BirthYear:        IntPtr(res.BirthYear),
 		BirthDateSource:  StrPtr(res.BirthDateSource),
 		BirthPlace:       StrPtr(res.BirthPlace),
 		Country:          StrPtr(res.Country),

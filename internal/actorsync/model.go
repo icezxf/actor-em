@@ -13,7 +13,10 @@ type Actor struct {
 
 	Gender    *string `json:"gender"`
 	BirthDate *string `json:"birth_date"`
-	// BirthDateSource：javstash（权威）/ mdcx / yinrenlu / cinewho / idoldb / castwiki。
+	// BirthYear：只有年份的生日（StashDB 常见 "2004"），无法填进 birth_date 时存这里。
+	// 完整日期仍走 birth_date（权威口径不变）；下游若只要精确生日可忽略本字段。
+	BirthYear *int `json:"birth_year,omitempty"`
+	// BirthDateSource：javstash（权威）/ stashdb / tpdb / mdcx / yinrenlu / cinewho / idoldb / castwiki。
 	// 空表示还没有生日。下游若不信任二手生日，按这个字段过滤即可。
 	BirthDateSource *string `json:"birth_date_source"`
 	// BirthPlace 一律带国家：都道府县级写成「日本·东京都」，只有国家时写「日本」。

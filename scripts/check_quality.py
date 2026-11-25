@@ -233,9 +233,11 @@ def main():
         if not c:
             continue
         c = c.strip().upper()
-        if c not in CUP_LETTERS:
+        # 单字母 A-O（日标）或双字母重复（AA/DD/JJ，欧美杯型）
+        valid = (len(c) == 1 and c in CUP_LETTERS) or (len(c) == 2 and c[0] == c[1] and c[0] in CUP_LETTERS)
+        if not valid:
             bad_cup.append(f"{a.get('key')} = {a.get('cup_size')}")
-    rep.check("罩杯非法", bad_cup, n, "只接受 A–N 单字母")
+    rep.check("罩杯非法", bad_cup, n, "接受 A–O 单字母或 AA/DD/JJ 双字母")
 
     # 罩杯标签一致性
     no_tag, wrong_tag = [], []

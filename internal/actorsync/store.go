@@ -3,6 +3,7 @@ package actorsync
 import (
 	"encoding/json"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -20,9 +21,19 @@ func (db *Db) FindByKey(key string) *Actor {
 }
 
 // FindByName 按规范化名字查（清单里改名或写别名时靠它接上旧记录）。
+// UUID 清单特殊处理：按 provider_ids 里的站点 ID 反查，避免同一 UUID 被当新人反复抓。
 func (db *Db) FindByName(name string) *Actor {
 	n := NormalizeName(name)
+	isID := IsUUID(name)
 	for _, a := range db.Actors {
+		// UUID 清单：按各站点的 performer ID 精确匹配
+		if isID {
+			for _, site := range []string{"StashDB", "JavStash", "TPDB"} {
+				if strings.EqualFold(strings.TrimSpace(a.ProviderIDs[site]), name) {
+					return a
+				}
+			}
+		}
 		if NormalizeName(a.Name) == n {
 			return a
 		}

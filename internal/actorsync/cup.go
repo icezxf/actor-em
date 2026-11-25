@@ -24,7 +24,8 @@ func CupTag(cup string) string {
 	return c + "罩杯"
 }
 
-// normalizeCup 只接受 A~O 的单个字母（JAV 用不到更后面的）。
+// normalizeCup 接受 A~O 的罩杯。日系是单字母（A~O）；欧美常见双字母（AA/DD/JJ），
+// 也接受——但只允许同一个字母重复两次（AA/DD/JJ），不认 AB/CD 这类乱组合。
 func normalizeCup(cup string) string {
 	s := strings.TrimSpace(cup)
 	if m := reCupOnly.FindStringSubmatch(s); len(m) > 1 {
@@ -39,8 +40,8 @@ func normalizeCup(cup string) string {
 			return ""
 		}
 	}
-	// 两位的写法（AA/DD）不统一，长度超过 1 就当认不出来
-	if len(s) != 1 {
+	// 双字母必须两个相同（AA/DD/JJ），否则不认。
+	if len(s) == 2 && s[0] != s[1] {
 		return ""
 	}
 	return s
