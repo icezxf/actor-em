@@ -364,9 +364,9 @@ func (f *Fetcher) Fetch(ctx context.Context, name string) *FetchResult {
 	// 标 bio_lang=en，下游可选择只显示中文；放在这里保证"中文优先"不被长英文抢占。
 	if res.Bio == "" && res.BioEnFallback != "" {
 		res.Bio = res.BioEnFallback
+		res.BioLang = "en" // 明确标英文，不靠 DetectLanguage 猜（弯引号等会让它判 unknown）
 		f.logf("[%s] 简介用 TPDB 英文兜底（%d 字）", name, len([]rune(res.Bio)))
-	}
-	if res.Bio != "" {
+	} else if res.Bio != "" {
 		res.BioLang = DetectLanguage(res.Bio)
 	}
 	res.Bio = TruncateUTF8(res.Bio, 6000)
