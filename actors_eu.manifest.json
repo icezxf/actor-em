@@ -1,33 +1,33 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-25T08:02:46Z",
+  "generated_at": "2026-11-25T08:11:20Z",
   "count": 200,
   "by_status": {
-    "ok": 27,
-    "partial": 173
+    "ok": 25,
+    "partial": 175
   },
   "last_run": {
-    "started_at": "2026-11-25T08:02:14Z",
-    "duration_sec": 31,
+    "started_at": "2026-11-25T08:10:50Z",
+    "duration_sec": 29,
     "picked": 100,
-    "added": 100,
-    "updated": 0,
+    "added": 0,
+    "updated": 100,
     "failed": 0,
     "source": "txt",
-    "source_count": 63208
+    "source_count": 200
   },
   "sources": {
     "javstash": {
       "miss": 0,
-      "ok": 10
+      "ok": 11
     },
     "stashdb": {
       "miss": 0,
       "ok": 100
     },
     "tpdb": {
-      "miss": 72,
-      "ok": 28
+      "miss": 82,
+      "ok": 18
     },
     "wiki": {
       "miss": 100,

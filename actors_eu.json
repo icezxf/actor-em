@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-25T08:02:46Z",
+  "generated_at": "2026-11-25T08:11:19Z",
   "count": 200,
   "actors": [
     {
@@ -43,7 +43,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:44Z",
-      "scraped_at": "2026-11-25T08:02:44Z"
+      "scraped_at": "2026-11-25T08:10:52Z"
     },
     {
       "key": "stashdb:01a1f8df-dd38-7abe-8f4b-fef6831ac374",
@@ -85,7 +85,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:42Z",
-      "scraped_at": "2026-11-25T08:02:42Z"
+      "scraped_at": "2026-11-25T08:10:53Z"
     },
     {
       "key": "stashdb:01a1f943-f8d3-737c-acce-1a59b4ef99db",
@@ -122,7 +122,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:38Z",
-      "scraped_at": "2026-11-25T08:02:38Z"
+      "scraped_at": "2026-11-25T08:10:53Z"
     },
     {
       "key": "stashdb:01a1f944-db7f-733a-9eca-24fd71b8d631",
@@ -160,7 +160,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:38Z",
-      "scraped_at": "2026-11-25T08:02:38Z"
+      "scraped_at": "2026-11-25T08:10:52Z"
     },
     {
       "key": "stashdb:01a1f944-ee1b-7f37-9c99-e4190d98561c",
@@ -197,7 +197,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:53Z"
     },
     {
       "key": "stashdb:01a1f945-01c7-77da-bb13-d0c7e81d8e3d",
@@ -236,7 +236,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:53Z"
     },
     {
       "key": "stashdb:01a1f945-151b-7386-b724-2961e2891511",
@@ -274,7 +274,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:53Z"
     },
     {
       "key": "stashdb:01a1f946-173b-78a5-8397-2c0456eb95d3",
@@ -313,7 +313,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:54Z"
     },
     {
       "key": "stashdb:01a1f946-9f2e-758f-9462-0d7e07455710",
@@ -350,7 +350,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:54Z"
     },
     {
       "key": "stashdb:01a1f946-e3d8-7a9b-916b-87e58736ea2a",
@@ -389,7 +389,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:36Z",
-      "scraped_at": "2026-11-25T08:02:36Z"
+      "scraped_at": "2026-11-25T08:10:55Z"
     },
     {
       "key": "stashdb:01a1f94a-98b7-7324-a018-8d72664ef35e",
@@ -426,7 +426,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:57Z"
     },
     {
       "key": "stashdb:01a1f94a-b0ed-7933-afe5-5fa7e834f47e",
@@ -465,7 +465,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:42Z",
-      "scraped_at": "2026-11-25T08:02:42Z"
+      "scraped_at": "2026-11-25T08:10:55Z"
     },
     {
       "key": "stashdb:01a1f94c-288f-792e-8439-f4812f4b6d76",
@@ -491,18 +491,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f94c-288f-792e-8439-f4812f4b6d76",
       "provider_ids": {
-        "StashDB": "01a1f94c-288f-792e-8439-f4812f4b6d76"
+        "StashDB": "01a1f94c-288f-792e-8439-f4812f4b6d76",
+        "TPDB": "0e288751-6646-49b6-af6f-f4b076346eef"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:56Z"
     },
     {
       "key": "stashdb:01a1f94e-78f5-7dc2-9c2b-1813db52909e",
@@ -512,8 +513,8 @@
       "gender": "female",
       "birth_date": "1998-03-30",
       "birth_date_source": "javstash",
-      "birth_place": null,
-      "country": null,
+      "birth_place": "俄罗斯",
+      "country": "RU",
       "height_cm": null,
       "weight_kg": null,
       "measurements": null,
@@ -528,19 +529,20 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f94e-78f5-7dc2-9c2b-1813db52909e",
       "provider_ids": {
-        "StashDB": "01a1f94e-78f5-7dc2-9c2b-1813db52909e"
+        "StashDB": "01a1f94e-78f5-7dc2-9c2b-1813db52909e",
+        "TPDB": "91db264d-192a-4b7d-8d79-0efaafbc3bda"
       },
       "status": "ok",
       "sources": {
         "javstash": true,
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:32Z",
-      "scraped_at": "2026-11-25T08:02:32Z"
+      "scraped_at": "2026-11-25T08:10:57Z"
     },
     {
       "key": "stashdb:01a1f950-4adc-7810-8dfd-985039b79b9a",
@@ -577,7 +579,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:56Z"
     },
     {
       "key": "stashdb:01a1f950-95b7-7832-9e99-8f3e2869fb73",
@@ -603,18 +605,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f950-95b7-7832-9e99-8f3e2869fb73",
       "provider_ids": {
-        "StashDB": "01a1f950-95b7-7832-9e99-8f3e2869fb73"
+        "StashDB": "01a1f950-95b7-7832-9e99-8f3e2869fb73",
+        "TPDB": "64c1563b-8296-45c7-b028-9ac1bce0ab73"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:57Z"
     },
     {
       "key": "stashdb:01a1f951-54ee-739c-a772-dc46736b8522",
@@ -651,7 +654,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:57Z"
     },
     {
       "key": "stashdb:01a1f952-0838-73d0-b41c-d54dcd584ca7",
@@ -688,7 +691,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:34Z",
-      "scraped_at": "2026-11-25T08:02:34Z"
+      "scraped_at": "2026-11-25T08:10:57Z"
     },
     {
       "key": "stashdb:01a1f952-42c1-7b6a-b92b-dd962b34488a",
@@ -725,7 +728,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:58Z"
     },
     {
       "key": "stashdb:01a1f952-85b3-7a2b-8ca5-164b04877874",
@@ -762,7 +765,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:58Z"
     },
     {
       "key": "stashdb:01a1f953-f881-7893-93a0-0424a3d6748d",
@@ -799,7 +802,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:59Z"
     },
     {
       "key": "stashdb:01a1f955-5176-7191-919e-d700a08ded81",
@@ -836,7 +839,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:59Z"
     },
     {
       "key": "stashdb:01a1f955-c1b2-7bde-8187-b7ea6fcb39f4",
@@ -873,7 +876,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:59Z"
     },
     {
       "key": "stashdb:01a1f957-4187-76b3-8c39-1c7492259ba1",
@@ -910,7 +913,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:33Z",
-      "scraped_at": "2026-11-25T08:02:33Z"
+      "scraped_at": "2026-11-25T08:10:59Z"
     },
     {
       "key": "stashdb:01a1f958-da91-741a-b4c6-8d623d329212",
@@ -947,7 +950,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:32Z",
-      "scraped_at": "2026-11-25T08:02:32Z"
+      "scraped_at": "2026-11-25T08:10:59Z"
     },
     {
       "key": "stashdb:01a1f959-3059-724f-aa02-6e2783a207d6",
@@ -984,7 +987,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:32Z",
-      "scraped_at": "2026-11-25T08:02:32Z"
+      "scraped_at": "2026-11-25T08:11:00Z"
     },
     {
       "key": "stashdb:01a1f959-dea3-7266-9792-10a470c494a8",
@@ -1021,7 +1024,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:32Z",
-      "scraped_at": "2026-11-25T08:02:32Z"
+      "scraped_at": "2026-11-25T08:11:00Z"
     },
     {
       "key": "stashdb:01a1f95a-f3b2-72e0-a9c6-461a49340bec",
@@ -1058,7 +1061,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:38Z",
-      "scraped_at": "2026-11-25T08:02:38Z"
+      "scraped_at": "2026-11-25T08:11:00Z"
     },
     {
       "key": "stashdb:01a1f95b-3f9b-7534-bfe2-37d85903834b",
@@ -1095,7 +1098,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:40Z",
-      "scraped_at": "2026-11-25T08:02:40Z"
+      "scraped_at": "2026-11-25T08:11:00Z"
     },
     {
       "key": "stashdb:01a1f95c-939c-7612-9ec3-bb995ee268d1",
@@ -1121,19 +1124,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f95c-939c-7612-9ec3-bb995ee268d1",
       "provider_ids": {
-        "StashDB": "01a1f95c-939c-7612-9ec3-bb995ee268d1",
-        "TPDB": "4e3c7d27-c7be-42b2-86f2-4db80f620caa"
+        "StashDB": "01a1f95c-939c-7612-9ec3-bb995ee268d1"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:38Z",
-      "scraped_at": "2026-11-25T08:02:38Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1f95c-dbcb-711f-a317-825e69d08c53",
@@ -1170,7 +1172,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:39Z",
-      "scraped_at": "2026-11-25T08:02:39Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1f95d-2ffb-7ffe-8dea-679803d6c44b",
@@ -1210,7 +1212,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:38Z",
-      "scraped_at": "2026-11-25T08:02:38Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1f95e-1dee-7959-a901-73bba6c9f173",
@@ -1218,8 +1220,8 @@
       "name_original": "01a1f95e-1dee-7959-a901-73bba6c9f173",
       "aliases": [],
       "gender": "female",
-      "birth_date": "1978-01-01",
-      "birth_date_source": "tpdb",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": "美国",
       "country": "US",
       "height_cm": null,
@@ -1236,19 +1238,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f95e-1dee-7959-a901-73bba6c9f173",
       "provider_ids": {
-        "StashDB": "01a1f95e-1dee-7959-a901-73bba6c9f173",
-        "TPDB": "1e487133-21bf-44f5-b404-fa59183de271"
+        "StashDB": "01a1f95e-1dee-7959-a901-73bba6c9f173"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:40Z",
-      "scraped_at": "2026-11-25T08:02:40Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1f95e-7035-7c14-8959-dee73ac08356",
@@ -1274,19 +1275,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f95e-7035-7c14-8959-dee73ac08356",
       "provider_ids": {
-        "StashDB": "01a1f95e-7035-7c14-8959-dee73ac08356",
-        "TPDB": "ddbf2e76-7703-4f84-9f4b-7e3f64b2e909"
+        "StashDB": "01a1f95e-7035-7c14-8959-dee73ac08356"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:41Z",
-      "scraped_at": "2026-11-25T08:02:41Z"
+      "scraped_at": "2026-11-25T08:11:02Z"
     },
     {
       "key": "stashdb:01a1f95e-d465-71bb-a66d-3eea54be4e7b",
@@ -1312,19 +1312,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f95e-d465-71bb-a66d-3eea54be4e7b",
       "provider_ids": {
-        "StashDB": "01a1f95e-d465-71bb-a66d-3eea54be4e7b",
-        "TPDB": "846f9fc1-a490-41d1-95a3-363b01cf6a68"
+        "StashDB": "01a1f95e-d465-71bb-a66d-3eea54be4e7b"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:41Z",
-      "scraped_at": "2026-11-25T08:02:41Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1f95f-5e3e-7f8c-ab14-9e94766dd4e4",
@@ -1363,7 +1362,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:40Z",
-      "scraped_at": "2026-11-25T08:02:40Z"
+      "scraped_at": "2026-11-25T08:11:02Z"
     },
     {
       "key": "stashdb:01a1f960-0e07-7b95-ae5f-999dec36f419",
@@ -1400,7 +1399,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:41Z",
-      "scraped_at": "2026-11-25T08:02:41Z"
+      "scraped_at": "2026-11-25T08:11:02Z"
     },
     {
       "key": "stashdb:01a1f9f3-34cb-737f-8e11-251c5686f9c4",
@@ -1410,14 +1409,14 @@
       "gender": "female",
       "birth_date": "1992-01-01",
       "birth_date_source": "stashdb",
-      "birth_place": "美国",
-      "country": "US",
+      "birth_place": null,
+      "country": null,
       "height_cm": 162,
       "weight_kg": null,
-      "measurements": "34B-28-36",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": "K",
-      "career_start": 2003,
+      "career_start": null,
       "tags": [
         "K罩杯"
       ],
@@ -1428,19 +1427,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1f9f3-34cb-737f-8e11-251c5686f9c4",
       "provider_ids": {
-        "StashDB": "01a1f9f3-34cb-737f-8e11-251c5686f9c4",
-        "TPDB": "29fbbbb1-f967-4b54-a5ee-60eaf8b505f9"
+        "StashDB": "01a1f9f3-34cb-737f-8e11-251c5686f9c4"
       },
       "status": "ok",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:46Z",
-      "scraped_at": "2026-11-25T08:02:46Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1fa0f-d6e3-7670-8f2b-874e00ea7222",
@@ -1481,7 +1479,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:44Z",
-      "scraped_at": "2026-11-25T08:02:44Z"
+      "scraped_at": "2026-11-25T08:11:02Z"
     },
     {
       "key": "stashdb:01a1fa19-8276-7023-af00-edc7580740be",
@@ -1507,19 +1505,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fa19-8276-7023-af00-edc7580740be",
       "provider_ids": {
-        "StashDB": "01a1fa19-8276-7023-af00-edc7580740be",
-        "TPDB": "436de3a5-d3bc-4909-aecc-1f8ea280dda8"
+        "StashDB": "01a1fa19-8276-7023-af00-edc7580740be"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:44Z",
-      "scraped_at": "2026-11-25T08:02:44Z"
+      "scraped_at": "2026-11-25T08:11:04Z"
     },
     {
       "key": "stashdb:01a1fb08-46fc-7b58-aa06-d7f914126211",
@@ -1540,8 +1537,8 @@
       "cup_size": null,
       "career_start": 2023,
       "tags": [],
-      "bio": "Submissive babygirl \u0026 pet from the UK. New vids every week - follow to stay up to date! Customs open",
-      "bio_lang": "unknown",
+      "bio": null,
+      "bio_lang": null,
       "avatar": "https://stashdb.org/images/9328f41e-3c6e-4021-9a2b-6e1746aa2734",
       "avatar_cn": null,
       "avatar_source_site": "stashdb",
@@ -1553,13 +1550,13 @@
       "status": "ok",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:42Z",
-      "scraped_at": "2026-11-25T08:02:42Z"
+      "scraped_at": "2026-11-25T08:11:01Z"
     },
     {
       "key": "stashdb:01a1fb40-fea2-753f-b4bf-ecda8cd3512d",
@@ -1585,19 +1582,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fb40-fea2-753f-b4bf-ecda8cd3512d",
       "provider_ids": {
-        "StashDB": "01a1fb40-fea2-753f-b4bf-ecda8cd3512d",
-        "TPDB": "414081c9-dae9-43d8-9deb-854d6341159e"
+        "StashDB": "01a1fb40-fea2-753f-b4bf-ecda8cd3512d"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:43Z",
-      "scraped_at": "2026-11-25T08:02:43Z"
+      "scraped_at": "2026-11-25T08:11:04Z"
     },
     {
       "key": "stashdb:01a1fd6d-dc35-7248-9a62-2fd788cdf74f",
@@ -1611,13 +1607,11 @@
       "country": "CZ",
       "height_cm": 163,
       "weight_kg": null,
-      "measurements": "34B-26-36",
-      "measurements_unit": "in",
-      "cup_size": "B",
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
       "career_start": 2026,
-      "tags": [
-        "B罩杯"
-      ],
+      "tags": [],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://stashdb.org/images/33b8d4e5-fd83-43a4-9a03-97b9e616842b",
@@ -1625,20 +1619,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd6d-dc35-7248-9a62-2fd788cdf74f",
       "provider_ids": {
-        "StashDB": "01a1fd6d-dc35-7248-9a62-2fd788cdf74f",
-        "TPDB": "83a2faa9-ac8d-4bd2-9038-ae66bbbc0e44"
+        "StashDB": "01a1fd6d-dc35-7248-9a62-2fd788cdf74f"
       },
       "status": "ok",
       "sources": {
         "javstash": true,
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:27Z",
-      "scraped_at": "2026-11-25T07:02:27Z"
+      "scraped_at": "2026-11-25T08:11:04Z"
     },
     {
       "key": "stashdb:01a1fd78-5004-7cb5-a81c-1a77daa35878",
@@ -1676,7 +1669,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:27Z",
-      "scraped_at": "2026-11-25T07:02:27Z"
+      "scraped_at": "2026-11-25T08:11:04Z"
     },
     {
       "key": "stashdb:01a1fd7b-9487-74f0-8519-6ae2c8e34a7a",
@@ -1716,7 +1709,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:26Z",
-      "scraped_at": "2026-11-25T07:02:26Z"
+      "scraped_at": "2026-11-25T08:11:04Z"
     },
     {
       "key": "stashdb:01a1fd7e-60de-79c7-adad-eee8ebcb8378",
@@ -1724,19 +1717,18 @@
       "name_original": "01a1fd7e-60de-79c7-adad-eee8ebcb8378",
       "aliases": [],
       "gender": "female",
-      "birth_date": "1975-07-24",
-      "birth_date_source": "tpdb",
+      "birth_date": null,
+      "birth_year": 2004,
+      "birth_date_source": null,
       "birth_place": "CZ",
       "country": "CZ",
       "height_cm": 189,
-      "weight_kg": 50,
-      "measurements": "40K-40-52",
-      "measurements_unit": "in",
-      "cup_size": "K",
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
       "career_start": 2026,
-      "tags": [
-        "K罩杯"
-      ],
+      "tags": [],
       "bio": null,
       "bio_lang": null,
       "avatar": "https://stashdb.org/images/1dd963f7-bd68-4fc6-926a-ad5764ec8595",
@@ -1744,19 +1736,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd7e-60de-79c7-adad-eee8ebcb8378",
       "provider_ids": {
-        "StashDB": "01a1fd7e-60de-79c7-adad-eee8ebcb8378",
-        "TPDB": "5b967fb6-6e54-489c-ac26-7bcea2ea82c7"
+        "StashDB": "01a1fd7e-60de-79c7-adad-eee8ebcb8378"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:26Z",
-      "scraped_at": "2026-11-25T07:02:26Z"
+      "scraped_at": "2026-11-25T08:11:05Z"
     },
     {
       "key": "stashdb:01a1fd85-7506-7f1a-be72-526e8b34c799",
@@ -1793,7 +1784,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:31Z",
-      "scraped_at": "2026-11-25T08:02:31Z"
+      "scraped_at": "2026-11-25T08:11:05Z"
     },
     {
       "key": "stashdb:01a1fd85-885d-7c7b-8208-f46a17b7ae72",
@@ -1830,7 +1821,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:31Z",
-      "scraped_at": "2026-11-25T08:02:31Z"
+      "scraped_at": "2026-11-25T08:11:05Z"
     },
     {
       "key": "stashdb:01a1fd85-9138-7e4a-8887-6c803dbe54f6",
@@ -1868,7 +1859,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:32Z",
-      "scraped_at": "2026-11-25T08:02:32Z"
+      "scraped_at": "2026-11-25T08:11:06Z"
     },
     {
       "key": "stashdb:01a1fd86-898a-7d83-92ab-d0259f0871cc",
@@ -1905,7 +1896,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:31Z",
-      "scraped_at": "2026-11-25T08:02:31Z"
+      "scraped_at": "2026-11-25T08:11:06Z"
     },
     {
       "key": "stashdb:01a1fd87-4e40-745e-9934-7a9ea38c8ba3",
@@ -1942,7 +1933,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:05Z"
     },
     {
       "key": "stashdb:01a1fd87-74a0-73e9-922a-6280874bc198",
@@ -1979,7 +1970,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:06Z"
     },
     {
       "key": "stashdb:01a1fd87-8836-79eb-ab1d-1727c0b33bd2",
@@ -2016,7 +2007,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:06Z"
     },
     {
       "key": "stashdb:01a1fd89-2a18-7860-94f1-6881e284491b",
@@ -2053,7 +2044,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:07Z"
     },
     {
       "key": "stashdb:01a1fd89-3e8a-7da5-8568-dcc149f8011e",
@@ -2090,7 +2081,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:06Z"
     },
     {
       "key": "stashdb:01a1fd8a-656e-70dc-aa85-00ab21c694f1",
@@ -2127,7 +2118,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:30Z",
-      "scraped_at": "2026-11-25T08:02:30Z"
+      "scraped_at": "2026-11-25T08:11:07Z"
     },
     {
       "key": "stashdb:01a1fd8b-1a7c-74d3-9b5a-417940e15d04",
@@ -2164,7 +2155,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:29Z",
-      "scraped_at": "2026-11-25T08:02:29Z"
+      "scraped_at": "2026-11-25T08:11:07Z"
     },
     {
       "key": "stashdb:01a1fd8b-2d90-7342-96bb-398e4fd6bf53",
@@ -2201,7 +2192,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:29Z",
-      "scraped_at": "2026-11-25T08:02:29Z"
+      "scraped_at": "2026-11-25T08:11:07Z"
     },
     {
       "key": "stashdb:01a1fd8b-4176-7270-a77f-8b0ac9676843",
@@ -2238,7 +2229,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:29Z",
-      "scraped_at": "2026-11-25T08:02:29Z"
+      "scraped_at": "2026-11-25T08:11:08Z"
     },
     {
       "key": "stashdb:01a1fd8b-54f4-7928-9308-beac9656c67d",
@@ -2275,7 +2266,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:07Z"
     },
     {
       "key": "stashdb:01a1fd8c-c346-7bfb-a076-7e60e2172b77",
@@ -2312,7 +2303,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:29Z",
-      "scraped_at": "2026-11-25T08:02:29Z"
+      "scraped_at": "2026-11-25T08:11:08Z"
     },
     {
       "key": "stashdb:01a1fd8c-f74b-7847-87a9-a42d5a891dc0",
@@ -2349,7 +2340,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:08Z"
     },
     {
       "key": "stashdb:01a1fd8e-d3d4-7e99-bc54-79a7e37192ef",
@@ -2375,19 +2366,20 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd8e-d3d4-7e99-bc54-79a7e37192ef",
       "provider_ids": {
-        "StashDB": "01a1fd8e-d3d4-7e99-bc54-79a7e37192ef"
+        "StashDB": "01a1fd8e-d3d4-7e99-bc54-79a7e37192ef",
+        "TPDB": "57b1e4a5-7b6b-4042-ab02-5058f89b50e4"
       },
       "status": "ok",
       "sources": {
         "javstash": true,
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:10Z"
     },
     {
       "key": "stashdb:01a1fd8e-fab6-7645-9da6-3f426908326c",
@@ -2424,7 +2416,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:10Z"
     },
     {
       "key": "stashdb:01a1fd90-74f6-7a21-a721-a1831804539e",
@@ -2461,7 +2453,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:08Z"
     },
     {
       "key": "stashdb:01a1fd90-c3c6-7792-b7c5-52a5a5b763ec",
@@ -2498,7 +2490,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:27Z",
-      "scraped_at": "2026-11-25T08:02:27Z"
+      "scraped_at": "2026-11-25T08:11:10Z"
     },
     {
       "key": "stashdb:01a1fd90-eb66-7c80-9981-e148fb0b67b9",
@@ -2536,7 +2528,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:28Z",
-      "scraped_at": "2026-11-25T08:02:28Z"
+      "scraped_at": "2026-11-25T08:11:13Z"
     },
     {
       "key": "stashdb:01a1fd92-4c9b-7cd9-b47f-39c22448e6ad",
@@ -2562,19 +2554,20 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd92-4c9b-7cd9-b47f-39c22448e6ad",
       "provider_ids": {
-        "StashDB": "01a1fd92-4c9b-7cd9-b47f-39c22448e6ad"
+        "StashDB": "01a1fd92-4c9b-7cd9-b47f-39c22448e6ad",
+        "TPDB": "eed17f01-8f77-4846-a9c2-c96cee9d7467"
       },
       "status": "ok",
       "sources": {
         "javstash": true,
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:27Z",
-      "scraped_at": "2026-11-25T08:02:27Z"
+      "scraped_at": "2026-11-25T08:11:11Z"
     },
     {
       "key": "stashdb:01a1fd92-c7a1-7463-a1b6-8ba35829b36b",
@@ -2600,19 +2593,20 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd92-c7a1-7463-a1b6-8ba35829b36b",
       "provider_ids": {
-        "StashDB": "01a1fd92-c7a1-7463-a1b6-8ba35829b36b"
+        "StashDB": "01a1fd92-c7a1-7463-a1b6-8ba35829b36b",
+        "TPDB": "2587105f-42a5-4cbe-ae5b-ea8e9cc8459c"
       },
       "status": "ok",
       "sources": {
         "javstash": true,
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:27Z",
-      "scraped_at": "2026-11-25T08:02:27Z"
+      "scraped_at": "2026-11-25T08:11:10Z"
     },
     {
       "key": "stashdb:01a1fd92-ecfc-7e24-b3f6-aae0ed05c8d5",
@@ -2650,7 +2644,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:27Z",
-      "scraped_at": "2026-11-25T08:02:27Z"
+      "scraped_at": "2026-11-25T08:11:13Z"
     },
     {
       "key": "stashdb:01a1fd97-d75d-7295-ac24-dbaba94af182",
@@ -2687,7 +2681,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:27Z",
-      "scraped_at": "2026-11-25T08:02:27Z"
+      "scraped_at": "2026-11-25T08:11:11Z"
     },
     {
       "key": "stashdb:01a1fd98-47dc-78a3-a19f-025fcd250cfa",
@@ -2724,7 +2718,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:26Z",
-      "scraped_at": "2026-11-25T08:02:26Z"
+      "scraped_at": "2026-11-25T08:11:11Z"
     },
     {
       "key": "stashdb:01a1fd98-5cf2-7f9b-8828-7535820877ed",
@@ -2750,18 +2744,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd98-5cf2-7f9b-8828-7535820877ed",
       "provider_ids": {
-        "StashDB": "01a1fd98-5cf2-7f9b-8828-7535820877ed"
+        "StashDB": "01a1fd98-5cf2-7f9b-8828-7535820877ed",
+        "TPDB": "3109f5ae-3df2-474a-8ea1-6188662e079a"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:26Z",
-      "scraped_at": "2026-11-25T08:02:26Z"
+      "scraped_at": "2026-11-25T08:11:13Z"
     },
     {
       "key": "stashdb:01a1fd9a-5f5b-7272-9c9a-1ddbcac18b96",
@@ -2798,7 +2793,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:26Z",
-      "scraped_at": "2026-11-25T08:02:26Z"
+      "scraped_at": "2026-11-25T08:11:13Z"
     },
     {
       "key": "stashdb:01a1fd9b-9395-7e65-9a57-881ac5ca101a",
@@ -2824,18 +2819,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd9b-9395-7e65-9a57-881ac5ca101a",
       "provider_ids": {
-        "StashDB": "01a1fd9b-9395-7e65-9a57-881ac5ca101a"
+        "StashDB": "01a1fd9b-9395-7e65-9a57-881ac5ca101a",
+        "TPDB": "ba2a146a-69bf-40d5-881f-f09620ca7322"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:25Z",
-      "scraped_at": "2026-11-25T08:02:25Z"
+      "scraped_at": "2026-11-25T08:11:14Z"
     },
     {
       "key": "stashdb:01a1fd9c-298e-7a63-b844-0775524e6367",
@@ -2872,7 +2868,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:26Z",
-      "scraped_at": "2026-11-25T08:02:26Z"
+      "scraped_at": "2026-11-25T08:11:13Z"
     },
     {
       "key": "stashdb:01a1fd9c-3d1c-7146-bde1-7936036c63c1",
@@ -2909,7 +2905,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:26Z",
-      "scraped_at": "2026-11-25T08:02:26Z"
+      "scraped_at": "2026-11-25T08:11:15Z"
     },
     {
       "key": "stashdb:01a1fd9c-5096-7db8-956a-9cf98e1cbe76",
@@ -2946,7 +2942,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:25Z",
-      "scraped_at": "2026-11-25T08:02:25Z"
+      "scraped_at": "2026-11-25T08:11:14Z"
     },
     {
       "key": "stashdb:01a1fd9f-ce1d-7fa2-bf0c-4a0af880dae9",
@@ -2983,7 +2979,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:25Z",
-      "scraped_at": "2026-11-25T08:02:25Z"
+      "scraped_at": "2026-11-25T08:11:15Z"
     },
     {
       "key": "stashdb:01a1fd9f-f6d4-7467-914f-e35057ad1186",
@@ -2991,12 +2987,12 @@
       "name_original": "01a1fd9f-f6d4-7467-914f-e35057ad1186",
       "aliases": [],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1989-10-04",
+      "birth_date_source": "tpdb",
       "birth_place": null,
       "country": null,
       "height_cm": null,
-      "weight_kg": null,
+      "weight_kg": 64,
       "measurements": null,
       "measurements_unit": null,
       "cup_size": null,
@@ -3009,18 +3005,19 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fd9f-f6d4-7467-914f-e35057ad1186",
       "provider_ids": {
-        "StashDB": "01a1fd9f-f6d4-7467-914f-e35057ad1186"
+        "StashDB": "01a1fd9f-f6d4-7467-914f-e35057ad1186",
+        "TPDB": "8ba7514a-a546-4dc9-95da-7d3192eb2db6"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "stashdb": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:25Z",
-      "scraped_at": "2026-11-25T08:02:25Z"
+      "scraped_at": "2026-11-25T08:11:15Z"
     },
     {
       "key": "stashdb:01a1fda0-09a9-715e-97e9-402a9b2dd55e",
@@ -3057,7 +3054,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:24Z",
-      "scraped_at": "2026-11-25T08:02:24Z"
+      "scraped_at": "2026-11-25T08:11:15Z"
     },
     {
       "key": "stashdb:01a1fda1-e70c-7646-8fcf-d6cf9d8136ba",
@@ -3095,7 +3092,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:25Z",
-      "scraped_at": "2026-11-25T08:02:25Z"
+      "scraped_at": "2026-11-25T08:11:15Z"
     },
     {
       "key": "stashdb:01a1fda4-b60c-7b3b-b683-09ebbf1ac8e6",
@@ -3133,7 +3130,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:24Z",
-      "scraped_at": "2026-11-25T08:02:24Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda4-c88a-7346-b23b-25a3b45f7518",
@@ -3173,7 +3170,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:24Z",
-      "scraped_at": "2026-11-25T08:02:24Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda4-dc28-79a1-965f-37b9f042464e",
@@ -3210,7 +3207,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:24Z",
-      "scraped_at": "2026-11-25T08:02:24Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda4-ef4e-7097-bb21-009674dc389a",
@@ -3247,7 +3244,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:24Z",
-      "scraped_at": "2026-11-25T08:02:24Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda5-f145-7d51-8cd3-687bc725af6f",
@@ -3284,7 +3281,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:23Z",
-      "scraped_at": "2026-11-25T08:02:23Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda7-7b20-7819-8988-b19caea67330",
@@ -3312,19 +3309,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda7-7b20-7819-8988-b19caea67330",
       "provider_ids": {
-        "StashDB": "01a1fda7-7b20-7819-8988-b19caea67330",
-        "TPDB": "af8f2ae1-15f6-49f5-9bdb-e9bb491fb89f"
+        "StashDB": "01a1fda7-7b20-7819-8988-b19caea67330"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:23Z",
-      "scraped_at": "2026-11-25T08:02:23Z"
+      "scraped_at": "2026-11-25T08:11:16Z"
     },
     {
       "key": "stashdb:01a1fda7-ba8c-73fb-8737-0f7878b6417c",
@@ -3350,19 +3346,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda7-ba8c-73fb-8737-0f7878b6417c",
       "provider_ids": {
-        "StashDB": "01a1fda7-ba8c-73fb-8737-0f7878b6417c",
-        "TPDB": "860dfabc-6bd8-4479-af65-26213ce68262"
+        "StashDB": "01a1fda7-ba8c-73fb-8737-0f7878b6417c"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:22Z",
-      "scraped_at": "2026-11-25T08:02:22Z"
+      "scraped_at": "2026-11-25T08:11:17Z"
     },
     {
       "key": "stashdb:01a1fda7-ce5f-76a9-a387-06c08e1789e8",
@@ -3388,19 +3383,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda7-ce5f-76a9-a387-06c08e1789e8",
       "provider_ids": {
-        "StashDB": "01a1fda7-ce5f-76a9-a387-06c08e1789e8",
-        "TPDB": "8e0fd2e8-c70f-4370-893d-2d92cd6466b3"
+        "StashDB": "01a1fda7-ce5f-76a9-a387-06c08e1789e8"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:22Z",
-      "scraped_at": "2026-11-25T08:02:22Z"
+      "scraped_at": "2026-11-25T08:11:17Z"
     },
     {
       "key": "stashdb:01a1fda7-f5a2-7fb2-a0b8-ad7dbe74fd65",
@@ -3437,7 +3431,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:22Z",
-      "scraped_at": "2026-11-25T08:02:22Z"
+      "scraped_at": "2026-11-25T08:11:17Z"
     },
     {
       "key": "stashdb:01a1fda8-927c-73db-b7a9-2968935c6ac5",
@@ -3445,10 +3439,10 @@
       "name_original": "01a1fda8-927c-73db-b7a9-2968935c6ac5",
       "aliases": [],
       "gender": "female",
-      "birth_date": "1964-04-20",
-      "birth_date_source": "tpdb",
-      "birth_place": "德国",
-      "country": "DE",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": null,
+      "country": null,
       "height_cm": null,
       "weight_kg": null,
       "measurements": null,
@@ -3463,19 +3457,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda8-927c-73db-b7a9-2968935c6ac5",
       "provider_ids": {
-        "StashDB": "01a1fda8-927c-73db-b7a9-2968935c6ac5",
-        "TPDB": "bec773b9-ef5d-4b12-96fb-ce8d9007461f"
+        "StashDB": "01a1fda8-927c-73db-b7a9-2968935c6ac5"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:22Z",
-      "scraped_at": "2026-11-25T08:02:22Z"
+      "scraped_at": "2026-11-25T08:11:18Z"
     },
     {
       "key": "stashdb:01a1fda8-bd76-7ac4-968c-8097e8d1f267",
@@ -3512,7 +3505,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:21Z",
-      "scraped_at": "2026-11-25T08:02:21Z"
+      "scraped_at": "2026-11-25T08:11:18Z"
     },
     {
       "key": "stashdb:01a1fda8-e27c-765f-a980-3386dbf893af",
@@ -3538,19 +3531,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda8-e27c-765f-a980-3386dbf893af",
       "provider_ids": {
-        "StashDB": "01a1fda8-e27c-765f-a980-3386dbf893af",
-        "TPDB": "092c941b-7477-40c4-ad5e-328e40dd8a82"
+        "StashDB": "01a1fda8-e27c-765f-a980-3386dbf893af"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:20Z",
-      "scraped_at": "2026-11-25T08:02:20Z"
+      "scraped_at": "2026-11-25T08:11:17Z"
     },
     {
       "key": "stashdb:01a1fda9-808d-7ac8-8686-adf469016918",
@@ -3576,19 +3568,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fda9-808d-7ac8-8686-adf469016918",
       "provider_ids": {
-        "StashDB": "01a1fda9-808d-7ac8-8686-adf469016918",
-        "TPDB": "35b41817-686f-4518-b489-0a31aa6ffc71"
+        "StashDB": "01a1fda9-808d-7ac8-8686-adf469016918"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:21Z",
-      "scraped_at": "2026-11-25T08:02:21Z"
+      "scraped_at": "2026-11-25T08:11:19Z"
     },
     {
       "key": "stashdb:01a1fda9-aa82-76bf-b328-4c30ebfa79bd",
@@ -3627,7 +3618,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:20Z",
-      "scraped_at": "2026-11-25T08:02:20Z"
+      "scraped_at": "2026-11-25T08:11:19Z"
     },
     {
       "key": "stashdb:01a1fe35-267c-772e-b6a6-3726595c7b80",
@@ -3655,19 +3646,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fe35-267c-772e-b6a6-3726595c7b80",
       "provider_ids": {
-        "StashDB": "01a1fe35-267c-772e-b6a6-3726595c7b80",
-        "TPDB": "4ebf470d-7005-4e96-ac55-072f38aea434"
+        "StashDB": "01a1fe35-267c-772e-b6a6-3726595c7b80"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T08:02:20Z",
-      "scraped_at": "2026-11-25T08:02:20Z"
+      "scraped_at": "2026-11-25T08:11:19Z"
     },
     {
       "key": "stashdb:01a1fee6-9387-7cdb-b424-1544edbeed00",
@@ -3693,19 +3683,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fee6-9387-7cdb-b424-1544edbeed00",
       "provider_ids": {
-        "StashDB": "01a1fee6-9387-7cdb-b424-1544edbeed00",
-        "TPDB": "82d5c34e-79ce-463d-9e4f-221eb805536c"
+        "StashDB": "01a1fee6-9387-7cdb-b424-1544edbeed00"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:25Z",
-      "scraped_at": "2026-11-25T07:02:25Z"
+      "scraped_at": "2026-11-25T08:11:18Z"
     },
     {
       "key": "stashdb:01a1fee6-d055-77aa-9a4b-beb342f5ab36",
@@ -3731,19 +3720,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fee6-d055-77aa-9a4b-beb342f5ab36",
       "provider_ids": {
-        "StashDB": "01a1fee6-d055-77aa-9a4b-beb342f5ab36",
-        "TPDB": "cde6091a-5078-411b-8cdb-8915d072b889"
+        "StashDB": "01a1fee6-d055-77aa-9a4b-beb342f5ab36"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:25Z",
-      "scraped_at": "2026-11-25T07:02:25Z"
+      "scraped_at": "2026-11-25T08:11:19Z"
     },
     {
       "key": "stashdb:01a1fee8-773b-7bc7-9ff2-34d7e569938d",
@@ -3769,19 +3757,18 @@
       "avatar_source_site": "stashdb",
       "homepage_url": "https://stashdb.org/performers/01a1fee8-773b-7bc7-9ff2-34d7e569938d",
       "provider_ids": {
-        "StashDB": "01a1fee8-773b-7bc7-9ff2-34d7e569938d",
-        "TPDB": "7955709d-0f57-4134-8a9f-f129bdb57354"
+        "StashDB": "01a1fee8-773b-7bc7-9ff2-34d7e569938d"
       },
       "status": "partial",
       "sources": {
         "stashdb": true,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-25T07:02:25Z",
-      "scraped_at": "2026-11-25T07:02:25Z"
+      "scraped_at": "2026-11-25T08:11:19Z"
     },
     {
       "key": "stashdb:01a1fee8-969e-7fb4-8be0-5b0d6d2c7254",
