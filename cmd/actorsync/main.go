@@ -31,7 +31,8 @@ func main() {
 		serveBot    bool
 		tgOnce      string
 		backfill    bool
-		stashList   string
+		stashList     string
+		refreshStored bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -55,6 +56,7 @@ func main() {
 	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
 	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
 	flag.StringVar(&stashList, "stash-list", "", "StashDB 欧美模式：UUID 清单文件（一行一个 UUID）；只用这份清单，不掺日系字典。配合 --data 写独立库")
+	flag.BoolVar(&refreshStored, "refresh-stored", false, "配合 --stash-list+--data：只重抓库里已存的记录（用它们的 StashDB UUID 作清单），不碰清单里还没入库的新人。适合小批量让新字段/简介对存量生效")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.LstdFlags)
@@ -148,6 +150,19 @@ func main() {
 			logger.Fatalf("读取 StashDB 清单 %s 失败: %v", stashList, err)
 		}
 		logger.Printf("StashDB 欧美模式：清单 %d 个 UUID（%s）", len(names), stashList)
+		if refreshStored {
+			// --refresh-stored：只用库里已存的 StashDB UUID 作清单，
+			// 这样 BuildPlan 只会 refresh 存量，不会把清单里还没入库的新人当 new 抓。
+			var stored []string
+			for _, a := range db.Actors {
+				if id := strings.TrimSpace(a.ProviderIDs["StashDB"]); id != "" {
+					stored = append(stored, id)
+				}
+			}
+			names = stored
+			refreshAll = true // 强制对这些名字走 refresh 分支
+			logger.Printf("只重抓库内已存记录：%d 个 UUID", len(names))
+		}
 	} else {
 		names, err = collectNames(fetcher.Dict, cfg.NamesFile, logger)
 		if err != nil {
