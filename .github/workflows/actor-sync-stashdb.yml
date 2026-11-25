@@ -1,7 +1,7 @@
 name: actor-sync-stashdb
 
 # 每次运行显示的名字：在 Actions 列表里一眼看出这批跑了什么参数
-run-name: "[欧美库] limit=${{ inputs.limit }}并发=${{ inputs.concurrency }} dry=${{ inputs.dry_run }}${{ inputs.refresh_list == true && ' 刷新清单' || '' }}"
+run-name: "[欧美库] limit=${{ inputs.limit }}并发=${{ inputs.concurrency }} dry=${{ inputs.dry_run }}${{ inputs.refresh_all == true && ' 重抓' || '' }}${{ inputs.refresh_list == true && ' 刷新清单' || '' }}"
 
 # 独立工作流：StashDB 欧美演员库（与日系 actor-sync 完全隔离）
 #
@@ -29,6 +29,10 @@ on:
         description: "只打印不写文件"
         type: boolean
         default: true
+      refresh_all:
+        description: "重抓已入库记录（用于让新字段/简介生效；配合 limit 控制条数）"
+        type: boolean
+        default: false
       include_asia:
         description: "清单包含亚洲国家码（一般不用勾）"
         type: boolean
@@ -100,6 +104,7 @@ jobs:
           LIMIT_INPUT: ${{ github.event.inputs.limit }}
           CONC_INPUT: ${{ github.event.inputs.concurrency }}
           DRY_INPUT: ${{ github.event.inputs.dry_run }}
+          REFRESH_ALL_INPUT: ${{ github.event.inputs.refresh_all }}
         run: |
           ARGS=(
             --stash-list actors_stashdb.txt
@@ -110,6 +115,7 @@ jobs:
           )
           if [ -n "$LIMIT_INPUT" ]; then ARGS+=(--limit "$LIMIT_INPUT"); fi
           if [ "$DRY_INPUT" = "true" ]; then ARGS+=(--dry-run); fi
+          if [ "$REFRESH_ALL_INPUT" = "true" ]; then ARGS+=(--refresh-all); fi
           echo "运行参数：${ARGS[*]}"
           ACTORS_CONCURRENCY="$CONC_INPUT" /tmp/actorsync "${ARGS[@]}"
 
