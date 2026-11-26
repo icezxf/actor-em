@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-26T11:08:44Z",
-  "count": 63103,
+  "generated_at": "2026-11-26T11:37:27Z",
+  "count": 63110,
   "actors": [
     {
       "key": "javstash:2b231b15-e112-453a-b0e9-9b357ac1eeee",
@@ -535835,6 +535835,44 @@
       "retry_after": null,
       "created_at": "2026-11-26T01:39:42Z",
       "scraped_at": "2026-11-26T01:39:42Z"
+    },
+    {
+      "key": "stashdb:18f11050-6269-4c4d-b97c-6cb4e90d1035",
+      "name": "Vera",
+      "name_original": "18f11050-6269-4c4d-b97c-6cb4e90d1035",
+      "aliases": [],
+      "gender": "female",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "PL",
+      "country": "PL",
+      "height_cm": null,
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2001,
+      "tags": [],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/4d329a71-706a-4bea-854b-f05ccb276ab2",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/18f11050-6269-4c4d-b97c-6cb4e90d1035",
+      "provider_ids": {
+        "StashDB": "18f11050-6269-4c4d-b97c-6cb4e90d1035"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:25Z",
+      "scraped_at": "2026-11-26T11:37:25Z"
     },
     {
       "key": "stashdb:18f21716-c03f-4392-969a-fced2bfb3eef",
@@ -1078904,6 +1078942,60 @@
       "scraped_at": "2026-11-26T02:42:21Z"
     },
     {
+      "key": "stashdb:545e8fff-fa69-44d9-9753-7d0933112f95",
+      "name": "Shaylee",
+      "name_original": "545e8fff-fa69-44d9-9753-7d0933112f95",
+      "aliases": [
+        "Alesya",
+        "Alisa",
+        "Diana B",
+        "Elsa",
+        "Elsa C",
+        "Hazel",
+        "Jade",
+        "Katja",
+        "Leia",
+        "Mandy",
+        "Mistress Alesya",
+        "Oksana",
+        "Oleanna",
+        "Olesya",
+        "Olga"
+      ],
+      "gender": "female",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "俄罗斯",
+      "country": "RU",
+      "height_cm": null,
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2008,
+      "tags": [],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/c8bff2c3-1167-4db8-ab3c-289fbe106607",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/545e8fff-fa69-44d9-9753-7d0933112f95",
+      "provider_ids": {
+        "StashDB": "545e8fff-fa69-44d9-9753-7d0933112f95"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:27Z",
+      "scraped_at": "2026-11-26T11:37:27Z"
+    },
+    {
       "key": "stashdb:545f348a-5f8e-40ae-ab42-074274b606bd",
       "name": "Sear",
       "name_original": "545f348a-5f8e-40ae-ab42-074274b606bd",
@@ -1135112,7 +1135204,7 @@
         "stashdb": true,
         "tpdb": true,
         "wiki": false,
-        "wiki_en": false
+        "wiki_en": true
       },
       "fail_count": 0,
       "retry_after": null,
@@ -1170290,6 +1170382,45 @@
       "retry_after": null,
       "created_at": "2026-11-26T01:19:22Z",
       "scraped_at": "2026-11-26T01:19:22Z"
+    },
+    {
+      "key": "stashdb:5e7cff44-7656-434a-bee2-2ce3e0f1630d",
+      "name": "Aria",
+      "name_original": "5e7cff44-7656-434a-bee2-2ce3e0f1630d",
+      "aliases": [],
+      "gender": "female",
+      "birth_date": "1995-11-30",
+      "birth_date_source": "javstash",
+      "birth_place": "美国",
+      "country": "US",
+      "height_cm": 162,
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2014,
+      "tags": [],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/cd09321e-1b02-4b6c-8cb7-a357a0b39e2c",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/5e7cff44-7656-434a-bee2-2ce3e0f1630d",
+      "provider_ids": {
+        "StashDB": "5e7cff44-7656-434a-bee2-2ce3e0f1630d"
+      },
+      "status": "ok",
+      "sources": {
+        "javstash": true,
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:27Z",
+      "scraped_at": "2026-11-26T11:37:27Z"
     },
     {
       "key": "stashdb:5e7eeb1c-0e96-45f4-a35b-12ee984732ba",
@@ -1867139,6 +1867270,44 @@
       "scraped_at": "2026-11-25T10:47:52Z"
     },
     {
+      "key": "stashdb:ab2070bc-675e-40e5-af94-e2522e6a9778",
+      "name": "Bia",
+      "name_original": "ab2070bc-675e-40e5-af94-e2522e6a9778",
+      "aliases": [],
+      "gender": "female",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "巴西",
+      "country": "BR",
+      "height_cm": null,
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2008,
+      "tags": [],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/793e90a4-d988-4b83-b8c9-626aa084bf4f",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/ab2070bc-675e-40e5-af94-e2522e6a9778",
+      "provider_ids": {
+        "StashDB": "ab2070bc-675e-40e5-af94-e2522e6a9778"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:25Z",
+      "scraped_at": "2026-11-26T11:37:25Z"
+    },
+    {
       "key": "stashdb:ab215cbf-0bc6-48e6-bb7e-d29b27bbd32c",
       "name": "Heather Thomas",
       "name_original": "ab215cbf-0bc6-48e6-bb7e-d29b27bbd32c",
@@ -1879800,6 +1879969,46 @@
       "retry_after": null,
       "created_at": "2026-11-25T14:48:58Z",
       "scraped_at": "2026-11-25T14:48:58Z"
+    },
+    {
+      "key": "stashdb:ac95dd78-db05-492d-9c9b-b1bd53826091",
+      "name": "Esmeralda Duarte",
+      "name_original": "ac95dd78-db05-492d-9c9b-b1bd53826091",
+      "aliases": [],
+      "gender": "female",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "CO",
+      "country": "CO",
+      "height_cm": 170,
+      "weight_kg": null,
+      "measurements": "34C-26-34",
+      "measurements_unit": "in",
+      "cup_size": "C",
+      "career_start": 2012,
+      "tags": [
+        "C罩杯"
+      ],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/ede86023-460f-466e-87c5-f43f23b88ed7",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/ac95dd78-db05-492d-9c9b-b1bd53826091",
+      "provider_ids": {
+        "StashDB": "ac95dd78-db05-492d-9c9b-b1bd53826091"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:27Z",
+      "scraped_at": "2026-11-26T11:37:27Z"
     },
     {
       "key": "stashdb:ac95fc34-89af-4dda-a08d-eed01b89c2a4",
@@ -2507437,6 +2507646,49 @@
       "scraped_at": "2026-11-25T10:44:35Z"
     },
     {
+      "key": "stashdb:f1657879-7300-4a1d-a93e-b3c25b4e2719",
+      "name": "Vendula",
+      "name_original": "f1657879-7300-4a1d-a93e-b3c25b4e2719",
+      "aliases": [
+        "Lida",
+        "Lolly",
+        "Vendy"
+      ],
+      "gender": "female",
+      "birth_date": null,
+      "birth_year": 1993,
+      "birth_date_source": null,
+      "birth_place": "CZ",
+      "country": "CZ",
+      "height_cm": null,
+      "weight_kg": null,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2012,
+      "tags": [],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/e424cc02-4976-494b-b65a-732e3ad25913",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/f1657879-7300-4a1d-a93e-b3c25b4e2719",
+      "provider_ids": {
+        "StashDB": "f1657879-7300-4a1d-a93e-b3c25b4e2719"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:26Z",
+      "scraped_at": "2026-11-26T11:37:26Z"
+    },
+    {
       "key": "stashdb:f165b8d0-e84e-4498-9a9c-8f8323722d3e",
       "name": "Crystal Taylor",
       "name_original": "f165b8d0-e84e-4498-9a9c-8f8323722d3e",
@@ -2558602,6 +2558854,48 @@
       "retry_after": null,
       "created_at": "2026-11-26T01:59:47Z",
       "scraped_at": "2026-11-26T01:59:47Z"
+    },
+    {
+      "key": "stashdb:f73128b1-96d9-4895-94d7-6d4d450c7149",
+      "name": "Athena",
+      "name_original": "f73128b1-96d9-4895-94d7-6d4d450c7149",
+      "aliases": [
+        "Amber"
+      ],
+      "gender": "female",
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "美国",
+      "country": "US",
+      "height_cm": 160,
+      "weight_kg": null,
+      "measurements": "34B-26-35",
+      "measurements_unit": "in",
+      "cup_size": "B",
+      "career_start": 2010,
+      "tags": [
+        "B罩杯"
+      ],
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://stashdb.org/images/c5e739be-d077-4ea7-a3de-ff6a56f60076",
+      "avatar_cn": null,
+      "avatar_source_site": "stashdb",
+      "homepage_url": "https://stashdb.org/performers/f73128b1-96d9-4895-94d7-6d4d450c7149",
+      "provider_ids": {
+        "StashDB": "f73128b1-96d9-4895-94d7-6d4d450c7149"
+      },
+      "status": "partial",
+      "sources": {
+        "stashdb": true,
+        "tpdb": false,
+        "wiki": false,
+        "wiki_en": false
+      },
+      "fail_count": 0,
+      "retry_after": null,
+      "created_at": "2026-11-26T11:37:26Z",
+      "scraped_at": "2026-11-26T11:37:26Z"
     },
     {
       "key": "stashdb:f731dd0c-831e-484e-86ff-e7edd7f69309",
