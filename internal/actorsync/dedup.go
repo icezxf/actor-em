@@ -122,7 +122,7 @@ func MergeDuplicateActors(actors []*Actor) ([]*Actor, int, int) {
 		groups++
 	}
 	if len(drop) == 0 {
-		return actors, 0, 0
+		return mergeSameNameBirth(actors)
 	}
 	kept := make([]*Actor, 0, len(actors))
 	for _, a := range actors {
@@ -132,7 +132,80 @@ func MergeDuplicateActors(actors []*Actor) ([]*Actor, int, int) {
 		}
 		kept = append(kept, a)
 	}
-	return kept, groups, removed
+	// 第二遍：同名 + 同生日的重复卡。
+	// 不能和上面的并查集混在一起跑——ID 链会把不同名字的人连成一个大 cluster，
+	// 整个 cluster 就会被严格规则否掉，连带把本该合并的同名同生日组也跳过了。
+	// 独立成第二遍，按 (规范化名字, 生日) 精确分组，互不干扰。
+	out, g2, r2 := mergeSameNameBirth(kept)
+	return out, groups + g2, removed + r2
+}
+
+// mergeSameNameBirth 把「规范化名字相同 + 生日完全一致」的记录合并成一条。
+//
+// 背景：StashDB 上同一人常有多张 performer 卡，各自独立 UUID、互不共享 provider_id，
+// 单靠 ID 共享永远聚不到一起。但同名 + 同一天生日几乎不可能是两个不同的人。
+// 生日为空的一律不参与（没有证据就不合并）。
+// 返回 (合并后的切片, 合并组数, 移除条数)。
+func mergeSameNameBirth(actors []*Actor) ([]*Actor, int, int) {
+	groups := map[string][]*Actor{}
+	for _, a := range actors {
+		if a == nil || !a.Exportable() {
+			continue
+		}
+		bd := strings.TrimSpace(StrVal(a.BirthDate))
+		if bd == "" {
+			continue
+		}
+		k := NormalizeName(a.Name) + "\x00" + bd
+		groups[k] = append(groups[k], a)
+	}
+	drop := map[string]bool{}
+	n := 0
+	for _, members := range groups {
+		if len(members) < 2 {
+			continue
+		}
+		// 组内可能有 JavStash ID 冲突（不同 performer 卡），有冲突就不合并，保守处理。
+		firstJS := ""
+		conflict := false
+		for _, a := range members {
+			v := strings.ToLower(strings.TrimSpace(a.ProviderIDs["JavStash"]))
+			if v == "" {
+				continue
+			}
+			if firstJS == "" {
+				firstJS = v
+			} else if v != firstJS {
+				conflict = true
+				break
+			}
+		}
+		if conflict {
+			continue
+		}
+		sort.Slice(members, func(i, j int) bool {
+			if members[i].CreatedAt != members[j].CreatedAt {
+				return members[i].CreatedAt < members[j].CreatedAt
+			}
+			return members[i].Key < members[j].Key
+		})
+		for _, dup := range members[1:] {
+			mergeInto(members[0], dup)
+			drop[dup.Key] = true
+		}
+		n++
+	}
+	if len(drop) == 0 {
+		return actors, 0, 0
+	}
+	out := make([]*Actor, 0, len(actors)-len(drop))
+	for _, a := range actors {
+		if a != nil && drop[a.Key] {
+			continue
+		}
+		out = append(out, a)
+	}
+	return out, n, len(drop)
 }
 
 // identityConflict 判断一组记录里是否有「两个都有值却不一样」的核心锚点。
