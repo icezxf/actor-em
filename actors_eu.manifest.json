@@ -1,14 +1,14 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-26T11:58:57Z",
+  "generated_at": "2026-11-26T12:23:20Z",
   "count": 63172,
   "by_status": {
     "ok": 31426,
     "partial": 31746
   },
   "last_run": {
-    "started_at": "2026-11-26T11:38:36Z",
-    "duration_sec": 1221,
+    "started_at": "2026-11-26T12:01:31Z",
+    "duration_sec": 1308,
     "picked": 36,
     "added": 36,
     "updated": 0,
@@ -26,8 +26,8 @@
       "ok": 36
     },
     "tpdb": {
-      "miss": 16,
-      "ok": 20
+      "miss": 17,
+      "ok": 19
     },
     "wiki": {
       "miss": 36,
