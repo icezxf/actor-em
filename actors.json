@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-25T13:53:42Z",
+  "generated_at": "2026-11-26T13:29:25Z",
   "count": 16601,
   "actors": [
     {
@@ -2048,8 +2048,8 @@
     },
     {
       "key": "javstash:00c08255-8d51-4155-9930-a80b6a04006f",
-      "name": "二阶堂くるみ",
-      "name_original": "くるみ",
+      "name": "荻原くるみ",
+      "name_original": "原くるみ",
       "aliases": [
         "Ayaka Kikuchi",
         "Kotone Naruse",
@@ -2061,14 +2061,14 @@
         "菊池彩花"
       ],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
-      "birth_place": "日本",
+      "birth_date": "1990-01-03",
+      "birth_date_source": "mdcx",
+      "birth_place": "日本·北海道",
       "country": "JP",
-      "height_cm": 154,
+      "height_cm": 151,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30-22-33",
+      "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2009,
       "tags": [
@@ -2076,31 +2076,32 @@
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://javstash.org/images/f6f6187a-fffd-421a-b75f-db7b33e32b90",
-      "avatar_cn": null,
-      "avatar_source_site": "javstash",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8E%9F%E3%81%8F%E3%82%8B%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8E%9F%E3%81%8F%E3%82%8B%E3%81%BF.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/00c08255-8d51-4155-9930-a80b6a04006f",
       "provider_ids": {
-        "JavStash": "00c08255-8d51-4155-9930-a80b6a04006f"
+        "JavStash": "00c08255-8d51-4155-9930-a80b6a04006f",
+        "TPDB": "0cddc909-290d-4f74-97a7-701a6781e67b"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:18Z",
-      "scraped_at": "2026-11-25T13:53:00Z"
+      "scraped_at": "2026-11-26T13:28:42Z"
     },
     {
       "key": "javstash:00c2e65d-23e0-4bf9-bb22-69d7f2e7daba",
@@ -3885,7 +3886,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:24:52Z",
-      "scraped_at": "2026-11-25T13:53:19Z"
+      "scraped_at": "2026-11-26T13:28:42Z"
     },
     {
       "key": "javstash:014d80ed-28d0-4e0b-b727-954d2dc365b7",
@@ -7002,36 +7003,38 @@
     },
     {
       "key": "javstash:01a01d7a-e7ca-76b6-82f5-2f5d8e91956a",
-      "name": "梦见あい",
-      "name_original": "夢見あい",
+      "name": "和见あい",
+      "name_original": "和見あい",
       "aliases": [
-        "梦见あい",
+        "和美あい",
         "待补充",
-        "Ai Yumemi",
-        "夢見あい"
+        "Ai Kasumi",
+        "和見あい"
       ],
       "gender": "female",
-      "birth_date": "1986-08-03",
+      "birth_date": "1984-12-27",
       "birth_date_source": "mdcx",
-      "birth_place": "日本·北海道",
-      "country": "JP",
-      "height_cm": 154,
+      "birth_place": "待补充",
+      "country": null,
+      "height_cm": 152,
       "weight_kg": null,
-      "measurements": "30H-24-33",
+      "measurements": "32D-24-33",
       "measurements_unit": "in",
-      "cup_size": "H",
-      "career_start": 2006,
+      "cup_size": "D",
+      "career_start": 2001,
       "tags": [
-        "H罩杯"
+        "D罩杯",
+        "."
       ],
-      "bio": "夢見あい，出生于 1986 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Ai Yumemi 等公开写法，可用于对照不同语言的人物条目。",
+      "bio": "和見あい，出生于 1984 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Ai Kasumi 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A2%E8%A6%8B%E3%81%82%E3%81%84.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%A2%E8%A6%8B%E3%81%82%E3%81%84.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%92%8C%E8%A6%8B%E3%81%82%E3%81%84.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%92%8C%E8%A6%8B%E3%81%82%E3%81%84.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a01d7a-e7ca-76b6-82f5-2f5d8e91956a",
       "provider_ids": {
-        "JavStash": "01a01d7a-e7ca-76b6-82f5-2f5d8e91956a"
+        "JavStash": "01a01d7a-e7ca-76b6-82f5-2f5d8e91956a",
+        "TPDB": "4d0d1d02-a4c7-4d0c-b9b0-761d7079b06b"
       },
       "status": "ok",
       "sources": {
@@ -7043,14 +7046,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:20Z",
-      "scraped_at": "2026-11-25T13:53:41Z"
+      "scraped_at": "2026-11-26T13:29:01Z"
     },
     {
       "key": "javstash:01a01e4b-afc0-75de-8c93-7e26cb1710a7",
@@ -8526,39 +8529,39 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:52Z",
-      "scraped_at": "2026-11-25T13:53:16Z"
+      "scraped_at": "2026-11-26T13:28:29Z"
     },
     {
       "key": "javstash:01a05250-2e60-7b4a-b1b4-62cf14d34f21",
-      "name": "五十岚翔子",
-      "name_original": "五十嵐翔子",
+      "name": "中山翔子",
+      "name_original": null,
       "aliases": [
-        "徳山麗子(メス豚)"
+        "レイ(1000人斬り)",
+        "野本梨紗(メス豚)"
       ],
       "gender": "transgender_female",
-      "birth_date": "1976-01-01",
+      "birth_date": "1992-05-17",
       "birth_date_source": "mdcx",
-      "birth_place": "日本",
+      "birth_place": "日本·东京都",
       "country": "JP",
-      "height_cm": 159,
+      "height_cm": 157,
       "weight_kg": null,
-      "measurements": "32A-23-31",
+      "measurements": "32-22-31",
       "measurements_unit": "in",
-      "cup_size": "A",
-      "career_start": 2015,
+      "cup_size": null,
+      "career_start": 2012,
       "tags": [
-        "A罩杯",
-        "肩腰大腿纹身",
         "母猪"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%BA%94%E5%8D%81%E5%B5%90%E7%BF%94%E5%AD%90.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%BA%94%E5%8D%81%E5%B5%90%E7%BF%94%E5%AD%90.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B1%B1%E7%BF%94%E5%AD%90.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B1%B1%E7%BF%94%E5%AD%90.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a05250-2e60-7b4a-b1b4-62cf14d34f21",
       "provider_ids": {
-        "JavStash": "01a05250-2e60-7b4a-b1b4-62cf14d34f21"
+        "JavStash": "01a05250-2e60-7b4a-b1b4-62cf14d34f21",
+        "TPDB": "63e6b139-7f29-4816-9f60-c68bfb00cf98"
       },
       "status": "ok",
       "sources": {
@@ -8570,14 +8573,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:15:11Z",
-      "scraped_at": "2026-11-25T13:53:03Z"
+      "scraped_at": "2026-11-26T13:27:52Z"
     },
     {
       "key": "javstash:01a05271-8ee7-7e50-b079-1d2911ea7e08",
@@ -8630,8 +8633,8 @@
     },
     {
       "key": "javstash:01a0568f-8b7f-76ae-b6d3-62ef07ea7913",
-      "name": "大山菜穗",
-      "name_original": "大山菜穂",
+      "name": "大山凉子",
+      "name_original": "大山涼子",
       "aliases": [],
       "gender": "female",
       "birth_date": null,
@@ -8640,15 +8643,18 @@
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": "32-24-31",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": null,
-      "career_start": 2016,
-      "tags": [],
+      "career_start": 2014,
+      "tags": [
+        "Hey动画",
+        "丰满"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A7%E5%B1%B1%E8%8F%9C%E7%A9%82.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%A7%E5%B1%B1%E8%8F%9C%E7%A9%82.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E5%B1%B1%E6%B6%BC%E5%AD%90.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E5%B1%B1%E6%B6%BC%E5%AD%90.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a0568f-8b7f-76ae-b6d3-62ef07ea7913",
       "provider_ids": {
@@ -8671,7 +8677,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:34:42Z",
-      "scraped_at": "2026-11-24T14:34:53Z"
+      "scraped_at": "2026-11-26T13:29:16Z"
     },
     {
       "key": "javstash:01a057bb-9683-7b3c-b545-7b2748ef7454",
@@ -8944,30 +8950,30 @@
     },
     {
       "key": "javstash:01a05919-dcce-7bb5-a670-0a0fffd7d96f",
-      "name": "夕树亚美",
-      "name_original": "夕樹亜美",
+      "name": "城崎亚美",
+      "name_original": "城崎亜美",
       "aliases": [
-        "夕樹亞美",
+        "城崎亞美",
         "Ami"
       ],
       "gender": "female",
       "birth_date": "1991-02-19",
       "birth_date_source": "javstash",
-      "birth_place": "日本·东京都",
+      "birth_place": "日本·长野县",
       "country": "JP",
-      "height_cm": 154,
+      "height_cm": 168,
       "weight_kg": null,
-      "measurements": "32E-23-33",
+      "measurements": "33-24-34",
       "measurements_unit": "in",
-      "cup_size": "E",
-      "career_start": 1997,
+      "cup_size": "C",
+      "career_start": 2013,
       "tags": [
-        "E罩杯"
+        "C罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%95%E6%A8%B9%E4%BA%9C%E7%BE%8E.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%95%E6%A8%B9%E4%BA%9C%E7%BE%8E.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%9F%8E%E5%B4%8E%E4%BA%9C%E7%BE%8E.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%9F%8E%E5%B4%8E%E4%BA%9C%E7%BE%8E.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a05919-dcce-7bb5-a670-0a0fffd7d96f",
       "provider_ids": {
@@ -8990,7 +8996,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:50Z",
-      "scraped_at": "2026-11-25T13:53:39Z"
+      "scraped_at": "2026-11-26T13:29:06Z"
     },
     {
       "key": "javstash:01a05c60-0cf2-70df-a03d-104a9e841f40",
@@ -9041,7 +9047,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:34Z",
-      "scraped_at": "2026-11-25T13:53:08Z"
+      "scraped_at": "2026-11-26T13:28:10Z"
     },
     {
       "key": "javstash:01a05c61-4464-749a-9409-6ada1736e02b",
@@ -9091,43 +9097,46 @@
     },
     {
       "key": "javstash:01a05c63-2ac3-7a27-882b-ff6423ef97f3",
-      "name": "中西まみ",
-      "name_original": null,
+      "name": "一の濑まみ",
+      "name_original": "まみ",
       "aliases": [
+        "Mami Ichinose",
+        "ーの瀬まみ",
+        "一の瀨まみ",
+        "一の瀬真美",
+        "一ノ瀬まみ",
         "まみ148cm"
       ],
       "gender": "female",
-      "birth_date": "1994-09-30",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
       "height_cm": 148,
       "weight_kg": null,
-      "measurements": "32C-24-33",
-      "measurements_unit": "in",
-      "cup_size": "C",
-      "career_start": 2016,
-      "tags": [
-        "C罩杯"
-      ],
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E8%A5%BF%E3%81%BE%E3%81%BF.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E8%A5%BF%E3%81%BE%E3%81%BF.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/01a05c63-2ac3-7a27-882b-ff6423ef97f3",
       "provider_ids": {
         "JavStash": "01a05c63-2ac3-7a27-882b-ff6423ef97f3"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -9136,7 +9145,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:10:59Z",
-      "scraped_at": "2026-11-25T13:52:53Z"
+      "scraped_at": "2026-11-26T13:27:14Z"
     },
     {
       "key": "javstash:01a05ccf-9a40-73d7-93e4-1bce89fb5d89",
@@ -9386,32 +9395,32 @@
     },
     {
       "key": "javstash:01a068c0-d604-7f1e-8f24-5ec0fb189bc1",
-      "name": "仲本みなみ",
+      "name": "反田みなみ",
       "name_original": null,
       "aliases": [
-        "橘優香",
         "Minami",
         "みなみ"
       ],
       "gender": "transgender_female",
-      "birth_date": "1988-08-08",
-      "birth_date_source": "cinewho",
+      "birth_date": "1956-11-30",
+      "birth_date_source": "mdcx",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 158,
+      "height_cm": 152,
       "weight_kg": null,
-      "measurements": "32C-25-34",
+      "measurements": "30C-23-33",
       "measurements_unit": "in",
       "cup_size": "C",
-      "career_start": null,
+      "career_start": 2013,
       "tags": [
         "C罩杯",
-        "刚毛"
+        "五十路",
+        "熟女"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BB%B2%E6%9C%AC%E3%81%BF%E3%81%AA%E3%81%BF.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%BB%B2%E6%9C%AC%E3%81%BF%E3%81%AA%E3%81%BF.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%8F%8D%E7%94%B0%E3%81%BF%E3%81%AA%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%8F%8D%E7%94%B0%E3%81%BF%E3%81%AA%E3%81%BF.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a068c0-d604-7f1e-8f24-5ec0fb189bc1",
       "provider_ids": {
@@ -9434,7 +9443,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:36Z",
-      "scraped_at": "2026-11-25T13:53:07Z"
+      "scraped_at": "2026-11-26T13:28:51Z"
     },
     {
       "key": "javstash:01a06d12-d4c4-77f0-87ee-7ef1e99aed58",
@@ -9748,50 +9757,53 @@
     },
     {
       "key": "javstash:01a082fd-186d-7647-b970-9ac8475bcdb2",
-      "name": "城田洋子",
-      "name_original": "洋子",
+      "name": "城戸洋子",
+      "name_original": null,
       "aliases": [
         "Yoko"
       ],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1997-11-30",
+      "birth_date_source": "mdcx",
       "birth_place": "日本",
       "country": "JP",
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
-      "career_start": null,
-      "tags": [],
+      "measurements": "30D-23-33",
+      "measurements_unit": "in",
+      "cup_size": "D",
+      "career_start": 2019,
+      "tags": [
+        "D罩杯"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9F%8E%E6%88%B8%E6%B4%8B%E5%AD%90.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9F%8E%E6%88%B8%E6%B4%8B%E5%AD%90.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/01a082fd-186d-7647-b970-9ac8475bcdb2",
       "provider_ids": {
-        "JavStash": "01a082fd-186d-7647-b970-9ac8475bcdb2"
+        "JavStash": "01a082fd-186d-7647-b970-9ac8475bcdb2",
+        "TPDB": "a25656b7-9cf0-4102-a8dd-07b7989061e0"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:17:18Z",
-      "scraped_at": "2026-11-25T13:53:32Z"
+      "scraped_at": "2026-11-26T13:29:05Z"
     },
     {
       "key": "javstash:01a08323-0c8d-7ff5-84ac-600d0a5c5005",
@@ -11675,41 +11687,44 @@
     },
     {
       "key": "javstash:01a13c06-8243-76c8-aa96-5ed1116ea6ed",
-      "name": "坂巻かおり",
-      "name_original": null,
-      "aliases": [],
+      "name": "古川香织",
+      "name_original": "かおり",
+      "aliases": [
+        "Furukawa Kaori",
+        "Niiyama Yuuki",
+        "古川香織",
+        "新山 ゆうき"
+      ],
       "gender": "female",
-      "birth_date": "1974-08-04",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 153,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "32B-23-34",
-      "measurements_unit": "in",
-      "cup_size": "B",
-      "career_start": 1994,
-      "tags": [
-        "B罩杯"
-      ],
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9D%82%E5%B7%BB%E3%81%8B%E3%81%8A%E3%82%8A.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9D%82%E5%B7%BB%E3%81%8B%E3%81%8A%E3%82%8A.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/01a13c06-8243-76c8-aa96-5ed1116ea6ed",
       "provider_ids": {
         "JavStash": "01a13c06-8243-76c8-aa96-5ed1116ea6ed"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -11718,7 +11733,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:18Z",
-      "scraped_at": "2026-11-25T13:53:31Z"
+      "scraped_at": "2026-11-26T13:28:46Z"
     },
     {
       "key": "javstash:01a13e9b-ed2e-7122-b8cb-98d35912d248",
@@ -17122,10 +17137,9 @@
     },
     {
       "key": "javstash:02d01ce1-2232-40f3-a9dd-2a598b0b4b9f",
-      "name": "阪井伊织",
-      "name_original": "坂井伊織",
+      "name": "七海伊织",
+      "name_original": "七海伊織",
       "aliases": [
-        "阪井伊織",
         "Asuka Shirosawa",
         "Yukari Kitamura",
         "たちばないおり",
@@ -17135,22 +17149,21 @@
       "gender": "female",
       "birth_date": "1990-05-03",
       "birth_date_source": "javstash",
-      "birth_place": "日本·神奈川县",
+      "birth_place": "日本·福岛县",
       "country": "JP",
-      "height_cm": 158,
+      "height_cm": 160,
       "weight_kg": null,
-      "measurements": "30D-22-33",
+      "measurements": "33-31-34",
       "measurements_unit": "in",
-      "cup_size": "D",
-      "career_start": null,
+      "cup_size": "F",
+      "career_start": 2011,
       "tags": [
-        "D罩杯",
-        "着衣色情"
+        "F罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9D%82%E4%BA%95%E4%BC%8A%E7%B9%94.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9D%82%E4%BA%95%E4%BC%8A%E7%B9%94.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%83%E6%B5%B7%E4%BC%8A%E7%B9%94.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%83%E6%B5%B7%E4%BC%8A%E7%B9%94.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/02d01ce1-2232-40f3-a9dd-2a598b0b4b9f",
       "provider_ids": {
@@ -17173,7 +17186,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:11:51Z",
-      "scraped_at": "2026-11-25T13:53:31Z"
+      "scraped_at": "2026-11-26T13:27:21Z"
     },
     {
       "key": "javstash:02d7e9ec-55ec-4ea9-b28c-77c2b65bbe75",
@@ -54788,29 +54801,29 @@
     },
     {
       "key": "javstash:0fb6c83e-cba3-4227-9e9f-589d6619c86d",
-      "name": "佐々野佳奈",
-      "name_original": null,
-      "aliases": [],
+      "name": "佐伯佳代",
+      "name_original": "佳奈",
+      "aliases": [
+        "Saeki Kana",
+        "さえきかな"
+      ],
       "gender": "female",
       "birth_date": null,
       "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 153,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "31-23-33",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": null,
       "career_start": null,
-      "tags": [
-        "母猪",
-        "萝莉"
-      ],
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%BD%90%E3%80%85%E9%87%8E%E4%BD%B3%E5%A5%88.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%BD%90%E3%80%85%E9%87%8E%E4%BD%B3%E5%A5%88.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/0fb6c83e-cba3-4227-9e9f-589d6619c86d",
       "provider_ids": {
         "JavStash": "0fb6c83e-cba3-4227-9e9f-589d6619c86d"
@@ -54820,10 +54833,10 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -54832,7 +54845,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:35Z",
-      "scraped_at": "2026-11-25T13:53:10Z"
+      "scraped_at": "2026-11-26T13:28:11Z"
     },
     {
       "key": "javstash:0fb87fda-0afd-4eb7-bc5c-3bf1d2143115",
@@ -59883,8 +59896,8 @@
     },
     {
       "key": "javstash:115b06c4-2e08-48b5-a222-670e220dfeeb",
-      "name": "坂上真琴",
-      "name_original": null,
+      "name": "仓田真琴",
+      "name_original": "倉田真琴",
       "aliases": [
         "Mako Mizutano",
         "Makoto Takeuchi",
@@ -59900,22 +59913,21 @@
       "gender": "female",
       "birth_date": "1993-10-04",
       "birth_date_source": "javstash",
-      "birth_place": "日本·神奈川县",
+      "birth_place": "日本",
       "country": "JP",
-      "height_cm": 159,
+      "height_cm": 156,
       "weight_kg": null,
-      "measurements": "34-22-33",
+      "measurements": "33-24-34",
       "measurements_unit": "in",
       "cup_size": "D",
-      "career_start": 1988,
+      "career_start": 2014,
       "tags": [
-        "D罩杯",
-        "钻石映像"
+        "D罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%9D%82%E4%B8%8A%E7%9C%9F%E7%90%B4.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%9D%82%E4%B8%8A%E7%9C%9F%E7%90%B4.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%80%89%E7%94%B0%E7%9C%9F%E7%90%B4.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%80%89%E7%94%B0%E7%9C%9F%E7%90%B4.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/115b06c4-2e08-48b5-a222-670e220dfeeb",
       "provider_ids": {
@@ -59943,7 +59955,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:21:30Z",
-      "scraped_at": "2026-11-25T13:53:31Z"
+      "scraped_at": "2026-11-26T13:28:21Z"
     },
     {
       "key": "javstash:115e6b81-8cab-493e-8ee4-b690dc5edcd4",
@@ -60263,33 +60275,31 @@
     },
     {
       "key": "javstash:11839dbf-3529-400f-9f50-5f3dbf1175b5",
-      "name": "中村あみ",
-      "name_original": null,
+      "name": "大冢あみ",
+      "name_original": "あみ",
       "aliases": [],
       "gender": "female",
-      "birth_date": "1983-06-20",
-      "birth_date_source": "mdcx",
-      "birth_place": "日本·东京都",
-      "country": "JP",
-      "height_cm": 158,
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": null,
+      "country": null,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "32D-24-34",
-      "measurements_unit": "in",
-      "cup_size": "D",
-      "career_start": 2003,
-      "tags": [
-        "D罩杯"
-      ],
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%9D%91%E3%81%82%E3%81%BF.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%9D%91%E3%81%82%E3%81%BF.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%A4%A7%E5%A1%9A%E3%81%82%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%A4%A7%E5%A1%9A%E3%81%82%E3%81%BF.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/11839dbf-3529-400f-9f50-5f3dbf1175b5",
       "provider_ids": {
         "JavStash": "11839dbf-3529-400f-9f50-5f3dbf1175b5"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -60297,7 +60307,7 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -60306,7 +60316,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:47Z",
-      "scraped_at": "2026-11-25T13:52:47Z"
+      "scraped_at": "2026-11-26T13:29:12Z"
     },
     {
       "key": "javstash:118a06f2-964b-4232-a926-a73b82cca2d1",
@@ -63461,10 +63471,11 @@
     },
     {
       "key": "javstash:12af63fb-2510-4d4d-a12d-1fe7607982cc",
-      "name": "夏濑あおい",
-      "name_original": "夏瀬あおい",
+      "name": "たちあおい",
+      "name_original": "山本あおい",
       "aliases": [
-        "夏瀨あおい",
+        "Shoko Otani",
+        "Tachi Aoi",
         "AOI",
         "Aoi",
         "Aoi Miyamoto",
@@ -63485,46 +63496,42 @@
       "birth_date_source": "javstash",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 161,
+      "height_cm": 152,
       "weight_kg": null,
-      "measurements": "32E-23-35",
-      "measurements_unit": "in",
-      "cup_size": "E",
-      "career_start": 2012,
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": "B",
+      "career_start": null,
       "tags": [
-        "E罩杯",
-        "萝莉",
-        "穿衣诱惑出身",
-        "无毛"
+        "B罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%80%AC%E3%81%82%E3%81%8A%E3%81%84.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%80%AC%E3%81%82%E3%81%8A%E3%81%84.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/6001ba5c-4139-43e7-835c-e8e482d2f079",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/12af63fb-2510-4d4d-a12d-1fe7607982cc",
       "provider_ids": {
-        "JavStash": "12af63fb-2510-4d4d-a12d-1fe7607982cc",
-        "TPDB": "92c19457-8e37-40a9-b475-4414e185bb4c"
+        "JavStash": "12af63fb-2510-4d4d-a12d-1fe7607982cc"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:35Z",
-      "scraped_at": "2026-11-25T13:53:38Z"
+      "scraped_at": "2026-11-26T13:26:58Z"
     },
     {
       "key": "javstash:12b32b87-da43-4779-8e41-c56cb6cdbdac",
@@ -69754,7 +69761,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:27:42Z",
-      "scraped_at": "2026-11-25T13:53:27Z"
+      "scraped_at": "2026-11-26T13:28:56Z"
     },
     {
       "key": "javstash:15360257-5adf-4ddc-92c6-fe179232eed9",
@@ -76575,59 +76582,58 @@
     },
     {
       "key": "javstash:17d83ba6-28fc-493c-9527-8de126f211f9",
-      "name": "クイーン・クリスティーン",
-      "name_original": null,
+      "name": "逢阪优",
+      "name_original": "クリスティーン",
       "aliases": [
+        "クリスティーン北島",
+        "逢阪優",
         "Kitajima Christine",
         "クリスティーン",
-        "北島クリスティーン",
-        "Christin Queen",
-        "Queen Christin"
+        "北島クリスティーン"
       ],
       "gender": "female",
       "birth_date": "1992-09-20",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·佐贺县",
       "country": "JP",
       "height_cm": 162,
-      "weight_kg": 51,
-      "measurements": "34C-24-36",
+      "weight_kg": null,
+      "measurements": "30F-23-35",
       "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2013,
       "tags": [
         "F罩杯"
       ],
-      "bio": "This blonde Romanian hottie was playing with her slutty friend and didn't know she was being filmed by a pervy neighbor. Good thing by the time they noticed they had had enough pussy and were craving cock. This chick seriously digs anal.",
-      "bio_lang": "en",
-      "avatar": "https://javstash.org/images/cf9fd7f9-b834-4474-803d-641a7971b65d",
-      "avatar_cn": null,
-      "avatar_source_site": "javstash",
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%86%E3%82%A3%E3%83%BC%E3%83%B3%E5%8C%97%E5%B3%B6.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E3%82%AF%E3%83%AA%E3%82%B9%E3%83%86%E3%82%A3%E3%83%BC%E3%83%B3%E5%8C%97%E5%B3%B6.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/17d83ba6-28fc-493c-9527-8de126f211f9",
       "provider_ids": {
         "JavStash": "17d83ba6-28fc-493c-9527-8de126f211f9",
-        "TPDB": "2bfa9033-12ca-4369-aef9-f5ba9d4d7d69",
         "Wikidata": "Q17349918",
         "Wikipedia": "ja.wikipedia.org/wiki/クリスティーン_(AV女優)"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:04:56Z",
-      "scraped_at": "2026-11-25T13:52:29Z"
+      "scraped_at": "2026-11-26T13:27:09Z"
     },
     {
       "key": "javstash:17d907d9-a72c-4b89-a4a4-4de4c3142b3c",
@@ -77945,20 +77951,20 @@
     },
     {
       "key": "javstash:183830d4-2b44-4c11-9965-a778c5dee1e3",
-      "name": "中山みき",
-      "name_original": null,
+      "name": "北川みき",
+      "name_original": "みき",
       "aliases": [
         "山川みき"
       ],
       "gender": "transgender_female",
       "birth_date": null,
       "birth_date_source": null,
-      "birth_place": "日本·兵库县",
+      "birth_place": "日本",
       "country": "JP",
       "height_cm": 165,
       "weight_kg": null,
-      "measurements": "35-25-34",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": "E",
       "career_start": null,
       "tags": [
@@ -77966,8 +77972,8 @@
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B1%B1%E3%81%BF%E3%81%8D.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B1%B1%E3%81%BF%E3%81%8D.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%8C%97%E5%B7%9D%E3%81%BF%E3%81%8D.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%8C%97%E5%B7%9D%E3%81%BF%E3%81%8D.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/183830d4-2b44-4c11-9965-a778c5dee1e3",
       "provider_ids": {
@@ -77981,7 +77987,7 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -77990,7 +77996,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:06Z",
-      "scraped_at": "2026-11-25T13:52:46Z"
+      "scraped_at": "2026-11-26T13:28:27Z"
     },
     {
       "key": "javstash:1847ee5f-70c1-4f13-86a6-f4bd789c164d",
@@ -92977,9 +92983,10 @@
     },
     {
       "key": "javstash:1d68f01f-86d4-441d-b1ce-1fc379c72449",
-      "name": "大咲凉",
-      "name_original": "大咲涼",
+      "name": "大崎凉",
+      "name_original": "大崎涼",
       "aliases": [
+        "うらら(太平洋娘)",
         "Ryo"
       ],
       "gender": "female",
@@ -92987,10 +92994,10 @@
       "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 172,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "33-24-35",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": null,
       "career_start": null,
       "tags": [],
@@ -93020,7 +93027,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:19:01Z",
-      "scraped_at": "2026-11-25T13:53:42Z"
+      "scraped_at": "2026-11-26T13:29:17Z"
     },
     {
       "key": "javstash:1d723484-db15-4ab5-9387-28ba599f35ce",
@@ -94218,37 +94225,33 @@
     },
     {
       "key": "javstash:1db7dade-eea8-401f-8158-1317eb08405d",
-      "name": "夏焼みのり",
-      "name_original": null,
+      "name": "可爱みのり",
+      "name_original": "みのり",
       "aliases": [
         "日向まお"
       ],
       "gender": "female",
-      "birth_date": "1996-04-26",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": null,
       "country": null,
-      "height_cm": 153,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "30H-28-38",
-      "measurements_unit": "in",
-      "cup_size": "H",
-      "career_start": 2014,
-      "tags": [
-        "H罩杯",
-        "丰满",
-        "巨乳"
-      ],
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%84%BC%E3%81%BF%E3%81%AE%E3%82%8A.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%84%BC%E3%81%BF%E3%81%AE%E3%82%8A.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%8F%AF%E6%84%9B%E3%81%BF%E3%81%AE%E3%82%8A.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%8F%AF%E6%84%9B%E3%81%BF%E3%81%AE%E3%82%8A.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/1db7dade-eea8-401f-8158-1317eb08405d",
       "provider_ids": {
         "JavStash": "1db7dade-eea8-401f-8158-1317eb08405d"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -94256,7 +94259,7 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -94265,7 +94268,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:38Z",
-      "scraped_at": "2026-11-25T13:53:38Z"
+      "scraped_at": "2026-11-26T13:28:51Z"
     },
     {
       "key": "javstash:1db9fdd7-acac-45f1-8eb7-91d1be117987",
@@ -96497,52 +96500,51 @@
     },
     {
       "key": "javstash:1e81ebec-dbd3-48ec-a422-3cec36371639",
-      "name": "盐见唯子",
-      "name_original": "塩見唯子",
+      "name": "中里唯",
+      "name_original": null,
       "aliases": [
-        "鹽見唯子"
+        "中裏唯"
       ],
       "gender": "female",
-      "birth_date": "2001-09-30",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": null,
       "country": null,
-      "height_cm": 156,
+      "height_cm": 163,
       "weight_kg": null,
-      "measurements": "32C-24-33",
+      "measurements": "34-23-33",
       "measurements_unit": "in",
-      "cup_size": "C",
-      "career_start": 2023,
-      "tags": [
-        "C罩杯"
-      ],
+      "cup_size": null,
+      "career_start": 2012,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%AD%E9%87%8C%E5%94%AF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%B8%AD%E9%87%8C%E5%94%AF.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/1e81ebec-dbd3-48ec-a422-3cec36371639",
       "provider_ids": {
-        "JavStash": "1e81ebec-dbd3-48ec-a422-3cec36371639"
+        "JavStash": "1e81ebec-dbd3-48ec-a422-3cec36371639",
+        "TPDB": "270a257e-41c6-4ee9-8037-968c19046033"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:11:10Z",
-      "scraped_at": "2026-11-25T13:53:36Z"
+      "scraped_at": "2026-11-26T13:28:01Z"
     },
     {
       "key": "javstash:1e848b45-45e0-49b0-ac82-aa3f0df4abb4",
@@ -109853,11 +109855,11 @@
     },
     {
       "key": "javstash:235bdbc2-6b01-45ef-9ae4-1ed53710071d",
-      "name": "北内美圣",
-      "name_original": "北内美聖",
+      "name": "北川青罗",
+      "name_original": "聖",
       "aliases": [
-        "宇野由菜",
-        "北內美聖",
+        "Seira Kitagawa",
+        "北川青羅",
         "山崎千花",
         "待补充",
         "聖",
@@ -109865,20 +109867,17 @@
         "聖 (AV女優)"
       ],
       "gender": "female",
-      "birth_date": "1992-11-20",
-      "birth_date_source": "mdcx",
-      "birth_place": "日本·栃木县",
-      "country": "JP",
-      "height_cm": 162,
+      "birth_date": "1985-07-07",
+      "birth_date_source": "cinewho",
+      "birth_place": "待补充",
+      "country": null,
+      "height_cm": 154,
       "weight_kg": null,
-      "measurements": "28G-23-35",
+      "measurements": "33-23-33",
       "measurements_unit": "in",
-      "cup_size": "G",
+      "cup_size": null,
       "career_start": null,
-      "tags": [
-        "G罩杯",
-        "写真偶像"
-      ],
+      "tags": [],
       "bio": "聖 (AV女優)（聖），出生于 1985 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 聖、Sei 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
       "avatar": null,
@@ -109896,7 +109895,7 @@
         "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -109905,7 +109904,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:46Z",
-      "scraped_at": "2026-11-25T13:53:14Z"
+      "scraped_at": "2026-11-26T13:28:27Z"
     },
     {
       "key": "javstash:235ce590-2052-4cbf-81e7-a4c6f7c4aee6",
@@ -147051,15 +147050,18 @@
     },
     {
       "key": "javstash:308e042c-53c4-4b71-8666-bf8fed0bc2f9",
-      "name": "北浦爱",
+      "name": "又吉爱",
       "name_original": "愛",
       "aliases": [
-        "きたうら あゆ",
-        "Ayu Kitaura"
+        "またよし あい",
+        "마타요시 아이",
+        "Ai Matayoshi",
+        "又吉爱",
+        "又吉愛"
       ],
       "gender": "transgender_female",
-      "birth_date": "1992-11-26",
-      "birth_date_source": "castwiki",
+      "birth_date": "1983-04-02",
+      "birth_date_source": "cinewho",
       "birth_place": "日本",
       "country": "JP",
       "height_cm": null,
@@ -147080,8 +147082,8 @@
       },
       "status": "ok",
       "sources": {
-        "castwiki": true,
-        "cinewho": false,
+        "castwiki": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": false,
         "idoldb": false,
@@ -147095,7 +147097,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:24:43Z",
-      "scraped_at": "2026-11-25T13:53:17Z"
+      "scraped_at": "2026-11-26T13:28:42Z"
     },
     {
       "key": "javstash:309749aa-f4ce-4257-a9e8-1942b7ac4db4",
@@ -153770,35 +153772,37 @@
     },
     {
       "key": "javstash:33728821-3b9e-4434-8222-8562a6a398e6",
-      "name": "大久保弥生",
+      "name": "城田弥生",
       "name_original": null,
       "aliases": [
-        "大久保彌生"
+        "城田彌生"
       ],
       "gender": "transgender_female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1981-09-30",
+      "birth_date_source": "mdcx",
       "birth_place": null,
       "country": null,
-      "height_cm": null,
+      "height_cm": 155,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": "D",
-      "career_start": 2023,
+      "measurements": "30E-26-34",
+      "measurements_unit": "in",
+      "cup_size": "E",
+      "career_start": 2013,
       "tags": [
-        "D罩杯"
+        "E罩杯",
+        "熟女",
+        "丰胸乳"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A7%E4%B9%85%E4%BF%9D%E5%BC%A5%E7%94%9F.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%A7%E4%B9%85%E4%BF%9D%E5%BC%A5%E7%94%9F.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9F%8E%E7%94%B0%E5%BC%A5%E7%94%9F.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9F%8E%E7%94%B0%E5%BC%A5%E7%94%9F.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/33728821-3b9e-4434-8222-8562a6a398e6",
       "provider_ids": {
         "JavStash": "33728821-3b9e-4434-8222-8562a6a398e6"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -153815,7 +153819,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:39Z",
-      "scraped_at": "2026-11-25T13:53:41Z"
+      "scraped_at": "2026-11-26T13:29:07Z"
     },
     {
       "key": "javstash:337452c1-9f8d-4148-9e29-16d9ee52705f",
@@ -155113,7 +155117,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:27:27Z",
-      "scraped_at": "2026-11-25T13:53:35Z"
+      "scraped_at": "2026-11-26T13:29:09Z"
     },
     {
       "key": "javstash:33f92b09-8cd5-4def-a664-28db0503ce57",
@@ -156004,9 +156008,10 @@
     },
     {
       "key": "javstash:343860f7-b715-45cb-aa97-9bbd4dcdb0ed",
-      "name": "中西ひなの",
+      "name": "大野城ひなの",
       "name_original": "ひなの",
       "aliases": [
+        "川原麗蘭",
         "まほ",
         "まゆみ",
         "相沢春香",
@@ -156053,7 +156058,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:12Z",
-      "scraped_at": "2026-11-25T13:52:50Z"
+      "scraped_at": "2026-11-26T13:29:20Z"
     },
     {
       "key": "javstash:34396030-59a0-45f1-92ae-e78fbaa2e747",
@@ -176755,7 +176760,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:24Z",
-      "scraped_at": "2026-11-25T13:53:11Z"
+      "scraped_at": "2026-11-26T13:28:19Z"
     },
     {
       "key": "javstash:3c06a7f0-a99e-440a-a47d-3ca1b928578f",
@@ -179511,7 +179516,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:25:01Z",
-      "scraped_at": "2026-11-25T13:53:18Z"
+      "scraped_at": "2026-11-26T13:28:33Z"
     },
     {
       "key": "javstash:3d59a516-0650-406e-a85b-099a612dde20",
@@ -197968,8 +197973,8 @@
     },
     {
       "key": "javstash:4381cc6d-e3ba-4499-97ef-b1468b6286e3",
-      "name": "仓持ゆな",
-      "name_original": "倉持ゆな",
+      "name": "天野ゆな",
+      "name_original": null,
       "aliases": [
         "Yuna"
       ],
@@ -197981,21 +197986,22 @@
       "country": "JP",
       "height_cm": 154,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "30-25-32",
+      "measurements_unit": "in",
       "cup_size": "A",
-      "career_start": 2016,
+      "career_start": 2014,
       "tags": [
         "A罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%80%89%E6%8C%81%E3%82%86%E3%81%AA.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%80%89%E6%8C%81%E3%82%86%E3%81%AA.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A9%E9%87%8E%E3%82%86%E3%81%AA.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%A9%E9%87%8E%E3%82%86%E3%81%AA.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/4381cc6d-e3ba-4499-97ef-b1468b6286e3",
       "provider_ids": {
-        "JavStash": "4381cc6d-e3ba-4499-97ef-b1468b6286e3"
+        "JavStash": "4381cc6d-e3ba-4499-97ef-b1468b6286e3",
+        "TPDB": "55e154f3-6561-4737-9f86-e7db9e6a3931"
       },
       "status": "partial",
       "sources": {
@@ -198007,14 +198013,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:21:19Z",
-      "scraped_at": "2026-11-25T13:53:11Z"
+      "scraped_at": "2026-11-26T13:29:24Z"
     },
     {
       "key": "javstash:438333d9-d98d-4165-94ba-fd47d67075ac",
@@ -206773,8 +206779,8 @@
     },
     {
       "key": "javstash:46eff96a-dd04-4c89-8f26-26faaff650b0",
-      "name": "中野沙耶",
-      "name_original": null,
+      "name": "中西沙耶",
+      "name_original": "沙耶",
       "aliases": [
         "Rino Kitahara",
         "北原梨乃"
@@ -206789,16 +206795,15 @@
       "measurements": null,
       "measurements_unit": null,
       "cup_size": "D",
-      "career_start": 2014,
+      "career_start": null,
       "tags": [
-        "D罩杯",
-        "无毛"
+        "D罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E9%87%8E%E6%B2%99%E8%80%B6.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E9%87%8E%E6%B2%99%E8%80%B6.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/4d7b3d06-dd4f-4e7c-8cc0-8c629675cf7c",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/46eff96a-dd04-4c89-8f26-26faaff650b0",
       "provider_ids": {
         "JavStash": "46eff96a-dd04-4c89-8f26-26faaff650b0"
@@ -206808,10 +206813,10 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -206820,7 +206825,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:16Z",
-      "scraped_at": "2026-11-25T13:52:53Z"
+      "scraped_at": "2026-11-26T13:27:59Z"
     },
     {
       "key": "javstash:46f60a47-5fac-4226-be70-8f560c2f5df8",
@@ -219908,31 +219913,40 @@
     },
     {
       "key": "javstash:4c17fcb7-2862-4751-b969-daca8224a4a1",
-      "name": "ショコラ",
+      "name": "南ショコラ",
       "name_original": null,
-      "aliases": [],
+      "aliases": [
+        "待补充",
+        "Shokora Minami",
+        "南ショコラ"
+      ],
       "gender": "female",
       "birth_date": null,
       "birth_date_source": null,
-      "birth_place": null,
+      "birth_place": "待补充",
       "country": null,
-      "height_cm": null,
+      "height_cm": 172,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
+      "measurements": "40J-34-49",
+      "measurements_unit": "in",
+      "cup_size": "J",
       "career_start": null,
-      "tags": [],
-      "bio": null,
-      "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%82%B7%E3%83%A7%E3%82%B3%E3%83%A9.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%82%B7%E3%83%A7%E3%82%B3%E3%83%A9.jpg",
+      "tags": [
+        "J罩杯",
+        "爆乳",
+        "丰满",
+        "S嬢"
+      ],
+      "bio": "南ショコラ，公开出生年份待补充。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Shokora Minami 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8D%97%E3%82%B7%E3%83%A7%E3%82%B3%E3%83%A9.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8D%97%E3%82%B7%E3%83%A7%E3%82%B3%E3%83%A9.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/4c17fcb7-2862-4751-b969-daca8224a4a1",
       "provider_ids": {
         "JavStash": "4c17fcb7-2862-4751-b969-daca8224a4a1"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -219940,16 +219954,16 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:05:33Z",
-      "scraped_at": "2026-11-25T13:52:28Z"
+      "scraped_at": "2026-11-26T13:28:38Z"
     },
     {
       "key": "javstash:4c1aff7a-3277-4711-9c45-fe555f392710",
@@ -224645,7 +224659,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:14:20Z",
-      "scraped_at": "2026-11-25T13:53:33Z"
+      "scraped_at": "2026-11-26T13:29:07Z"
     },
     {
       "key": "javstash:4db8168d-65e3-4d29-8be5-7ed3f7d26da8",
@@ -258431,7 +258445,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:24:00Z",
-      "scraped_at": "2026-11-25T13:53:35Z"
+      "scraped_at": "2026-11-26T13:29:07Z"
     },
     {
       "key": "javstash:5984bfec-e808-4648-86e9-aecc4cf8b71b",
@@ -260611,7 +260625,7 @@
     },
     {
       "key": "javstash:5a5f7ecc-c656-413a-b79c-7f7fd32e1cd0",
-      "name": "リア・ロドリゲス",
+      "name": "リア・ブレア",
       "name_original": null,
       "aliases": [
         "Ria Kurisu",
@@ -260620,8 +260634,8 @@
         "来栖リア"
       ],
       "gender": "female",
-      "birth_date": "1992-12-24",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
       "height_cm": 147,
@@ -260641,9 +260655,10 @@
       "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/5a5f7ecc-c656-413a-b79c-7f7fd32e1cd0",
       "provider_ids": {
-        "JavStash": "5a5f7ecc-c656-413a-b79c-7f7fd32e1cd0"
+        "JavStash": "5a5f7ecc-c656-413a-b79c-7f7fd32e1cd0",
+        "TPDB": "8ed732e5-5a1f-4a8c-bb6e-0a92697a815d"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -260653,14 +260668,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:10:14Z",
-      "scraped_at": "2026-11-25T13:52:32Z"
+      "scraped_at": "2026-11-26T13:27:13Z"
     },
     {
       "key": "javstash:5a604c65-a281-4af4-ba7c-dd558d66e110",
@@ -262176,33 +262191,31 @@
     },
     {
       "key": "javstash:5af31879-b5b9-43b8-bcba-3aaa937af1af",
-      "name": "三泽のぞみ",
-      "name_original": "三沢のぞみ",
+      "name": "大田のぞみ",
+      "name_original": null,
       "aliases": [
-        "三沢望 小沢望",
-        "三澤のぞみ",
         "Nozomi"
       ],
       "gender": "female",
       "birth_date": null,
       "birth_year": 1995,
       "birth_date_source": null,
-      "birth_place": "日本·新潟县",
+      "birth_place": "日本",
       "country": "JP",
-      "height_cm": 156,
+      "height_cm": 158,
       "weight_kg": null,
-      "measurements": "36-25-37",
+      "measurements": "31-24-33",
       "measurements_unit": "in",
       "cup_size": "A",
-      "career_start": 2003,
+      "career_start": 2018,
       "tags": [
         "A罩杯"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://javstash.org/images/ac170fa5-eb1e-4c1e-8d1c-f1f21a5744e5",
-      "avatar_cn": null,
-      "avatar_source_site": "javstash",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E7%94%B0%E3%81%AE%E3%81%9E%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E7%94%B0%E3%81%AE%E3%81%9E%E3%81%BF.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/5af31879-b5b9-43b8-bcba-3aaa937af1af",
       "provider_ids": {
         "JavStash": "5af31879-b5b9-43b8-bcba-3aaa937af1af"
@@ -262212,7 +262225,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
@@ -262224,7 +262237,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:01Z",
-      "scraped_at": "2026-11-25T13:52:38Z"
+      "scraped_at": "2026-11-26T13:29:16Z"
     },
     {
       "key": "javstash:5af68155-2dc5-4170-b41b-596ff469987b",
@@ -277495,64 +277508,57 @@
     },
     {
       "key": "javstash:60b30550-5aae-40a3-bf8e-337ff415f26a",
-      "name": "城星凛",
-      "name_original": "星セリ",
+      "name": "古坂凛菜",
+      "name_original": null,
       "aliases": [
-        "城星凛",
-        "城星凜",
-        "Seri Kizuki",
-        "星セリ",
+        "古坂凜菜",
         "くみ",
         "まさみ",
-        "りな",
-        "Hoshi Seri",
-        "Kizuki Seri",
-        "Cheng Xing Lin",
-        "Xing Seri"
+        "りな"
       ],
       "gender": "female",
-      "birth_date": "1994-12-12",
+      "birth_date": "1984-07-30",
       "birth_date_source": "mdcx",
-      "birth_place": "日本",
-      "country": "JP",
-      "height_cm": 168,
+      "birth_place": null,
+      "country": null,
+      "height_cm": 150,
       "weight_kg": null,
-      "measurements": "32C-24-35",
+      "measurements": "32C-23-33",
       "measurements_unit": "in",
       "cup_size": "C",
-      "career_start": 2016,
+      "career_start": 2015,
       "tags": [
         "C罩杯",
-        "现役跨性别保健小姐"
+        "熟女",
+        "低身长"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://cdn.theporndb.net/performer/8a/17/41/729b3e24f6f108daec7a43ee85b6c6b/poster/seri-hoshi-from-stashdb.jpg",
-      "avatar_cn": null,
-      "avatar_source_site": "tpdb",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8F%A4%E5%9D%82%E5%87%9B%E8%8F%9C.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8F%A4%E5%9D%82%E5%87%9B%E8%8F%9C.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/60b30550-5aae-40a3-bf8e-337ff415f26a",
       "provider_ids": {
-        "JavStash": "60b30550-5aae-40a3-bf8e-337ff415f26a",
-        "TPDB": "63062f34-53ea-4af9-a03d-029d05268d7f"
+        "JavStash": "60b30550-5aae-40a3-bf8e-337ff415f26a"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": true,
+        "tpdb": false,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:14:35Z",
-      "scraped_at": "2026-11-25T13:53:34Z"
+      "scraped_at": "2026-11-26T13:28:45Z"
     },
     {
       "key": "javstash:60b5d872-71de-42c7-bfdf-937fd081dd69",
@@ -280330,9 +280336,11 @@
     },
     {
       "key": "javstash:61e5ebe2-1d77-4cf8-a33b-d2d57e748809",
-      "name": "中根ゆか",
+      "name": "南崎ゆか",
       "name_original": "ゆか",
-      "aliases": [],
+      "aliases": [
+        "Yuka Minamisaki"
+      ],
       "gender": "female",
       "birth_date": null,
       "birth_date_source": null,
@@ -280347,9 +280355,9 @@
       "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%A0%B9%E3%82%86%E3%81%8B.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%A0%B9%E3%82%86%E3%81%8B.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/61e5ebe2-1d77-4cf8-a33b-d2d57e748809",
       "provider_ids": {
         "JavStash": "61e5ebe2-1d77-4cf8-a33b-d2d57e748809"
@@ -280359,7 +280367,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
@@ -280371,7 +280379,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:44Z",
-      "scraped_at": "2026-11-25T13:52:49Z"
+      "scraped_at": "2026-11-26T13:28:36Z"
     },
     {
       "key": "javstash:61efe19c-5158-4f35-96d0-fb5335f1eb80",
@@ -291084,31 +291092,36 @@
     },
     {
       "key": "javstash:657f4fea-6e72-485f-9bab-b00b1010480b",
-      "name": "三田摩耶",
-      "name_original": null,
-      "aliases": [],
+      "name": "真矢弘美",
+      "name_original": "摩耶",
+      "aliases": [
+        "ひろみ麻耶",
+        "中川あや",
+        "弘美",
+        "戸塚のりこ",
+        "水谷留美子",
+        "沢木田祐子",
+        "荒木沢玲",
+        "ひろみ摩耶",
+        "Hiromi Maya"
+      ],
       "gender": "female",
-      "birth_date": "1973-09-30",
-      "birth_date_source": "mdcx",
+      "birth_date": "1954-08-18",
+      "birth_date_source": "cinewho",
       "birth_place": null,
       "country": null,
-      "height_cm": 163,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "32C-24-33",
-      "measurements_unit": "in",
-      "cup_size": "C",
-      "career_start": 2012,
-      "tags": [
-        "C罩杯",
-        "熟女",
-        "苗条",
-        "美阴毛"
-      ],
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%89%E7%94%B0%E6%91%A9%E8%80%B6.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%B8%89%E7%94%B0%E6%91%A9%E8%80%B6.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/657f4fea-6e72-485f-9bab-b00b1010480b",
       "provider_ids": {
         "JavStash": "657f4fea-6e72-485f-9bab-b00b1010480b"
@@ -291116,12 +291129,12 @@
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -291130,7 +291143,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:16Z",
-      "scraped_at": "2026-11-25T13:52:39Z"
+      "scraped_at": "2026-11-26T13:27:03Z"
     },
     {
       "key": "javstash:658b4144-7525-460e-8365-e7b70d5aedf1",
@@ -291344,10 +291357,9 @@
     },
     {
       "key": "javstash:659ea819-6ed6-44c4-bf8a-8c1cf80ac097",
-      "name": "坂上なつみ",
+      "name": "大桃なつみ",
       "name_original": "なつみ",
       "aliases": [
-        "Natsumi Sakagami",
         "Natsumi",
         "なつみ"
       ],
@@ -291367,9 +291379,9 @@
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%9D%82%E4%B8%8A%E3%81%AA%E3%81%A4%E3%81%BF.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E5%9D%82%E4%B8%8A%E3%81%AA%E3%81%A4%E3%81%BF.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/2fdf81ff-e903-4697-81e9-6031d78d7537",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/659ea819-6ed6-44c4-bf8a-8c1cf80ac097",
       "provider_ids": {
         "JavStash": "659ea819-6ed6-44c4-bf8a-8c1cf80ac097",
@@ -291381,7 +291393,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
@@ -291394,7 +291406,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:12Z",
-      "scraped_at": "2026-11-25T13:53:29Z"
+      "scraped_at": "2026-11-26T13:29:16Z"
     },
     {
       "key": "javstash:65a23f2a-2bbb-402a-bcac-4595bd674ac4",
@@ -341076,50 +341088,47 @@
     },
     {
       "key": "javstash:76837b40-2455-40a4-bfbd-46ac009398ae",
-      "name": "エマ・バット",
+      "name": "エマ・ホワイト",
       "name_original": null,
       "aliases": [
+        "ベラ・スパーク",
         "Emma",
-        "Emma Butts",
-        "Tara Summers",
-        "Emma May",
-        "Misstress Pandora",
-        "Emma Butt Jasmine Black",
-        "Mistress Pandora",
-        "Sister B",
-        "待补充",
-        "エマ・バット",
-        "Emma Butt"
+        "Bella Spark Aka Emma White",
+        "Bella Spark"
       ],
       "gender": "female",
-      "birth_date": "1985-07-27",
+      "birth_date": "2000-08-11",
       "birth_date_source": "mdcx",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 180,
-      "weight_kg": 67,
-      "measurements": "34GG-30-38",
+      "height_cm": 165,
+      "weight_kg": null,
+      "measurements": "32B-24-34",
       "measurements_unit": "in",
-      "cup_size": "GG",
-      "career_start": 2006,
+      "cup_size": "B",
+      "career_start": 2022,
       "tags": [
-        "GG罩杯",
-        "英格兰人"
+        "B罩杯",
+        "微乳",
+        "以色列人",
+        "美少女",
+        "美人",
+        "洋物"
       ],
-      "bio": "Emma Butt，出生于 1985 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为英国。\n\n姓名另有 エマ・バット 等公开写法，可用于对照不同语言的人物条目。",
-      "bio_lang": "zh",
-      "avatar": "https://cdn.theporndb.net/performer/af/8e/2b/be92ea511df3efd8b811e2d2ffefeaa/poster/emma-butt.webp",
+      "bio": "Emma White is a Belgian porn star, not to be confused with an Israeli blonde Emma White bearing the same name.",
+      "bio_lang": "en",
+      "avatar": "https://cdn.theporndb.net/performer/3d/16/a9/b6374edce99beb47d8ced3c891324f3/poster/emma-white.webp",
       "avatar_cn": null,
       "avatar_source_site": "tpdb",
       "homepage_url": "https://javstash.org/performers/76837b40-2455-40a4-bfbd-46ac009398ae",
       "provider_ids": {
         "JavStash": "76837b40-2455-40a4-bfbd-46ac009398ae",
-        "TPDB": "6cbbfc93-9151-4db8-a4dc-e3f43f653bf4"
+        "TPDB": "490e2178-8a4e-4976-b96b-e2f343be053a"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
         "dramaface": false,
         "gfriends": false,
         "idoldb": false,
@@ -341128,12 +341137,12 @@
         "theactorbase": false,
         "tpdb": true,
         "wiki": false,
-        "yinrenlu": true
+        "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:04:08Z",
-      "scraped_at": "2026-11-25T13:52:28Z"
+      "scraped_at": "2026-11-26T13:27:06Z"
     },
     {
       "key": "javstash:7683d44c-4faf-4b03-a9dc-645fe8564889",
@@ -345368,53 +345377,57 @@
     },
     {
       "key": "javstash:77c51fca-75aa-47af-82b8-6b3b052caa2a",
-      "name": "坂下ゆかり",
-      "name_original": null,
+      "name": "大泽ゆかり",
+      "name_original": "大沢ゆかり",
       "aliases": [
+        "クミコ・グレース",
         "Yukari"
       ],
       "gender": "female",
-      "birth_date": "1990-11-30",
-      "birth_year": 1986,
+      "birth_date": "1968-05-02",
       "birth_date_source": "mdcx",
-      "birth_place": "日本",
+      "birth_place": "日本·东京都",
       "country": "JP",
-      "height_cm": 157,
+      "height_cm": 166,
       "weight_kg": null,
-      "measurements": "30E-23-35",
+      "measurements": "30G-24-35",
       "measurements_unit": "in",
-      "cup_size": "E",
-      "career_start": 2010,
+      "cup_size": "G",
+      "career_start": 2006,
       "tags": [
-        "E罩杯"
+        "G罩杯",
+        "巨乳",
+        "超级身材",
+        "完美身材"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%9D%82%E4%B8%8B%E3%82%86%E3%81%8B%E3%82%8A.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%9D%82%E4%B8%8B%E3%82%86%E3%81%8B%E3%82%8A.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/8dbc29ae-d983-4cb7-a0d7-6134ca38bb76",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/77c51fca-75aa-47af-82b8-6b3b052caa2a",
       "provider_ids": {
-        "JavStash": "77c51fca-75aa-47af-82b8-6b3b052caa2a"
+        "JavStash": "77c51fca-75aa-47af-82b8-6b3b052caa2a",
+        "TPDB": "d07a8f84-5955-4c7f-9311-8bc018138890"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:19:03Z",
-      "scraped_at": "2026-11-25T13:53:31Z"
+      "scraped_at": "2026-11-26T13:29:18Z"
     },
     {
       "key": "javstash:77c7be4a-a852-400c-9c3b-19c532d2cb35",
@@ -353887,8 +353900,8 @@
     },
     {
       "key": "javstash:7aa4a065-e3dc-437f-8e35-e87dc3db2415",
-      "name": "中野纱奈",
-      "name_original": "中野紗奈",
+      "name": "三村纱枝",
+      "name_original": "紗奈",
       "aliases": [
         "Aihara Yui",
         "Kana Kinoshita",
@@ -353913,11 +353926,11 @@
       "gender": "female",
       "birth_date": "1988-12-13",
       "birth_date_source": "javstash",
-      "birth_place": "日本·千叶县",
+      "birth_place": "日本",
       "country": "JP",
       "height_cm": 158,
       "weight_kg": null,
-      "measurements": "34-23-34",
+      "measurements": "33C-22-34",
       "measurements_unit": "in",
       "cup_size": "C",
       "career_start": 2008,
@@ -353926,13 +353939,14 @@
       ],
       "bio": "紗奈（さな，1988年12月13日 - ）是一位日本的AV女优。\n\n人物与略历：\n\n她的兴趣爱好是做指甲艺术，特长是唱歌。\n她于2008年5月从アリスJAPAN公司开始了専属AV事业。\n她在2009年9月在新宿ニューアート进行了脱衣舞台的首秀。",
       "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E9%87%8E%E7%B4%97%E5%A5%88.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E9%87%8E%E7%B4%97%E5%A5%88.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/9a1f8f89-5fe5-459d-8bab-3fe2517e1b72",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/7aa4a065-e3dc-437f-8e35-e87dc3db2415",
       "provider_ids": {
         "JavStash": "7aa4a065-e3dc-437f-8e35-e87dc3db2415",
         "StashDB": "3a40b1ba-cb8f-485c-af97-382c3620ca3d",
+        "TPDB": "a35e80e3-95c7-4bfa-aaa3-e37ee9bd4a1e",
         "Wikidata": "Q11605472",
         "Wikipedia": "ja.wikipedia.org/wiki/紗奈"
       },
@@ -353941,20 +353955,20 @@
         "castwiki": false,
         "cinewho": true,
         "dramaface": true,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "stashdb": true,
         "theactorbase": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:55Z",
-      "scraped_at": "2026-11-25T13:52:53Z"
+      "scraped_at": "2026-11-26T13:27:34Z"
     },
     {
       "key": "javstash:7aa5223d-293b-4613-b695-68e0b5a8aa71",
@@ -360739,45 +360753,42 @@
     },
     {
       "key": "javstash:7cad50b5-61c7-4204-8329-ad46a2e3c847",
-      "name": "夏目ゆず希",
-      "name_original": null,
+      "name": "夏梅柚子",
+      "name_original": "ゆず",
       "aliases": [
         "ゆづ",
         "青山ゆず"
       ],
       "gender": "female",
-      "birth_date": "1997-04-27",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": null,
       "country": null,
-      "height_cm": 160,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "32E-23-35",
-      "measurements_unit": "in",
-      "cup_size": "E",
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
       "career_start": null,
-      "tags": [
-        "E罩杯",
-        "泡泡浴女郎"
-      ],
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%8F%E7%9B%AE%E3%82%86%E3%81%9A%E5%B8%8C.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%8F%E7%9B%AE%E3%82%86%E3%81%9A%E5%B8%8C.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/7cad50b5-61c7-4204-8329-ad46a2e3c847",
       "provider_ids": {
         "JavStash": "7cad50b5-61c7-4204-8329-ad46a2e3c847"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -360786,7 +360797,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:54Z",
-      "scraped_at": "2026-11-25T13:53:38Z"
+      "scraped_at": "2026-11-26T13:29:10Z"
     },
     {
       "key": "javstash:7caeb673-ad40-4f5c-8123-3cc9ea88fec5",
@@ -365066,7 +365077,7 @@
     },
     {
       "key": "javstash:7e1d0785-8516-4673-b942-c387aa0f22bd",
-      "name": "和泉冴子",
+      "name": "三井冴子",
       "name_original": null,
       "aliases": [
         "AOI",
@@ -365091,19 +365102,20 @@
       "birth_date_source": "javstash",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 156,
+      "height_cm": 166,
       "weight_kg": null,
-      "measurements": "33-23-33",
+      "measurements": "32E-26-39",
       "measurements_unit": "in",
-      "cup_size": "D",
-      "career_start": 2004,
+      "cup_size": "E",
+      "career_start": 2013,
       "tags": [
-        "D罩杯"
+        "E罩杯",
+        "熟女"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%92%8C%E6%B3%89%E5%86%B4%E5%AD%90.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%92%8C%E6%B3%89%E5%86%B4%E5%AD%90.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%89%E4%BA%95%E5%86%B4%E5%AD%90.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%89%E4%BA%95%E5%86%B4%E5%AD%90.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/7e1d0785-8516-4673-b942-c387aa0f22bd",
       "provider_ids": {
@@ -365129,7 +365141,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:27Z",
-      "scraped_at": "2026-11-25T13:53:30Z"
+      "scraped_at": "2026-11-26T13:27:33Z"
     },
     {
       "key": "javstash:7e225552-6f8c-459e-85d1-0659b7b3ed47",
@@ -367048,10 +367060,10 @@
     },
     {
       "key": "javstash:7e8ed997-a921-438f-a216-35b4402d5166",
-      "name": "三条まゆみ",
+      "name": "佐藤まゆみ",
       "name_original": "まゆみ",
       "aliases": [
-        "三條まゆみ"
+        "Mayumi Sato"
       ],
       "gender": "female",
       "birth_date": null,
@@ -367091,7 +367103,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:57Z",
-      "scraped_at": "2026-11-25T13:52:38Z"
+      "scraped_at": "2026-11-26T13:28:16Z"
     },
     {
       "key": "javstash:7e8f69b5-bf77-48ad-a56a-3dcea29ae5aa",
@@ -370874,55 +370886,60 @@
     },
     {
       "key": "javstash:7ff85ebd-818d-46cc-aa89-d1b9a2952e64",
-      "name": "久保田光",
-      "name_original": "ひかり",
+      "name": "原田ひかり",
+      "name_original": null,
       "aliases": [
-        "くぼたひかり",
+        "Hikari Harada",
         "Hikari",
         "Hikari Mizuno",
         "Yuki",
         "ユキ",
-        "水野ヒカリ"
+        "水野ヒカリ",
+        "待补充",
+        "原田ひかり"
       ],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
-      "birth_place": "日本",
+      "birth_date": "1969-07-11",
+      "birth_date_source": "mdcx",
+      "birth_place": "日本·东京都",
       "country": "JP",
-      "height_cm": null,
+      "height_cm": 167,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "33-23-33",
+      "measurements_unit": "in",
       "cup_size": null,
-      "career_start": null,
-      "tags": [],
-      "bio": null,
-      "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "career_start": 1991,
+      "tags": [
+        "右大腿牡丹纹身"
+      ],
+      "bio": "原田ひかり，出生于 1969 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Hikari Harada 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8E%9F%E7%94%B0%E3%81%B2%E3%81%8B%E3%82%8A.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8E%9F%E7%94%B0%E3%81%B2%E3%81%8B%E3%82%8A.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/7ff85ebd-818d-46cc-aa89-d1b9a2952e64",
       "provider_ids": {
-        "JavStash": "7ff85ebd-818d-46cc-aa89-d1b9a2952e64"
+        "JavStash": "7ff85ebd-818d-46cc-aa89-d1b9a2952e64",
+        "TPDB": "aed80b64-3173-43eb-bc39-e83eb16527d2"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:08Z",
-      "scraped_at": "2026-11-25T13:52:57Z"
+      "scraped_at": "2026-11-26T13:28:44Z"
     },
     {
       "key": "javstash:80053b12-17fa-4225-8eb2-175a82f13308",
@@ -385334,7 +385351,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:05Z",
-      "scraped_at": "2026-11-25T13:52:49Z"
+      "scraped_at": "2026-11-26T13:27:50Z"
     },
     {
       "key": "javstash:850a49cb-8110-405b-aefc-6226428804f5",
@@ -396760,11 +396777,9 @@
     },
     {
       "key": "javstash:8923dcc7-e5fc-4226-8c6d-1d21647136de",
-      "name": "堤若菜",
-      "name_original": "若菜",
+      "name": "坂上若菜",
+      "name_original": null,
       "aliases": [
-        "Tsutsumi Wakana",
-        "つつみわかな",
         "Sayaka Kuzumi",
         "Wakana",
         "Wakana Yamaguchi",
@@ -396781,8 +396796,8 @@
       "country": "JP",
       "height_cm": 154,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "32-22-33",
+      "measurements_unit": "in",
       "cup_size": "F",
       "career_start": 2008,
       "tags": [
@@ -396790,12 +396805,13 @@
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A0%A4%E8%8B%A5%E8%8F%9C.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A0%A4%E8%8B%A5%E8%8F%9C.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%9D%82%E4%B8%8A%E8%8B%A5%E8%8F%9C.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%9D%82%E4%B8%8A%E8%8B%A5%E8%8F%9C.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/8923dcc7-e5fc-4226-8c6d-1d21647136de",
       "provider_ids": {
-        "JavStash": "8923dcc7-e5fc-4226-8c6d-1d21647136de"
+        "JavStash": "8923dcc7-e5fc-4226-8c6d-1d21647136de",
+        "TPDB": "1961cdf6-a4f6-47b8-a879-97c8ff5f90d5"
       },
       "status": "partial",
       "sources": {
@@ -396805,16 +396821,16 @@
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:30:45Z",
-      "scraped_at": "2026-11-25T13:53:34Z"
+      "scraped_at": "2026-11-26T13:29:04Z"
     },
     {
       "key": "javstash:892f3dc5-ed85-4c73-af57-61796b3dac5b",
@@ -409951,9 +409967,13 @@
     },
     {
       "key": "javstash:8e0b0f48-a6a6-4296-bb7c-21f513b6b6f0",
-      "name": "七海凉",
-      "name_original": "七海涼",
+      "name": "七海里佳",
+      "name_original": null,
       "aliases": [
+        "夏目ちか",
+        "橘ゆら",
+        "玉響ゆら",
+        "七海裏佳",
         "Hirose Nami",
         "Nami",
         "Nanami",
@@ -409967,22 +409987,29 @@
       "gender": "female",
       "birth_date": "1993-11-30",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·千叶县",
       "country": "JP",
-      "height_cm": 157,
+      "height_cm": 165,
       "weight_kg": null,
-      "measurements": "32C-23-34",
+      "measurements": "30G-24-36",
       "measurements_unit": "in",
-      "cup_size": "C",
+      "cup_size": "G",
       "career_start": 2013,
       "tags": [
-        "C罩杯"
+        "G罩杯",
+        "巨乳",
+        "色白",
+        "美白",
+        "美巨乳",
+        "丰满",
+        "性感",
+        "性感身材"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%83%E6%B5%B7%E6%B6%BC.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%83%E6%B5%B7%E6%B6%BC.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/a2063856-d174-41d2-a2cb-8fb5e1dca68b",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/8e0b0f48-a6a6-4296-bb7c-21f513b6b6f0",
       "provider_ids": {
         "JavStash": "8e0b0f48-a6a6-4296-bb7c-21f513b6b6f0",
@@ -409994,7 +410021,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
@@ -410007,7 +410034,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:11:48Z",
-      "scraped_at": "2026-11-25T13:52:36Z"
+      "scraped_at": "2026-11-26T13:27:20Z"
     },
     {
       "key": "javstash:8e0eee2b-0aba-4bb3-8d0e-814ae9e3d314",
@@ -410149,56 +410176,53 @@
     },
     {
       "key": "javstash:8e122780-2888-4406-b046-933ae16312f3",
-      "name": "友崎りん",
-      "name_original": null,
+      "name": "大贯りん",
+      "name_original": "大貫りん",
       "aliases": [
-        "Rin",
-        "待补充",
-        "友崎りん",
-        "Rin Tomosaki",
-        "友崎玲",
-        "Tomosaki Rin"
+        "Rin"
       ],
       "gender": "female",
-      "birth_date": "1980-12-02",
+      "birth_date": "1989-09-28",
+      "birth_year": 1998,
       "birth_date_source": "mdcx",
-      "birth_place": "日本·东京都",
+      "birth_place": "日本·京都府",
       "country": "JP",
-      "height_cm": 160,
+      "height_cm": 153,
       "weight_kg": null,
-      "measurements": "34-23-34",
+      "measurements": "33-23-33",
       "measurements_unit": "in",
       "cup_size": "D",
-      "career_start": 2000,
+      "career_start": 2017,
       "tags": [
         "D罩杯"
       ],
-      "bio": "友崎玲（日語：友崎りん、ともさき りん，英語：Rin Tomosaki，1980年12月2日—），日本AV女優，香港雜誌印友崎綸（Tomosaki Rin)，身高160cm，三圍：86cm（C-70），W：58cm，H：87cm。2000年出道，原隸屬KUKI 集團，後來陸續加盟WANZ、SOD 等獨立公司，外形清純，有一雙明亮的大眼睛。拍片內容近於激情，如綑綁、監禁等不時出現，處女作片名叫做《清純》，同年4月出版写真集「ring」，目前已引退。",
-      "bio_lang": "ja",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8F%8B%E5%B4%8E%E3%82%8A%E3%82%93.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8F%8B%E5%B4%8E%E3%82%8A%E3%82%93.jpg",
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A7%E8%B2%AB%E3%82%8A%E3%82%93.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%A7%E8%B2%AB%E3%82%8A%E3%82%93.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/8e122780-2888-4406-b046-933ae16312f3",
       "provider_ids": {
-        "JavStash": "8e122780-2888-4406-b046-933ae16312f3",
-        "TPDB": "fa854aca-6b40-4b93-b963-0b92f3a0368c"
+        "JavStash": "8e122780-2888-4406-b046-933ae16312f3"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
+        "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "tpdb": true,
-        "wiki": true,
-        "yinrenlu": true
+        "theactorbase": false,
+        "tpdb": false,
+        "wiki": false,
+        "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:03:01Z",
-      "scraped_at": "2026-11-25T13:53:23Z"
+      "scraped_at": "2026-11-26T13:29:21Z"
     },
     {
       "key": "javstash:8e1fbb71-8a28-4323-bde8-9508da9a004c",
@@ -423338,7 +423362,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:29:21Z",
-      "scraped_at": "2026-11-25T13:53:26Z"
+      "scraped_at": "2026-11-26T13:28:59Z"
     },
     {
       "key": "javstash:92537674-2c0f-4cf3-8b52-99a5e3d3195d",
@@ -432622,9 +432646,12 @@
     },
     {
       "key": "javstash:95615192-7959-4b29-8ade-b1cb0a815ed2",
-      "name": "北はるか",
-      "name_original": "はるか",
+      "name": "大出はるか",
+      "name_original": null,
       "aliases": [
+        "ちはる(FC2)",
+        "外川優樹(人妻斬り)",
+        "外川優樹",
         "Haruka",
         "Haruka Takaoka",
         "Yua Yashiro",
@@ -432638,14 +432665,15 @@
       "birth_date_source": "javstash",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 172,
+      "height_cm": 160,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
+      "measurements": "32D-24-35",
+      "measurements_unit": "in",
       "cup_size": "D",
-      "career_start": 2020,
+      "career_start": 2017,
       "tags": [
-        "D罩杯"
+        "D罩杯",
+        "熟女"
       ],
       "bio": null,
       "bio_lang": null,
@@ -432654,7 +432682,8 @@
       "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/95615192-7959-4b29-8ade-b1cb0a815ed2",
       "provider_ids": {
-        "JavStash": "95615192-7959-4b29-8ade-b1cb0a815ed2"
+        "JavStash": "95615192-7959-4b29-8ade-b1cb0a815ed2",
+        "TPDB": "37459255-8d5c-42f2-a0f4-32e32ae98549"
       },
       "status": "ok",
       "sources": {
@@ -432664,16 +432693,16 @@
         "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:02:06Z",
-      "scraped_at": "2026-11-25T13:53:13Z"
+      "scraped_at": "2026-11-26T13:29:13Z"
     },
     {
       "key": "javstash:9564ac57-360e-493e-bea9-4eee543c9ad9",
@@ -437310,7 +437339,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:23:12Z",
-      "scraped_at": "2026-11-25T13:53:12Z"
+      "scraped_at": "2026-11-26T13:28:26Z"
     },
     {
       "key": "javstash:972b37a1-092a-492c-9cc0-43247d16731f",
@@ -457221,55 +457250,59 @@
     },
     {
       "key": "javstash:9eddca52-261b-4703-a746-6e6ff5271198",
-      "name": "メラニー・マリー",
+      "name": "ハイム・マリー",
       "name_original": null,
-      "aliases": [],
-      "gender": "transgender_female",
-      "birth_date": "2004-06-07",
-      "birth_date_source": "mdcx",
-      "birth_place": null,
-      "country": null,
-      "height_cm": 170,
-      "weight_kg": null,
-      "measurements": "30C-24-35",
-      "measurements_unit": "in",
-      "cup_size": "C",
-      "career_start": null,
-      "tags": [
-        "C罩杯",
-        "米国出身",
-        "长身",
-        "美乳",
-        "巨尻",
-        "肚脐环"
+      "aliases": [
+        "ヒメ・マリー",
+        "待补充",
+        "Hime Marie"
       ],
-      "bio": null,
-      "bio_lang": null,
-      "avatar": null,
+      "gender": "transgender_female",
+      "birth_date": "1995-08-23",
+      "birth_date_source": "mdcx",
+      "birth_place": "美国",
+      "country": "US",
+      "height_cm": 160,
+      "weight_kg": 45,
+      "measurements": "34B-27-35",
+      "measurements_unit": "in",
+      "cup_size": "B",
+      "career_start": 2017,
+      "tags": [
+        "B罩杯",
+        "米国出身",
+        "熟女",
+        "微乳",
+        "微肉感"
+      ],
+      "bio": "Hime Marie，出生于 1995 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为美国。\n\n公开职业活动的起始年份记录为 2017 年。姓名另有 ヒメ・マリー 等公开写法，可用于对照不同语言的人物条目。",
+      "bio_lang": "zh",
+      "avatar": "https://cdn.theporndb.net/performer/b5/79/59/d2131f22c1ea320f7b6157ecd7acc97/poster/hime-marie.jpg",
       "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar_source_site": "tpdb",
       "homepage_url": "https://javstash.org/performers/9eddca52-261b-4703-a746-6e6ff5271198",
       "provider_ids": {
-        "JavStash": "9eddca52-261b-4703-a746-6e6ff5271198"
+        "JavStash": "9eddca52-261b-4703-a746-6e6ff5271198",
+        "TPDB": "0945d131-7506-4591-8b4a-12c10d3893f3"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
         "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": false
+        "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:03:42Z",
-      "scraped_at": "2026-11-25T13:52:30Z"
+      "scraped_at": "2026-11-26T13:27:12Z"
     },
     {
       "key": "javstash:9ef20abe-7fff-4b42-b3d5-269fd6886fe1",
@@ -471865,9 +471898,11 @@
     },
     {
       "key": "javstash:a43a9b49-1df5-4d89-8b51-df3459e67778",
-      "name": "二宫诗织",
-      "name_original": "二宮詩織",
+      "name": "佐田诗织",
+      "name_original": "佐田詩織",
       "aliases": [
+        "関根苑子(メス豚)",
+        "関根苑子",
         "Maki Hoshino",
         "Misa Akasaka",
         "Shiori",
@@ -471880,22 +471915,22 @@
       "gender": "female",
       "birth_date": "1982-10-20",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·青森县",
       "country": "JP",
-      "height_cm": 147,
+      "height_cm": 155,
       "weight_kg": null,
-      "measurements": "31-23-31",
+      "measurements": "32C-23-33",
       "measurements_unit": "in",
-      "cup_size": "F",
-      "career_start": 2005,
+      "cup_size": "C",
+      "career_start": 2014,
       "tags": [
-        "F罩杯",
-        "小柄"
+        "C罩杯",
+        "母猪"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BA%8C%E5%AE%AE%E8%A9%A9%E7%B9%94.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%BA%8C%E5%AE%AE%E8%A9%A9%E7%B9%94.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BD%90%E7%94%B0%E8%A9%A9%E7%B9%94.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%BD%90%E7%94%B0%E8%A9%A9%E7%B9%94.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/a43a9b49-1df5-4d89-8b51-df3459e67778",
       "provider_ids": {
@@ -471920,7 +471955,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:17:35Z",
-      "scraped_at": "2026-11-25T13:53:02Z"
+      "scraped_at": "2026-11-26T13:28:16Z"
     },
     {
       "key": "javstash:a43c3baa-428f-4106-82d6-ef406be4e942",
@@ -474301,7 +474336,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:37Z",
-      "scraped_at": "2026-11-25T13:53:21Z"
+      "scraped_at": "2026-11-26T13:28:52Z"
     },
     {
       "key": "javstash:a4e1877e-a78f-4c98-b877-ee37448ef414",
@@ -479932,52 +479967,52 @@
     },
     {
       "key": "javstash:a6caed2c-5d41-4e58-9693-0c68c0b941c4",
-      "name": "千秋直美",
-      "name_original": "なおみ",
-      "aliases": [
-        "Mieko Segawa",
-        "ちあきなおみ",
-        "瀬川三恵子"
-      ],
+      "name": "大森なおみ",
+      "name_original": null,
+      "aliases": [],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1992-11-30",
+      "birth_date_source": "mdcx",
       "birth_place": null,
       "country": null,
       "height_cm": null,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": null,
-      "career_start": null,
-      "tags": [],
+      "measurements": "30C-26-33",
+      "measurements_unit": "in",
+      "cup_size": "C",
+      "career_start": 2018,
+      "tags": [
+        "C罩杯",
+        "微熟女"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E6%A3%AE%E3%81%AA%E3%81%8A%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%A7%E6%A3%AE%E3%81%AA%E3%81%8A%E3%81%BF.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/a6caed2c-5d41-4e58-9693-0c68c0b941c4",
       "provider_ids": {
-        "JavStash": "a6caed2c-5d41-4e58-9693-0c68c0b941c4"
+        "JavStash": "a6caed2c-5d41-4e58-9693-0c68c0b941c4",
+        "TPDB": "d412d37f-3b8b-48f2-9b4e-6e16be2b4351"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:25:01Z",
-      "scraped_at": "2026-11-25T13:53:17Z"
+      "scraped_at": "2026-11-26T13:29:18Z"
     },
     {
       "key": "javstash:a6d35658-001c-40ea-9729-a0a2fd16bc95",
@@ -491909,12 +491944,10 @@
     },
     {
       "key": "javstash:aaeeb004-4409-4881-8dee-959d79370602",
-      "name": "中野瞳",
-      "name_original": null,
+      "name": "佐伯瞳",
+      "name_original": "瞳",
       "aliases": [
-        "上田美咲(メス豚)",
-        "ユウコ",
-        "上田美咲",
+        "仲間琴音",
         "持田夏樹",
         "待补充",
         "Hitomi",
@@ -491925,20 +491958,18 @@
       "birth_date_source": null,
       "birth_place": "待补充",
       "country": null,
-      "height_cm": 158,
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "31-25-32",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": null,
-      "career_start": 2015,
-      "tags": [
-        "母猪"
-      ],
+      "career_start": null,
+      "tags": [],
       "bio": "瞳，出生于 1983 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Hitomi 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B8%AD%E9%87%8E%E7%9E%B3.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%B8%AD%E9%87%8E%E7%9E%B3.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/aaeeb004-4409-4881-8dee-959d79370602",
       "provider_ids": {
         "JavStash": "aaeeb004-4409-4881-8dee-959d79370602"
@@ -491948,10 +491979,10 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -491960,7 +491991,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:34Z",
-      "scraped_at": "2026-11-25T13:52:52Z"
+      "scraped_at": "2026-11-26T13:28:13Z"
     },
     {
       "key": "javstash:aaf0c42a-a292-4ba3-9ca5-9ed83f1c49ee",
@@ -541823,12 +541854,9 @@
     },
     {
       "key": "javstash:bdae3c46-e616-451a-8f4f-fb3079ae572d",
-      "name": "かわいさとみ",
-      "name_original": null,
+      "name": "児玉さとみ",
+      "name_original": "さとみ",
       "aliases": [
-        "伊藤美穂",
-        "北原美枝",
-        "北原美穂",
         "Ayana Akazawa",
         "Kanna Sakura",
         "Satomi",
@@ -541837,31 +541865,27 @@
         "上原聡美",
         "優香",
         "桜香奈",
-        "赤澤彩奈",
-        "待补充",
-        "Satomi Kawai",
-        "かわいさとみ"
+        "赤澤彩奈"
       ],
       "gender": "female",
       "birth_date": "1993-10-30",
       "birth_date_source": "javstash",
-      "birth_place": "日本·神奈川县",
+      "birth_place": "日本",
       "country": "JP",
-      "height_cm": 160,
+      "height_cm": 154,
       "weight_kg": null,
-      "measurements": "31-24-33",
-      "measurements_unit": "in",
+      "measurements": null,
+      "measurements_unit": null,
       "cup_size": "F",
-      "career_start": 1986,
+      "career_start": 2023,
       "tags": [
-        "F罩杯",
-        "伝説"
+        "F罩杯"
       ],
-      "bio": "かわいさとみ，出生于 1969 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Satomi Kawai 等公开写法，可用于对照不同语言的人物条目。",
-      "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E3%81%8B%E3%82%8F%E3%81%84%E3%81%95%E3%81%A8%E3%81%BF.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E3%81%8B%E3%82%8F%E3%81%84%E3%81%95%E3%81%A8%E3%81%BF.jpg",
-      "avatar_source_site": "gfriends",
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://javstash.org/images/6e62fcdb-1c43-4db2-ae7e-adf735262bc9",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/bdae3c46-e616-451a-8f4f-fb3079ae572d",
       "provider_ids": {
         "JavStash": "bdae3c46-e616-451a-8f4f-fb3079ae572d"
@@ -541871,19 +541895,19 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
-        "yinrenlu": true
+        "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:12Z",
-      "scraped_at": "2026-11-25T13:52:18Z"
+      "scraped_at": "2026-11-26T13:28:21Z"
     },
     {
       "key": "javstash:bdb75da3-651c-4e41-986b-cdad2c098526",
@@ -541991,6 +542015,7 @@
       "aliases": [
         "Maria Yumeno",
         "夢野まりあ",
+        "Mari Yume",
         "Yumeno Maria",
         "梦野玛莉亚"
       ],
@@ -542000,7 +542025,7 @@
       "birth_place": "日本",
       "country": "JP",
       "height_cm": 155,
-      "weight_kg": null,
+      "weight_kg": 48,
       "measurements": "45L-24-34",
       "measurements_unit": "in",
       "cup_size": "L",
@@ -542017,6 +542042,7 @@
       "provider_ids": {
         "JavStash": "bdbef90c-e11b-480f-831c-8fce0ab26096",
         "StashDB": "b2970943-8dac-4852-8a99-97e031c80f1f",
+        "TPDB": "2a5d900d-104c-4ee6-83a6-63af4d58858f",
         "Wikidata": "Q6761664",
         "Wikipedia": "ja.wikipedia.org/wiki/%E5%A4%A2%E9%87%8E%E3%81%BE%E3%82%8A%E3%81%82"
       },
@@ -542031,14 +542057,14 @@
         "mdcx": false,
         "stashdb": true,
         "theactorbase": true,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:33:55Z",
-      "scraped_at": "2026-11-25T13:53:42Z"
+      "scraped_at": "2026-11-26T13:29:12Z"
     },
     {
       "key": "javstash:bdc207b2-f320-4cb4-b78f-7ae9684d53f6",
@@ -569647,34 +569673,30 @@
     },
     {
       "key": "javstash:c7540586-bd12-483c-baa9-d5679fe89670",
-      "name": "加藤ゆりあ",
+      "name": "南野ゆりあ",
       "name_original": null,
       "aliases": [
-        "待补充",
-        "Yuria Kato",
-        "加藤ゆりあ",
-        "Katouyuria"
+        "Yuria",
+        "ゆりあ"
       ],
       "gender": "female",
-      "birth_date": "1981-08-31",
-      "birth_date_source": "mdcx",
-      "birth_place": "日本·冈山县",
-      "country": "JP",
-      "height_cm": 150,
+      "birth_date": "1982-01-11",
+      "birth_date_source": "cinewho",
+      "birth_place": null,
+      "country": null,
+      "height_cm": 162,
       "weight_kg": null,
-      "measurements": "32C-22-31",
+      "measurements": "30G-26-35",
       "measurements_unit": "in",
-      "cup_size": "C",
+      "cup_size": "G",
       "career_start": null,
       "tags": [
-        "C罩杯",
-        "短发",
-        "名女优"
+        "G罩杯"
       ],
-      "bio": "加藤ゆりあ，出生于 1981 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Yuria Kato 等公开写法，可用于对照不同语言的人物条目。",
-      "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%8A%A0%E8%97%A4%E3%82%86%E3%82%8A%E3%81%82.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%8A%A0%E8%97%A4%E3%82%86%E3%82%8A%E3%81%82.jpg",
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8D%97%E9%87%8E%E3%82%86%E3%82%8A%E3%81%82.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8D%97%E9%87%8E%E3%82%86%E3%82%8A%E3%81%82.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/c7540586-bd12-483c-baa9-d5679fe89670",
       "provider_ids": {
@@ -569692,12 +569714,12 @@
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
-        "yinrenlu": true
+        "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:23:27Z",
-      "scraped_at": "2026-11-25T13:53:13Z"
+      "scraped_at": "2026-11-26T13:28:39Z"
     },
     {
       "key": "javstash:c7554183-acd3-49dd-8929-f90056c65ce5",
@@ -570181,38 +570203,36 @@
     },
     {
       "key": "javstash:c7796975-6712-45f2-a6e5-05e27685a18f",
-      "name": "仲西さやか",
+      "name": "北川さやか",
       "name_original": null,
       "aliases": [
         "JURINA",
         "Sayaka Yamane",
-        "山根爽香",
-        "待补充",
-        "Sayaka Nakanishi",
-        "仲西さやか"
+        "山根爽香"
       ],
       "gender": "female",
-      "birth_date": "1979-03-29",
-      "birth_date_source": "mdcx",
-      "birth_place": "日本·千叶县",
+      "birth_date": "1985-01-29",
+      "birth_date_source": "tpdb",
+      "birth_place": "日本",
       "country": "JP",
-      "height_cm": 154,
+      "height_cm": 151,
       "weight_kg": null,
-      "measurements": "32D-23-34",
+      "measurements": "32B-23-33",
       "measurements_unit": "in",
-      "cup_size": "D",
-      "career_start": 1999,
+      "cup_size": "B",
+      "career_start": 2003,
       "tags": [
-        "D罩杯"
+        "B罩杯"
       ],
-      "bio": "仲西さやか，出生于 1979 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Sayaka Nakanishi 等公开写法，可用于对照不同语言的人物条目。",
-      "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%BB%B2%E8%A5%BF%E3%81%95%E3%82%84%E3%81%8B.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%BB%B2%E8%A5%BF%E3%81%95%E3%82%84%E3%81%8B.jpg",
+      "bio": null,
+      "bio_lang": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8C%97%E5%B7%9D%E3%81%95%E3%82%84%E3%81%8B.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8C%97%E5%B7%9D%E3%81%95%E3%82%84%E3%81%8B.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/c7796975-6712-45f2-a6e5-05e27685a18f",
       "provider_ids": {
-        "JavStash": "c7796975-6712-45f2-a6e5-05e27685a18f"
+        "JavStash": "c7796975-6712-45f2-a6e5-05e27685a18f",
+        "TPDB": "671f5c1e-0dad-421a-8e70-672d4a5660c9"
       },
       "status": "ok",
       "sources": {
@@ -570224,14 +570244,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
-        "yinrenlu": true
+        "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:01:38Z",
-      "scraped_at": "2026-11-25T13:53:07Z"
+      "scraped_at": "2026-11-26T13:28:28Z"
     },
     {
       "key": "javstash:c77dcb0e-a9f7-424e-a391-01f432b8900b",
@@ -576880,50 +576900,43 @@
     },
     {
       "key": "javstash:c989bc0c-130b-4acc-b3a6-1b71313b265a",
-      "name": "千叶徳香",
-      "name_original": "中崎じゅんこ",
+      "name": "あきじゅん",
+      "name_original": "じゅん",
       "aliases": [
-        "あやこ(FC2動画)",
-        "きょうこ(HEY動画",
-        "本生素人TV)",
-        "千葉徳香(エッチな4610)",
-        "Nakazaki Junko",
-        "じゅんこなかざきじゅんこ",
+        "Jun Aki",
         "秋山ひとみ",
         "竹内奈津子"
       ],
       "gender": "female",
-      "birth_date": "1996-03-30",
-      "birth_date_source": "mdcx",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": null,
       "country": null,
-      "height_cm": 157,
+      "height_cm": null,
       "weight_kg": null,
       "measurements": null,
       "measurements_unit": null,
-      "cup_size": "D",
-      "career_start": 2019,
-      "tags": [
-        "D罩杯"
-      ],
+      "cup_size": null,
+      "career_start": null,
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B4%8E%E3%81%98%E3%82%85%E3%82%93%E3%81%93.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E5%B4%8E%E3%81%98%E3%82%85%E3%82%93%E3%81%93.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/c989bc0c-130b-4acc-b3a6-1b71313b265a",
       "provider_ids": {
         "JavStash": "c989bc0c-130b-4acc-b3a6-1b71313b265a"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -576932,7 +576945,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:38Z",
-      "scraped_at": "2026-11-25T13:52:48Z"
+      "scraped_at": "2026-11-26T13:26:51Z"
     },
     {
       "key": "javstash:c98c8950-4ceb-4bb2-bafb-c5a04857d57a",
@@ -579234,7 +579247,7 @@
     },
     {
       "key": "javstash:ca33e01e-ddb0-4c93-88d6-494dcfaad18e",
-      "name": "中林彩",
+      "name": "元木彩",
       "name_original": "彩",
       "aliases": [
         "中野優貴",
@@ -579255,9 +579268,9 @@
       "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%9E%97%E5%BD%A9.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B8%AD%E6%9E%97%E5%BD%A9.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/ca33e01e-ddb0-4c93-88d6-494dcfaad18e",
       "provider_ids": {
         "JavStash": "ca33e01e-ddb0-4c93-88d6-494dcfaad18e"
@@ -579267,7 +579280,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
@@ -579279,7 +579292,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:15:57Z",
-      "scraped_at": "2026-11-25T13:52:47Z"
+      "scraped_at": "2026-11-26T13:28:20Z"
     },
     {
       "key": "javstash:ca34207a-c05a-4923-acf0-a498a481310b",
@@ -580304,6 +580317,7 @@
       "provider_ids": {
         "JavStash": "ca8a6ccb-c98e-4d47-872f-00ab6c8ce996",
         "StashDB": "f5d8c0d6-a276-4c94-b868-0f6f49a67ee5",
+        "TPDB": "f42aab46-1ad5-4754-adc0-a2be0b480b8b",
         "Wikidata": "Q11582464",
         "Wikipedia": "ja.wikipedia.org/wiki/相馬あすか"
       },
@@ -580318,14 +580332,14 @@
         "mdcx": false,
         "stashdb": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:22:55Z",
-      "scraped_at": "2026-11-25T13:53:12Z"
+      "scraped_at": "2026-11-26T13:28:25Z"
     },
     {
       "key": "javstash:ca8e472f-e9e2-478c-a38b-688d3fedb9e2",
@@ -585552,39 +585566,32 @@
     },
     {
       "key": "javstash:cc90d897-ebb8-4003-96df-b5764f9e3176",
-      "name": "アンナ・モーナ",
-      "name_original": null,
+      "name": "キム・アンナ",
+      "name_original": "アンナ",
       "aliases": [
         "Anna",
         "アンナ",
-        "待补充",
-        "Anna Morna"
+        "待补充"
       ],
       "gender": "female",
       "birth_date": "2000-09-05",
       "birth_date_source": "javstash",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 175,
+      "height_cm": 158,
       "weight_kg": 95,
-      "measurements": "34A-21-34",
+      "measurements": "34DD-22-32",
       "measurements_unit": "in",
-      "cup_size": "A",
+      "cup_size": "F",
       "career_start": 2021,
       "tags": [
-        "A罩杯",
-        "米国出身",
-        "熟女",
-        "长身",
-        "贫乳",
-        "苗条",
-        "细腰"
+        "F罩杯"
       ],
       "bio": "アンナ，出生于 2000 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Anna 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E6%AD%A5%29/AI-Fix-%E3%82%A2%E3%83%B3%E3%83%8A%E3%83%BB%E3%83%A2%E3%83%BC%E3%83%8A.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E6%AD%A5%29/AI-Fix-%E3%82%A2%E3%83%B3%E3%83%8A%E3%83%BB%E3%83%A2%E3%83%BC%E3%83%8A.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/b38a211b-49f4-4e83-b18e-cc0896add3ba",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/cc90d897-ebb8-4003-96df-b5764f9e3176",
       "provider_ids": {
         "JavStash": "cc90d897-ebb8-4003-96df-b5764f9e3176",
@@ -585595,12 +585602,12 @@
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "stashdb": true,
         "theactorbase": false,
         "tpdb": true,
@@ -585610,7 +585617,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:03:38Z",
-      "scraped_at": "2026-11-25T13:52:26Z"
+      "scraped_at": "2026-11-26T13:27:07Z"
     },
     {
       "key": "javstash:cca0039f-10b4-4d27-86ea-87c639914226",
@@ -587216,45 +587223,47 @@
     },
     {
       "key": "javstash:cd35d916-72d6-4be9-a5f6-9c3a6591d37e",
-      "name": "仲山うさぎ",
-      "name_original": null,
+      "name": "うさぎ美优",
+      "name_original": "うさぎ美優",
       "aliases": [
+        "うさぎ(S級素人)",
+        "うさぎ美优",
+        "ミュウ(Prestige)",
+        "うさぎ",
         "Miyuu Usagi",
         "Myu",
         "Usagi",
-        "うさぎ",
-        "ミュウ",
-        "Nakayamausagi",
-        "仲山うさぎ"
+        "ミュウ"
       ],
       "gender": "female",
       "birth_date": "1994-11-30",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·东京都",
       "country": "JP",
-      "height_cm": 163,
+      "height_cm": 160,
       "weight_kg": null,
-      "measurements": "32B-23-33",
+      "measurements": "30E-22-33",
       "measurements_unit": "in",
-      "cup_size": "B",
+      "cup_size": "E",
       "career_start": 2017,
       "tags": [
-        "B罩杯"
+        "E罩杯",
+        "美乳轮"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%BB%B2%E5%B1%B1%E3%81%86%E3%81%95%E3%81%8E.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%BB%B2%E5%B1%B1%E3%81%86%E3%81%95%E3%81%8E.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E3%81%86%E3%81%95%E3%81%8E%E7%BE%8E%E5%84%AA.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E3%81%86%E3%81%95%E3%81%8E%E7%BE%8E%E5%84%AA.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/cd35d916-72d6-4be9-a5f6-9c3a6591d37e",
       "provider_ids": {
         "JavStash": "cd35d916-72d6-4be9-a5f6-9c3a6591d37e",
-        "TPDB": "f107cfc8-00b9-4cc4-828f-b6bd401def72"
+        "TPDB": "35a22623-b51f-447b-b67c-16e1275b2074"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
@@ -587268,7 +587277,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:00:56Z",
-      "scraped_at": "2026-11-25T13:53:07Z"
+      "scraped_at": "2026-11-26T13:26:57Z"
     },
     {
       "key": "javstash:cd35f4ec-71e7-46b0-93dd-736ab1ec814d",
@@ -598133,12 +598142,11 @@
     },
     {
       "key": "javstash:d14e6af1-5b2a-4ad1-ab2a-a20516cf0fa0",
-      "name": "中村杏里",
-      "name_original": "望月杏里",
+      "name": "仓田杏里",
+      "name_original": "倉田杏里",
       "aliases": [
-        "Anri Nakamura",
-        "中村杏裏",
-        "永森シーナ",
+        "仓田杏里",
+        "倉田杏裏",
         "Anri Mochizuki",
         "あんり",
         "さとみ",
@@ -598148,44 +598156,48 @@
       "gender": "female",
       "birth_date": "1991-12-25",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·山口县",
       "country": "JP",
       "height_cm": 153,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": "F",
+      "measurements": "32C-23-35",
+      "measurements_unit": "in",
+      "cup_size": "C",
       "career_start": null,
       "tags": [
-        "F罩杯"
+        "C罩杯",
+        "辣妹",
+        "巨乳",
+        "美尻"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://javstash.org/images/0b6605ce-de7e-4c4e-84df-a006f94cc631",
-      "avatar_cn": null,
-      "avatar_source_site": "javstash",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%80%89%E7%94%B0%E6%9D%8F%E9%87%8C.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%80%89%E7%94%B0%E6%9D%8F%E9%87%8C.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/d14e6af1-5b2a-4ad1-ab2a-a20516cf0fa0",
       "provider_ids": {
-        "JavStash": "d14e6af1-5b2a-4ad1-ab2a-a20516cf0fa0"
+        "JavStash": "d14e6af1-5b2a-4ad1-ab2a-a20516cf0fa0",
+        "TPDB": "92432cc2-2b75-4535-b6f7-93f6972bcf7b"
       },
       "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:15:48Z",
-      "scraped_at": "2026-11-25T13:52:47Z"
+      "scraped_at": "2026-11-26T13:28:20Z"
     },
     {
       "key": "javstash:d1592763-7907-4b39-a622-234d5541bb49",
@@ -600521,51 +600533,53 @@
     },
     {
       "key": "javstash:d24ecb2d-0147-43fc-97ae-050def46ed64",
-      "name": "五十岚兰",
-      "name_original": "蘭",
+      "name": "三上兰",
+      "name_original": "三上蘭",
       "aliases": [
-        "Igarashi Ran",
-        "五十嵐蘭"
+        "前原優樹"
       ],
       "gender": "female",
-      "birth_date": "1969-07-09",
-      "birth_date_source": "cinewho",
+      "birth_date": null,
+      "birth_date_source": null,
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 156,
+      "height_cm": null,
       "weight_kg": null,
       "measurements": null,
       "measurements_unit": null,
       "cup_size": null,
       "career_start": null,
-      "tags": [],
+      "tags": [
+        "美少女"
+      ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%BA%94%E5%8D%81%E5%B5%90%E8%98%AD.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%BA%94%E5%8D%81%E5%B5%90%E8%98%AD.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%89%E4%B8%8A%E8%98%AD.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%89%E4%B8%8A%E8%98%AD.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/d24ecb2d-0147-43fc-97ae-050def46ed64",
       "provider_ids": {
-        "JavStash": "d24ecb2d-0147-43fc-97ae-050def46ed64"
+        "JavStash": "d24ecb2d-0147-43fc-97ae-050def46ed64",
+        "TPDB": "bfba6f3f-6557-41db-852f-cd82626589a1"
       },
-      "status": "ok",
+      "status": "partial",
       "sources": {
         "castwiki": false,
-        "cinewho": true,
+        "cinewho": false,
         "dramaface": false,
         "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:24Z",
-      "scraped_at": "2026-11-25T13:53:01Z"
+      "scraped_at": "2026-11-26T13:27:21Z"
     },
     {
       "key": "javstash:d255099f-9389-4fa8-ba8a-d69984760aef",
@@ -619878,41 +619892,47 @@
     },
     {
       "key": "javstash:d8e2cd80-94ed-443a-b159-52aeb5e71ab1",
-      "name": "夏纯天",
-      "name_original": "夏純天",
-      "aliases": [],
+      "name": "大须贺纯",
+      "name_original": "純",
+      "aliases": [
+        "Jun Oosuka",
+        "Jun Shita",
+        "Shita Jun",
+        "舌純",
+        "Jun Osuka",
+        "大须贺纯",
+        "大須賀純"
+      ],
       "gender": "female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1979-05-24",
+      "birth_date_source": "cinewho",
       "birth_place": null,
       "country": null,
       "height_cm": null,
       "weight_kg": null,
       "measurements": null,
       "measurements_unit": null,
-      "cup_size": "G",
+      "cup_size": null,
       "career_start": null,
-      "tags": [
-        "G罩杯"
-      ],
+      "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%B4%94%E5%A4%A9.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%A4%8F%E7%B4%94%E5%A4%A9.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": null,
+      "avatar_cn": null,
+      "avatar_source_site": null,
       "homepage_url": "https://javstash.org/performers/d8e2cd80-94ed-443a-b159-52aeb5e71ab1",
       "provider_ids": {
         "JavStash": "d8e2cd80-94ed-443a-b159-52aeb5e71ab1"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
-        "mdcx": true,
+        "mdcx": false,
         "theactorbase": false,
         "tpdb": false,
         "wiki": false,
@@ -619921,7 +619941,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:11Z",
-      "scraped_at": "2026-11-25T13:53:38Z"
+      "scraped_at": "2026-11-26T13:29:20Z"
     },
     {
       "key": "javstash:d8e68938-9adb-4e99-a7f9-0daaca5c84a4",
@@ -621267,7 +621287,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:24:41Z",
-      "scraped_at": "2026-11-25T13:53:23Z"
+      "scraped_at": "2026-11-26T13:28:51Z"
     },
     {
       "key": "javstash:d960f112-c4f6-43da-a57b-b0665518b388",
@@ -642322,9 +642342,10 @@
     },
     {
       "key": "javstash:e140d06b-7015-43e5-9964-5a18c171519d",
-      "name": "久保田春奈",
+      "name": "及川春奈",
       "name_original": null,
       "aliases": [
+        "及川春菜",
         "Aizawa Haruna",
         "Akita Natsumi",
         "Haruna",
@@ -642356,7 +642377,9 @@
         "西崎美貴子",
         "仙道春奈",
         "待补充",
-        "Haruna Sendō"
+        "Haruna Sendō",
+        "Oikawa Haruna",
+        "及川はるな"
       ],
       "gender": "female",
       "birth_date": "1985-08-05",
@@ -642365,19 +642388,18 @@
       "country": "JP",
       "height_cm": 164,
       "weight_kg": null,
-      "measurements": "30-23-33",
+      "measurements": "32C-24-35",
       "measurements_unit": "in",
       "cup_size": "D",
-      "career_start": 2013,
+      "career_start": 2007,
       "tags": [
-        "D罩杯",
-        "熟女"
+        "D罩杯"
       ],
       "bio": "仙道春奈，公开出生年份待补充。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Haruna Sendō 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B9%85%E4%BF%9D%E7%94%B0%E6%98%A5%E5%A5%88.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B9%85%E4%BF%9D%E7%94%B0%E6%98%A5%E5%A5%88.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar": "https://javstash.org/images/e0a3e164-3dac-409c-a7ea-3ae09520cd69",
+      "avatar_cn": null,
+      "avatar_source_site": "javstash",
       "homepage_url": "https://javstash.org/performers/e140d06b-7015-43e5-9964-5a18c171519d",
       "provider_ids": {
         "JavStash": "e140d06b-7015-43e5-9964-5a18c171519d",
@@ -642389,9 +642411,9 @@
       "status": "ok",
       "sources": {
         "castwiki": false,
-        "cinewho": false,
+        "cinewho": true,
         "dramaface": false,
-        "gfriends": true,
+        "gfriends": false,
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
@@ -642404,7 +642426,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T07:59:52Z",
-      "scraped_at": "2026-11-25T13:52:57Z"
+      "scraped_at": "2026-11-26T13:28:47Z"
     },
     {
       "key": "javstash:e1433650-46e8-475a-9cbc-c4b1d021b647",
@@ -643410,10 +643432,10 @@
     },
     {
       "key": "javstash:e18cf70e-f571-4f32-8905-5399a0deecd2",
-      "name": "久田めぐみ",
+      "name": "上原めぐみ",
       "name_original": "めぐみ",
       "aliases": [
-        "Megumi Hisada",
+        "Megumi Uehara",
         "森田朋子"
       ],
       "gender": "female",
@@ -643430,9 +643452,9 @@
       "tags": [],
       "bio": null,
       "bio_lang": null,
-      "avatar": null,
-      "avatar_cn": null,
-      "avatar_source_site": null,
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%8A%E5%8E%9F%E3%82%81%E3%81%90%E3%81%BF.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%8A%E5%8E%9F%E3%82%81%E3%81%90%E3%81%BF.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/e18cf70e-f571-4f32-8905-5399a0deecd2",
       "provider_ids": {
         "JavStash": "e18cf70e-f571-4f32-8905-5399a0deecd2"
@@ -643442,7 +643464,7 @@
         "castwiki": false,
         "cinewho": false,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
         "mdcx": false,
@@ -643454,7 +643476,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:13:44Z",
-      "scraped_at": "2026-11-25T13:52:57Z"
+      "scraped_at": "2026-11-26T13:27:42Z"
     },
     {
       "key": "javstash:e18ea045-152f-481f-8489-7c14542263ea",
@@ -648239,35 +648261,37 @@
     },
     {
       "key": "javstash:e347fe1d-d88e-495f-b16b-605574da099c",
-      "name": "梦见心",
-      "name_original": "夢見心",
+      "name": "喜里川心",
+      "name_original": null,
       "aliases": [
+        "喜裏川心",
         "Kokoro"
       ],
       "gender": "transgender_female",
-      "birth_date": null,
-      "birth_date_source": null,
+      "birth_date": "1987-10-30",
+      "birth_date_source": "mdcx",
       "birth_place": "日本",
       "country": "JP",
-      "height_cm": 164,
+      "height_cm": 167,
       "weight_kg": null,
-      "measurements": "35-24-37",
+      "measurements": "30C-24-31",
       "measurements_unit": "in",
-      "cup_size": null,
-      "career_start": 2010,
+      "cup_size": "C",
+      "career_start": 2013,
       "tags": [
-        "."
+        "C罩杯",
+        "熟女"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%A4%A2%E8%A6%8B%E5%BF%83.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%A4%A2%E8%A6%8B%E5%BF%83.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E5%96%9C%E9%87%8C%E5%B7%9D%E5%BF%83.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E5%96%9C%E9%87%8C%E5%B7%9D%E5%BF%83.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/e347fe1d-d88e-495f-b16b-605574da099c",
       "provider_ids": {
         "JavStash": "e347fe1d-d88e-495f-b16b-605574da099c"
       },
-      "status": "partial",
+      "status": "ok",
       "sources": {
         "castwiki": false,
         "cinewho": false,
@@ -648284,7 +648308,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:30:08Z",
-      "scraped_at": "2026-11-25T13:53:41Z"
+      "scraped_at": "2026-11-26T13:29:00Z"
     },
     {
       "key": "javstash:e34c22c2-a9d9-427d-be74-649159120fe0",
@@ -649741,7 +649765,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:14:48Z",
-      "scraped_at": "2026-11-25T13:53:05Z"
+      "scraped_at": "2026-11-26T13:28:06Z"
     },
     {
       "key": "javstash:e3c6d53d-e961-47f9-ba34-29ffaef0e7a2",
@@ -716800,9 +716824,10 @@
     },
     {
       "key": "javstash:fe674740-a259-41f5-b61d-54501ada7639",
-      "name": "园崎爱海",
-      "name_original": "愛海",
+      "name": "吉泽　爱海",
+      "name_original": "吉沢愛海",
       "aliases": [
+        "吉澤 愛海",
         "Manami",
         "待补充",
         "愛海"
@@ -716810,25 +716835,26 @@
       "gender": "female",
       "birth_date": "1988-02-22",
       "birth_date_source": "javstash",
-      "birth_place": "日本",
+      "birth_place": "日本·东京都",
       "country": "JP",
-      "height_cm": 155,
+      "height_cm": 148,
       "weight_kg": null,
-      "measurements": null,
-      "measurements_unit": null,
-      "cup_size": "E",
+      "measurements": "30D-22-32",
+      "measurements_unit": "in",
+      "cup_size": "D",
       "career_start": 2008,
       "tags": [
-        "E罩杯"
+        "D罩杯"
       ],
       "bio": "愛海，出生于 1988 年。公开人物资料记录了其成人影视表演职业经历；该记录用于说明公开履历，不据此判断目前是否仍在从业。资料中的国籍／地区记录为日本。\n\n姓名另有 Manami 等公开写法，可用于对照不同语言的人物条目。",
       "bio_lang": "zh",
-      "avatar": "https://javstash.org/images/487d0c1c-fffb-4a90-ae31-de904745f5bc",
-      "avatar_cn": null,
-      "avatar_source_site": "javstash",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%90%89%E6%B2%A2%E6%84%9B%E6%B5%B7.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%90%89%E6%B2%A2%E6%84%9B%E6%B5%B7.jpg",
+      "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/fe674740-a259-41f5-b61d-54501ada7639",
       "provider_ids": {
         "JavStash": "fe674740-a259-41f5-b61d-54501ada7639",
+        "TPDB": "cf09d50b-3fbe-4fb5-92da-d2d692c43219",
         "Wikidata": "Q11493962",
         "Wikipedia": "ja.wikipedia.org/wiki/愛海"
       },
@@ -716837,19 +716863,19 @@
         "castwiki": false,
         "cinewho": true,
         "dramaface": false,
-        "gfriends": false,
+        "gfriends": true,
         "idoldb": false,
         "javstash": true,
-        "mdcx": false,
+        "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": true
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:18:11Z",
-      "scraped_at": "2026-11-25T13:53:27Z"
+      "scraped_at": "2026-11-26T13:29:00Z"
     },
     {
       "key": "javstash:fe6b20ed-9583-414d-ae12-8054ad29d828",
@@ -719021,31 +719047,35 @@
     },
     {
       "key": "javstash:ff802cfc-3bc3-404a-94f4-a577b311c83f",
-      "name": "久田理惠",
-      "name_original": "久田理恵",
+      "name": "三好理惠",
+      "name_original": "三好理恵",
       "aliases": [],
       "gender": "female",
       "birth_date": null,
       "birth_date_source": null,
       "birth_place": null,
       "country": null,
-      "height_cm": 156,
+      "height_cm": 153,
       "weight_kg": null,
-      "measurements": "31-22-31",
+      "measurements": "30F-24-33",
       "measurements_unit": "in",
-      "cup_size": null,
-      "career_start": 2009,
+      "cup_size": "F",
+      "career_start": null,
       "tags": [
-        "熟女"
+        "F罩杯",
+        "巨乳",
+        "美乳",
+        "美人"
       ],
       "bio": null,
       "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E4%B9%85%E7%94%B0%E7%90%86%E6%81%B5.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E4%B9%85%E7%94%B0%E7%90%86%E6%81%B5.jpg",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%89%E5%A5%BD%E7%90%86%E6%81%B5.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/z-DMM%28%E9%AA%91%29/AI-Fix-%E4%B8%89%E5%A5%BD%E7%90%86%E6%81%B5.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/ff802cfc-3bc3-404a-94f4-a577b311c83f",
       "provider_ids": {
-        "JavStash": "ff802cfc-3bc3-404a-94f4-a577b311c83f"
+        "JavStash": "ff802cfc-3bc3-404a-94f4-a577b311c83f",
+        "TPDB": "6d2304d6-aeae-45c4-b64c-904c4fedcc94"
       },
       "status": "partial",
       "sources": {
@@ -719057,14 +719087,14 @@
         "javstash": true,
         "mdcx": true,
         "theactorbase": false,
-        "tpdb": false,
+        "tpdb": true,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:12:41Z",
-      "scraped_at": "2026-11-25T13:52:58Z"
+      "scraped_at": "2026-11-26T13:27:33Z"
     },
     {
       "key": "javstash:ff8a4477-0a48-4787-b0c0-b3f42c82def1",
@@ -719806,36 +719836,33 @@
     },
     {
       "key": "javstash:ffb973ec-3a9e-438e-9934-eb241f170eb0",
-      "name": "久藤美绪",
-      "name_original": "久藤美緒",
+      "name": "及川美绪",
+      "name_original": "及川美緒",
       "aliases": [
         "上田真沙美",
         "仮）美緒",
         "桜井さん"
       ],
       "gender": "female",
-      "birth_date": "2000-06-30",
-      "birth_date_source": "mdcx",
-      "birth_place": null,
-      "country": null,
-      "height_cm": 152,
+      "birth_date": null,
+      "birth_date_source": null,
+      "birth_place": "日本·山口县",
+      "country": "JP",
+      "height_cm": null,
       "weight_kg": null,
-      "measurements": "32C-22-32",
-      "measurements_unit": "in",
-      "cup_size": "C",
-      "career_start": 2020,
-      "tags": [
-        "C罩杯"
-      ],
-      "bio": null,
-      "bio_lang": null,
-      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/%E4%B9%85%E8%97%A4%E7%BE%8E%E7%B7%92.jpg",
-      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/%E4%B9%85%E8%97%A4%E7%BE%8E%E7%B7%92.jpg",
+      "measurements": null,
+      "measurements_unit": null,
+      "cup_size": null,
+      "career_start": 2013,
+      "tags": [],
+      "bio": "及川美桜（おいかわ みお，Oikawa Mio，2003年7月19日—），中文名 及川美樱，日本女优，所属Bambi Promotion。旧艺名夏生なつ。 经历 2025年12月9日，从S1出道。 2026年4月13日，宣布将艺名改为及川美桜。 人物 旧艺名“夏生”是因为她7月出生。 她原本志愿成为播音员，但全部落选，于是决定进入女优行业。 她的胸部从初中开始变大，到高一左右就已经达到现在的大小。",
+      "bio_lang": "zh",
+      "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/y-Minnano/AI-Fix-%E5%8F%8A%E5%B7%9D%E7%BE%8E%E7%B7%92.jpg",
+      "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/y-Minnano/AI-Fix-%E5%8F%8A%E5%B7%9D%E7%BE%8E%E7%B7%92.jpg",
       "avatar_source_site": "gfriends",
       "homepage_url": "https://javstash.org/performers/ffb973ec-3a9e-438e-9934-eb241f170eb0",
       "provider_ids": {
-        "JavStash": "ffb973ec-3a9e-438e-9934-eb241f170eb0",
-        "TPDB": "2bc26d8a-487b-4aa3-9eed-a760be35ce4e"
+        "JavStash": "ffb973ec-3a9e-438e-9934-eb241f170eb0"
       },
       "status": "ok",
       "sources": {
@@ -719846,15 +719873,15 @@
         "idoldb": false,
         "javstash": true,
         "mdcx": true,
-        "theactorbase": false,
-        "tpdb": true,
+        "theactorbase": true,
+        "tpdb": false,
         "wiki": false,
         "yinrenlu": false
       },
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:16:52Z",
-      "scraped_at": "2026-11-25T13:53:02Z"
+      "scraped_at": "2026-11-26T13:28:48Z"
     },
     {
       "key": "javstash:ffbcecfd-9544-4763-8760-cfa4b5c7d61b",
@@ -891005,7 +891032,7 @@
     },
     {
       "key": "tpdb:6df283b8-46ac-47b9-8008-c6750346ca30",
-      "name": "エンジェル・ゴストーザ",
+      "name": "エンジェル・ゴスタソ",
       "name_original": null,
       "aliases": [
         "Angel Gustosa",
@@ -891013,13 +891040,13 @@
         "Angel Gostosa"
       ],
       "gender": "female",
-      "birth_date": "2003-02-14",
+      "birth_date": "2000-02-24",
       "birth_date_source": "mdcx",
       "birth_place": "巴西",
       "country": "BR",
       "height_cm": 160,
       "weight_kg": 47,
-      "measurements": "30B-25-36",
+      "measurements": "34B-25-36",
       "measurements_unit": "in",
       "cup_size": "B",
       "career_start": 2021,
@@ -891027,8 +891054,7 @@
         "B罩杯",
         "巴西人",
         "美乳",
-        "巨尻",
-        "大阴唇"
+        "巨尻"
       ],
       "bio": "Angel Gostosa joined the adult industry as she clocked 18. This was in 2021. She had always been interested in entertainment but she found out that the AV world had so much in store for her, especially as she loves being expressive with her body. Before then, she had lost her virginity at the age of 16 to her boyfriend. And so far, she had only been with three guys – no girls. She claims it was an awkward moment for her but it had fueled her passion for adult movies. \n\nWhen Angel started in 2021, she had only been posting risqué pictures on Twitter. She also had an Only Fans page where she was posting explicit content and was getting paid for exclusive access. She had always known she was going to use “Angel” as a stage name and “Gostado” (or “Gostosa”) is a Portuguese word for Sexy.",
       "bio_lang": "en",
@@ -891057,7 +891083,7 @@
       "fail_count": 0,
       "retry_after": null,
       "created_at": "2026-11-20T08:04:10Z",
-      "scraped_at": "2026-11-25T13:52:25Z"
+      "scraped_at": "2026-11-26T13:27:07Z"
     },
     {
       "key": "tpdb:6eb8afc8-4e7b-454e-8f53-a347ec1701ea",
