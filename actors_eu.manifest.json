@@ -1,14 +1,14 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-26T04:40:45Z",
-  "count": 49915,
+  "generated_at": "2026-11-26T05:03:51Z",
+  "count": 49921,
   "by_status": {
-    "ok": 20947,
-    "partial": 28968
+    "ok": 20946,
+    "partial": 28975
   },
   "last_run": {
-    "started_at": "2026-11-26T04:16:17Z",
-    "duration_sec": 1468,
+    "started_at": "2026-11-26T04:41:35Z",
+    "duration_sec": 1336,
     "picked": 2000,
     "added": 2000,
     "updated": 0,
@@ -26,16 +26,16 @@
       "ok": 2000
     },
     "tpdb": {
-      "miss": 1669,
-      "ok": 331
+      "miss": 1712,
+      "ok": 288
     },
     "wiki": {
       "miss": 2000,
       "ok": 0
     },
     "wiki_en": {
-      "miss": 1998,
-      "ok": 2
+      "miss": 2000,
+      "ok": 0
     }
   }
 }
