@@ -57,6 +57,10 @@ type Db struct {
 	GeneratedAt   string   `json:"generated_at"`
 	Count         int      `json:"count"`
 	Actors        []*Actor `json:"actors"`
+
+	// idx 是延迟构建的查找索引（不进 JSON）。六万条时线性扫描太慢：
+	// --refresh-stored 要按 UUID 逐个查 6 万次，O(n²) 会跑十几分钟。
+	idx *dbIndex
 }
 
 // SchemaVersion 3：对齐 docs/actor-fields.md
