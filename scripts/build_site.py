@@ -56,7 +56,7 @@ MAX_ALIASES = 12
 
 # 简介和主页链接只在点开详情时用得到，拆成 16 个分片按需加载：
 # 首屏索引从 5.5MB 降到 3.1MB（gzip ~1.1MB），点一个人只多拉一个 ~130KB 的分片。
-DETAIL_SHARDS = 16
+DETAIL_SHARDS = 256
 
 # 合并字典的列（actor_dict.csv 是「别名, 日文名, 中文名, 来源」，按人归并后只留这一组）
 DICT_FIELDS = ["ja", "zh", "source", "aliases"]

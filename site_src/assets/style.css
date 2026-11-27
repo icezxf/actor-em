@@ -465,3 +465,96 @@ main { padding: 12px 20px 40px; }
   color: #fff; background: var(--accent); border: none;
 }
 .pick-submit:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ==================== 移动端适配 ====================
+   两个断点：
+     ≤ 768px  平板/大屏手机：收紧间距、放大点击目标、弹层改底部抽屉
+     ≤ 480px  小屏手机：单列布局、工具栏横向滚动
+   要点：
+     - iOS Safari 对 <16px 的输入框会自动缩放整页，搜索框必须 16px；
+     - 触控目标建议 ≥44px，下拉框和按钮加高；
+     - 详情弹层在小屏几乎占满，避免 20px 双层留白。
+*/
+
+@media (max-width: 768px) {
+  /* 顶栏：品牌 + tabs 一行，搜索框单独一行 */
+  .topbar { padding: 10px 12px; gap: 10px; }
+  .brand h1 { font-size: 16px; }
+  .count { font-size: 12px; }
+
+  /* 搜索框 16px：低于这个值 iOS 会缩放页面 */
+  .search input { font-size: 16px; padding: 11px 13px; }
+
+  .toolbar { padding: 10px 12px 2px; gap: 7px; }
+  /* 下拉框加高到 44px、字号 16px，手指好点也不会触发缩放 */
+  .toolbar select {
+    min-height: 44px;
+    font-size: 16px;
+    padding: 0 12px;
+  }
+  .chk { min-height: 44px; padding: 0 4px; font-size: 14px; }
+  .chk input[type="checkbox"] { width: 18px; height: 18px; }
+
+  main { padding: 0 12px; }
+
+  /* 卡片：两列，缩略图小一点 */
+  .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .thumb { width: 64px; height: 85px; }
+  .name { font-size: 14px; }
+  .badge { font-size: 11px; }
+
+  /* 详情弹层：贴底抽屉式，最大高度留出顶部一点 */
+  .modal { padding: 0; align-items: end; }
+  .modal-card {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+  }
+  .close { top: 10px; right: 10px; width: 40px; height: 40px; font-size: 18px; }
+  .m-head { gap: 12px; }
+  .m-thumb { width: 92px; height: 122px; }
+  .m-title h2 { font-size: 18px; padding-right: 34px; }
+
+  /* 换头像：按钮和候选格子都要够大 */
+  .m-section h3 .linkish { min-height: 36px; font-size: 14px; }
+  .avatar-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+  .pick-submit { min-height: 46px; font-size: 15px; }
+
+  /* 表格视图：横向滚动 + 首列吸顶，方便对照 */
+  .tablewrap { margin: 0 12px 12px; -webkit-overflow-scrolling: touch; }
+  .dtable { font-size: 14px; }
+  .dtable th, .dtable td { padding: 10px 12px; white-space: nowrap; }
+
+  /* 标签栏：横向滚动，不换行挤占高度 */
+  .tagbar {
+    display: flex; flex-wrap: nowrap; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    margin-left: 0; padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tagbar::-webkit-scrollbar { display: none; }
+  .tagbar button { flex: 0 0 auto; min-height: 36px; padding: 0 12px; font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  /* 小屏：顶栏 tabs 允许横向滚动，不换行 */
+  .tabs { overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { padding: 6px 12px; font-size: 13px; white-space: nowrap; }
+
+  /* 工具栏：一行一个下拉，避免挤压 */
+  .toolbar select { flex: 1 1 46%; }
+  .toolbar { gap: 8px; }
+
+  /* 单列卡片更像列表：缩略图在左、信息在右 */
+  .grid { grid-template-columns: 1fr; gap: 8px; }
+  .card { padding: 8px; }
+  .thumb { width: 60px; height: 80px; }
+
+  /* 候选图两列偏宽更易点 */
+  .avatar-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+
+  .modal-card { max-height: 95vh; }
+  .m-thumb { width: 80px; height: 106px; }
+}

@@ -91,7 +91,7 @@
   }
 
   // 详情分片：简介和主页链接单独按需拉，首屏索引小一半
-  var DETAIL_SHARDS = 16;
+  var DETAIL_SHARDS = 256;
   var detailCache = {};
 
   // gfriends 候选图：按演员名哈希取分片（每片几十 KB），只在前端点「换头像」时拉。
