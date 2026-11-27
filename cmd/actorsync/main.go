@@ -33,6 +33,7 @@ func main() {
 		backfill    bool
 		stashList     string
 		refreshStored bool
+		applyChoices  bool
 	)
 
 	flag.IntVar(&cfg.Limit, "limit", cfg.Limit, "本轮最多处理多少个演员（0 = 不限）")
@@ -56,6 +57,7 @@ func main() {
 	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
 	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
 	flag.StringVar(&stashList, "stash-list", "", "StashDB 欧美模式：UUID 清单文件（一行一个 UUID）；只用这份清单，不掺日系字典。配合 --data 写独立库")
+	flag.BoolVar(&applyChoices, "apply-choices", false, "把 data/avatar_choices.json 里人工选好的头像直接写进数据库（不联网、秒级），配合 --data 指定要改的库")
 	flag.BoolVar(&refreshStored, "refresh-stored", false, "配合 --stash-list+--data：只重抓库里已存的记录（用它们的 StashDB UUID 作清单），不碰清单里还没入库的新人。适合小批量让新字段/简介对存量生效")
 	flag.Parse()
 
@@ -99,6 +101,14 @@ func main() {
 		ctx, cancel = context.WithTimeout(context.Background(), 5*time.Hour)
 	}
 	defer cancel()
+
+	// 人工选图立即生效：把 choices 里的头像写进数据库，不联网
+	if applyChoices {
+		if err := runApplyChoices(cfg, logger); err != nil {
+			logger.Fatalf("应用选图失败: %v", err)
+		}
+		return
+	}
 
 	// 只做离线补值：不联网、不需要任何 API Key
 	if backfill {
@@ -543,6 +553,58 @@ func safeFetch(e *actorsync.Engine, ctx context.Context, name string) (res *acto
 //   - 旧记录有生日但没标来源的，补标 javstash（那时候只有这一个来源）
 //   - 只给 ok/partial 的空生日补 MDCx 值，并标 mdcx
 //
+// runApplyChoices 把人工选好的头像（data/avatar_choices.json）直接写进数据库。
+//
+// 为什么需要它：choices 原本只在「该演员被重新抓取」时才应用，所以网页选完图后
+// 头像要等下一轮 refresh 才变——用户看到的是「提交了但页面没变」。
+// 这个命令跳过抓取，直接改 avatar 字段；幂等，重复跑无副作用。
+func runApplyChoices(cfg *Config, logger *log.Logger) error {
+	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
+	if err != nil {
+		return fmt.Errorf("读取 %s 失败: %w", cfg.ChoicesFile, err)
+	}
+	if len(choices.Choices) == 0 {
+		logger.Printf("choices 为空，无事可做（%s）", cfg.ChoicesFile)
+		return nil
+	}
+	db, err := actorsync.LoadDb(cfg.DataFile)
+	if err != nil {
+		return fmt.Errorf("读取本地库失败: %w", err)
+	}
+	engine := &actorsync.Engine{DB: db, Choices: choices, DataFile: cfg.DataFile}
+	logger.Printf("本地库 %d 条 / 人工选图 %d 条（%s）", len(db.Actors), len(choices.Choices), cfg.ChoicesFile)
+
+	applied, missing := 0, 0
+	for key := range choices.Choices {
+		url, ok := choices.Get(key)
+		if !ok {
+			continue
+		}
+		actor, note, err := engine.ApplyChoice(context.Background(), key, url)
+		if err != nil {
+			missing++ // 这个库里没有该记录（比如日系库没有 stashdb:xxx），跳过不算错
+			continue
+		}
+		applied++
+		logger.Printf("  %s → %s", actor.Name, note)
+	}
+	logger.Printf("应用结果：生效 %d 条，库里没有 %d 条", applied, missing)
+	if applied == 0 || cfg.DryRun {
+		return nil
+	}
+	if err := db.Save(cfg.DataFile); err != nil {
+		return fmt.Errorf("保存 %s 失败: %w", cfg.DataFile, err)
+	}
+	if actorsync.IsJSONLPath(cfg.DataFile) {
+		jsonPath := strings.TrimSuffix(cfg.DataFile, ".jsonl") + ".json"
+		if err := db.ExportJSON(jsonPath); err != nil {
+			logger.Printf("⚠️  派生 %s 失败: %v", jsonPath, err)
+		}
+	}
+	logger.Printf("已写回 %s", cfg.DataFile)
+	return nil
+}
+
 // runBackfill 用 MDCx 离线档案给库里已有的记录补空字段。
 //
 // 为什么需要它：`BuildPlan` 只挑 new / failed / no_source / refresh，库里已经 ok 的

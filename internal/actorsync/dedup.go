@@ -338,6 +338,10 @@ func mergeInto(keep, dup *Actor) {
 	if keep.CareerStart == nil {
 		keep.CareerStart = dup.CareerStart
 	}
+	// 人气排名取更靠前（数值更小）的那个
+	if dup.PopularityRank > 0 && (keep.PopularityRank == 0 || dup.PopularityRank < keep.PopularityRank) {
+		keep.PopularityRank = dup.PopularityRank
+	}
 	if keep.Bio == nil || (dup.Bio != nil && len([]rune(StrVal(dup.Bio))) > len([]rune(StrVal(keep.Bio)))) {
 		if dup.Bio != nil {
 			keep.Bio = dup.Bio

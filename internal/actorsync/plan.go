@@ -334,6 +334,11 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 		a.RetryAfter = nil
 	}
 
+	// 人气排名不在抓取结果里，来自独立脚本；重抓时必须原样继承，否则会被抹掉
+	if existing != nil {
+		a.PopularityRank = existing.PopularityRank
+	}
+
 	// 先保留旧头像：新图没抓到、或者处理失败时，不要把已有直链擦掉
 	if existing != nil {
 		a.Avatar = existing.Avatar

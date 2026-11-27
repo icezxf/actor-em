@@ -42,6 +42,11 @@ type Actor struct {
 	HomePageURL *string           `json:"homepage_url"` // Emby 的 HomePageUrl
 	ProviderIDs map[string]string `json:"provider_ids"`
 
+	// PopularityRank：人气排名（1 = 最火），0 或缺失表示没排名。
+	// 由 scripts/apply_popularity.py 写入；抓取/合并时必须原样保留，
+	// 否则任何一次 Go 读写都会把它丢掉（JSON 未知字段会被丢弃）。
+	PopularityRank int `json:"popularity_rank,omitempty"`
+
 	Status     string          `json:"status"`
 	Sources    map[string]bool `json:"sources"`
 	FailCount  int             `json:"fail_count"`
