@@ -111,8 +111,7 @@
       cb(gfriendsCache[shard][name] || []);
       return;
     }
-    fetch('data/gfriends/' + shard + '.json')
-      .then(function (r) { return r.ok ? r.json() : {}; })
+    SiteLock.fetchData('data/gfriends/' + shard + '.json')
       .catch(function () { return {}; })
       .then(function (data) {
         gfriendsCache[shard] = data;
@@ -137,8 +136,7 @@
     var shard = idShard(pid);
     var ck = dir + '/' + shard;
     if (siteImgCache[ck]) { cb(siteImgCache[ck][pid] || []); return; }
-    fetch('data/' + dir + '/' + shard + '.json')
-      .then(function (r) { return r.ok ? r.json() : {}; })
+    SiteLock.fetchData('data/' + dir + '/' + shard + '.json')
       .catch(function () { return {}; })
       .then(function (data) {
         siteImgCache[ck] = data;
@@ -224,8 +222,7 @@
       cb(detailCache[shard][String(id)] || null);
       return;
     }
-    fetch('data/detail/' + shard + '.json')
-      .then(function (r) { return r.ok ? r.json() : {}; })
+    SiteLock.fetchData('data/detail/' + shard + '.json')
       .catch(function () { return {}; })
       .then(function (data) {
         detailCache[shard] = data;
@@ -632,20 +629,52 @@
     refresh: function () { if (all.length) reset(); }
   };
 
-  Promise.all([
-    fetch('data/actors.json').then(function (r) { return r.json(); }),
-    fetch('data/meta.json').then(function (r) { return r.json(); }).catch(function () { return {}; })
-  ]).then(function (res) {
-    all = res[0].rows.map(decode);
-    buildNameIndex();
-    buildFilters();
-    reset();
-    if (res[1] && res[1].generated_at) {
-      el.generated.textContent = '更新于 ' + res[1].generated_at.replace('T', ' ').replace('Z', ' UTC');
-    }
-  }).catch(function (err) {
-    el.count.textContent = '加载失败';
-    el.empty.hidden = false;
-    el.empty.textContent = '数据加载失败：' + err.message;
+  function boot() {
+    Promise.all([
+      SiteLock.fetchData('data/actors.json'),
+      SiteLock.fetchData('data/meta.json').catch(function () { return {}; })
+    ]).then(function (res) {
+      all = res[0].rows.map(decode);
+      buildNameIndex();
+      buildFilters();
+      reset();
+      if (res[1] && res[1].generated_at) {
+        el.generated.textContent = '更新于 ' + res[1].generated_at.replace('T', ' ').replace('Z', ' UTC');
+      }
+    }).catch(function (err) {
+      el.count.textContent = '加载失败';
+      el.empty.hidden = false;
+      el.empty.textContent = '数据加载失败：' + err.message;
+    });
+  }
+
+  // 锁屏：先试上次会话的密码，不行就等用户输入
+  var lockEl = document.getElementById('lock');
+  var lockForm = document.getElementById('lock-form');
+  var lockPw = document.getElementById('lock-pw');
+  var lockMsg = document.getElementById('lock-msg');
+
+  function startLocked() {
+    lockEl.hidden = false;
+    lockMsg.textContent = '';
+    lockForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      lockMsg.textContent = '验证中…';
+      SiteLock.unlock(lockPw.value).then(function (ok) {
+        if (ok) {
+          lockEl.hidden = true;
+          boot();
+        } else {
+          lockMsg.textContent = '密码错误';
+          lockPw.select();
+        }
+      });
+    });
+    lockPw.focus();
+  }
+
+  SiteLock.tryRestore().then(function (ok) {
+    if (ok) { lockEl.hidden = true; boot(); }
+    else startLocked();
   });
 })();

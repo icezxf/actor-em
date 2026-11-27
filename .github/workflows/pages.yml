@@ -38,8 +38,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: 从 actors.jsonl 生成站点
         run: python3 scripts/build_site.py actors.jsonl
+
+      # 数据用 AES-256-GCM 加密：GitHub Pages 没有访问控制，
+      # 只有拿到密码的人能解密 data/**/*.enc。
+      - name: 加密站点数据
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: |
+          if [ -z "$SITE_PASSWORD" ]; then
+            echo "::error::缺少 SITE_PASSWORD secret，无法加密数据"
+            exit 1
+          fi
+          node scripts/encrypt_site.mjs
+          echo "剩余明文 JSON：$(find site -name '*.json' | wc -l) 个（应为 0）"
 
       - uses: actions/configure-pages@v5
 

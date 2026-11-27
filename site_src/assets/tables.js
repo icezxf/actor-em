@@ -76,11 +76,9 @@
     return td;
   }
 
+  // 数据文件都是加密的（.enc），统一走 SiteLock 解密
   function loadJSON(path) {
-    return fetch(path).then(function (r) {
-      if (!r.ok) throw new Error(path + ' ' + r.status);
-      return r.json();
-    });
+    return window.SiteLock.fetchData(path);
   }
 
   // ---------- 字典 ----------

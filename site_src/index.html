@@ -9,6 +9,21 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+
+<!-- 数据是 AES-GCM 加密的，没有密码拿不到任何演员信息 -->
+<div id="lock" class="lock">
+  <div class="lock-card">
+    <div class="lock-mark"></div>
+    <h2>演员库</h2>
+    <p class="lock-hint">数据已加密，请输入访问密码</p>
+    <form id="lock-form" autocomplete="off">
+      <input id="lock-pw" type="password" inputmode="text" placeholder="密码" autocomplete="current-password" required>
+      <button id="lock-go" type="submit">解锁</button>
+    </form>
+    <p id="lock-msg" class="lock-msg"></p>
+  </div>
+</div>
+
 <header class="topbar">
   <div class="brand">
     <span class="mark"></span>
@@ -149,6 +164,7 @@
   </div>
 </div>
 
+<script src="assets/lock.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/tables.js"></script>
 </body>

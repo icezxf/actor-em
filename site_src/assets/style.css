@@ -558,3 +558,38 @@ main { padding: 12px 20px 40px; }
   .modal-card { max-height: 95vh; }
   .m-thumb { width: 80px; height: 106px; }
 }
+
+/* ---------- 密码锁屏 ---------- */
+.lock {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+.lock[hidden] { display: none; }
+.lock-card { width: min(340px, 100%); text-align: center; }
+.lock-mark {
+  width: 44px; height: 44px; margin: 0 auto 14px;
+  border-radius: 12px; background: var(--accent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.lock-card h2 { margin: 0 0 6px; font-size: 20px; }
+.lock-hint { margin: 0 0 20px; font-size: 13px; color: var(--muted); }
+.lock-card form { display: flex; flex-direction: column; gap: 10px; }
+.lock-card input {
+  width: 100%; padding: 12px 14px;
+  font-size: 16px;                 /* ≥16px 防 iOS 聚焦放大 */
+  color: var(--text); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 10px; outline: none;
+}
+.lock-card input:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.lock-card button {
+  min-height: 46px; font-size: 15px; font-weight: 600;
+  color: #fff; background: var(--accent);
+  border: 0; border-radius: 10px; cursor: pointer;
+}
+.lock-card button:active { opacity: .85; }
+.lock-msg { min-height: 18px; margin: 12px 0 0; font-size: 13px; color: #c0392b; }

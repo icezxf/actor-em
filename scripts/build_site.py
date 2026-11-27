@@ -265,7 +265,7 @@ def main() -> int:
 
     for name in ("index.html",):
         shutil.copyfile(os.path.join(SRC_DIR, name), os.path.join(OUT_DIR, name))
-    for name in ("app.js", "tables.js", "style.css"):
+    for name in ("lock.js", "app.js", "tables.js", "style.css"):
         shutil.copyfile(os.path.join(SRC_DIR, "assets", name),
                         os.path.join(OUT_DIR, "assets", name))
 
