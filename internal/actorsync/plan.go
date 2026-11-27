@@ -260,8 +260,13 @@ func BuildActor(name string, res *FetchResult, existing *Actor) *Actor {
 		displayName = res.ChineseName
 	}
 
-	// name_original 存数据源返回的原始名（日文原名），和清单里的名字不同才有价值
+	// name_original 存数据源返回的原始名（日文原名），和清单里的名字不同才有价值。
+	// UUID 清单模式下清单名是 StashDB 的 ID，绝不能当 original——
+	// 用数据源返回的真实英文名；后面「与 displayName 相同就清空」会处理掉重复。
 	origName := res.NameOriginal
+	if IsUUID(name) {
+		origName = res.CanonicalName
+	}
 	if res.CanonicalName != "" && NormalizeName(res.CanonicalName) != NormalizeName(displayName) {
 		origName = res.CanonicalName
 	}

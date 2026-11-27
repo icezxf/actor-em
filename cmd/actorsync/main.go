@@ -459,9 +459,9 @@ func main() {
 		logger.Printf("dry-run 结束：处理 %d 个，未写本地文件", len(plan))
 		return
 	}
-	// 存量自愈：出生地补国家、罩杯进标签。两件都是幂等纯离线操作，
-	// 放在每轮收尾，老库不必专门跑一次 backfill 也能对齐口径。
-	placeFixed, cupFixed := 0, 0
+	// 存量自愈：出生地补国家、罩杯进标签、清掉误存成 UUID 的 name_original。
+	// 都是幂等纯离线操作，放在每轮收尾，老库不必专门跑一次 backfill 也能对齐口径。
+	placeFixed, cupFixed, uuidFixed := 0, 0, 0
 	for _, a := range db.Actors {
 		if actorsync.QualifyActorBirthPlace(a) {
 			placeFixed++
@@ -469,6 +469,12 @@ func main() {
 		if actorsync.EnsureActorCupTag(a) {
 			cupFixed++
 		}
+		if actorsync.ClearUUIDOriginal(a) {
+			uuidFixed++
+		}
+	}
+	if uuidFixed > 0 {
+		logger.Printf("清理 UUID 原名：%d 条（name_original 误存成 StashDB ID）", uuidFixed)
 	}
 	if placeFixed > 0 {
 		logger.Printf("出生地补国家：%d 条（都道府县级 → 「日本·东京都」）", placeFixed)

@@ -79,6 +79,17 @@ const (
 	StatusSkipped  = "skipped"   // 不是目标演员（男性等），留档但不再抓、不导出
 )
 
+// ClearUUIDOriginal 清掉「name_original 里存成 UUID」的错误值。
+// 早期 UUID 清单模式把 StashDB ID 误写进了 name_original；那不是演员原名，
+// 留着会让详情页显示一串 UUID、搜索和对照都错。幂等，返回是否改动。
+func ClearUUIDOriginal(a *Actor) bool {
+	if a == nil || a.NameOriginal == nil || !IsUUID(*a.NameOriginal) {
+		return false
+	}
+	a.NameOriginal = nil
+	return true
+}
+
 // Exportable 表示这条记录该不该交给下游（actors.json / Emby 刮削）。
 //
 // 只有拿到过数据的记录才算数：
