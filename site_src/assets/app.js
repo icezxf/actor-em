@@ -66,7 +66,8 @@
     mAvatarNote: document.getElementById('m-avatar-note')
   };
 
-  var state = { q: '', source: '', cup: '', height: '', region: '', country: '', sort: 'name', tag: '', onlyAvatar: false };
+  // 默认：只显示日系、按人气排序（用户希望打开就看到最热的日系演员）
+  var state = { q: '', source: 'jp', cup: '', height: '', region: '', country: '', sort: 'popularity', tag: '', onlyAvatar: false };
   var all = [];
   var view = [];
   var shown = 0;
