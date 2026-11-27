@@ -47,7 +47,7 @@ on:
 permissions:
   contents: write
 
-# 与 base-db、tg-command 共用一个 group，避免同时写数据文件
+# 与 base-db、actor-add 共用一个 group，避免同时写数据文件
 concurrency:
   group: actor-data
   cancel-in-progress: false

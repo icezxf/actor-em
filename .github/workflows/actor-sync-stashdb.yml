@@ -19,8 +19,8 @@ on:
   workflow_dispatch:
     inputs:
       limit:
-        description: "本轮最多处理多少个（0=不限；调试建议 10~100，全铺分批）"
-        default: "10"
+        description: "本轮最多处理多少个新人（0=不限；日常增量 500）"
+        default: "500"
       concurrency:
         description: "并发抓取数"
         default: "6"
@@ -29,9 +29,9 @@ on:
         type: boolean
         default: false
       dry_run:
-        description: "只打印不写文件"
+        description: "只打印不写文件（验证时勾，日常保持关）"
         type: boolean
-        default: true
+        default: false
       refresh_stored:
         description: "只重抓库内已存记录（让新字段/英文简介对存量生效，不抓新人；配合 limit 控制条数）"
         type: boolean

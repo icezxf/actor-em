@@ -1,0 +1,98 @@
+name: actor-add
+
+# 单独新增/刷新一个日系演员：只填名字，走完整日系刮削（和批量同步同一套逻辑）。
+# 不在库里就新增，在库里就覆盖刷新；名字不在字典里也能抓。
+# 用法：gh workflow run actor-add.yml --repo icezxf/actor-em -f name="小凑四叶"
+
+run-name: "[新增演员] ${{ inputs.name }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "演员名（中文名/日文名/罗马字均可；多个用逗号分隔）"
+        required: true
+        type: string
+      dry_run:
+        description: "只打印结果、不写文件（先验证可勾）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ① 校验字典与清单
+        run: |
+          for f in actor_dict.csv actors.txt; do
+            if [ ! -f "$f" ]; then echo "::error::缺少 $f"; exit 1; fi
+          done
+          echo "演员名：${{ inputs.name }}"
+
+      - name: ② 单独刮削（完整数据源）
+        env:
+          NAME: ${{ inputs.name }}
+          DRY: ${{ inputs.dry_run }}
+          TPDB_API_KEY: ${{ secrets.TPDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          WIKI_EMAIL: ${{ secrets.WIKI_EMAIL }}
+          MDCX_CSV: /tmp/mdcx_profiles.csv
+          GFRIENDS: "1"
+          THEACTORBASE: "1"
+          DRAMAFACE: "0"
+          YINRENLU: "0"
+          CINEWHO: "0"
+          IDOLDB: "0"
+          CASTWIKI: "0"
+          WIKI_EN: "1"
+        run: |
+          # 和日系批量同步用同一套数据源，字段不会残
+          python3 scripts/export_profiles.py -o /tmp/mdcx_profiles.csv
+          go build -o /tmp/actorsync ./cmd/actorsync
+          ARGS=(--refresh "$NAME" --limit 20 --no-xlsx)
+          if [ "$DRY" = "true" ]; then ARGS+=(--dry-run); fi
+          /tmp/actorsync "${ARGS[@]}"
+
+      - name: ③ 提交（仅非 dry-run）
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for f in actors.jsonl actors.json actors.manifest.json; do
+            [ -e "$f" ] && git add -- "$f" || true
+          done
+          if git diff --cached --quiet; then echo "无变化"; exit 0; fi
+          git commit -m "feat(actor): add/refresh ${{ inputs.name }}"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main >/dev/null 2>&1 || true
+            if git push; then echo "已推送"; exit 0; fi
+            sleep 5
+          done
+          exit 1
+
+      - name: ④ 重建页面
+        if: ${{ inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" || true

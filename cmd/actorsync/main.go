@@ -167,7 +167,7 @@ func main() {
 		}
 	}
 	// --refresh 里的人如果压根不在清单里（字典没收录、也没写进 actors.txt，
-	// 比如临时想起一个人或者是从 Telegram 抓过的），先补进清单再算计划：
+	// 比如手动新增一个演员），先补进清单再算计划：
 	// 库里有记录就走「刷新」，没有就走「新增」。
 	// 不补的话 BuildPlan 只遍历清单，手输的名字会被静默忽略。
 	if len(refreshNames) > 0 {
@@ -874,7 +874,6 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 	return fetcher
 }
 
-// runTelegramServe 常驻运行交互服务：长轮询收消息，发名字即走完整刮削并回候选图。
 //
 // 注意：同一个 bot token 只能有一个 getUpdates 客户端。跑这个服务时，
 // 批量同步那边要把 ACTORS_REVIEW_MAX 设成 0，否则两边会抢 update（409 Conflict）。
