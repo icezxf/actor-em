@@ -194,6 +194,10 @@ main { padding: 12px 20px 40px; }
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
+  /* 首字母 .initial 是绝对定位的兜底占位，会盖在普通流元素上，
+     这里把图片抬起来，图片正常时看不到那层字 */
+  position: relative;
+  z-index: 1;
 }
 
 .thumb img.hide, .m-thumb img.hide { display: none; }
@@ -606,6 +610,7 @@ main { padding: 12px 20px 40px; }
   border: 2px solid var(--panel); border-radius: 50%;
   cursor: pointer; padding: 0;
   box-shadow: 0 2px 8px rgba(16, 24, 40, .28);
+  z-index: 2;
 }
 .thumb-pick:hover { filter: brightness(1.08); }
 .thumb-pick svg { display: block; }
@@ -618,6 +623,7 @@ main { padding: 12px 20px 40px; }
   border: 0; border-radius: 7px;
   cursor: pointer; padding: 0;
   opacity: .9;
+  z-index: 2;
 }
 .card-pick:hover { background: var(--accent); opacity: 1; }
 .card-pick svg { display: block; }
