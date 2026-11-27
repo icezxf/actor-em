@@ -34,6 +34,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SHARDS = 128
 MAX_IMAGES = 6           # 每人最多存多少张，控制体积（6 张已够选）
 WORKERS = 8
+BATCH = 50               # 一次 GraphQL 查多少个演员（实测 100 也可以，50 更稳）
 UA = "actor-em/1.0 (https://github.com/icezxf/actor-em)"
 
 SITES = {
@@ -65,17 +66,30 @@ def shard_of(pid: str) -> int:
     return sum(ord(c) for c in pid) % SHARDS
 
 
-def fetch_images(url: str, api_key: str, pid: str, retries: int = 3) -> list[str] | None:
-    body = json.dumps({"query": QUERY, "variables": {"id": pid}})
+def fetch_batch(url: str, api_key: str, pids: list[str], retries: int = 3) -> dict[str, list[str]] | None:
+    """一次 GraphQL 请求查一批演员（别名并行），返回 {pid: [urls]}。
+
+    stash-box 的 findPerformer 每个查询只能查一个 ID，但 GraphQL 允许用别名
+    在一个请求里并列多个查询。实测 100 个别名也没问题——原来一个人一次请求要
+    7 万次调用，现在 50 个一批只要 1400 次，从 ~80 分钟降到几分钟。
+    """
+    parts, variables = [], {}
+    for i, pid in enumerate(pids):
+        parts.append(f"p{i}: findPerformer(id: $id{i}) {{ id images {{ url }} }}")
+        variables[f"id{i}"] = pid
+    decls = ",".join(f"$id{i}: ID!" for i in range(len(pids)))
+    query = f"query({decls}) {{ " + " ".join(parts) + " }"
+    body = json.dumps({"query": query, "variables": variables})
+
     for attempt in range(retries):
         try:
             raw = subprocess.run(
-                ["curl", "-s", "--ipv4", "--max-time", "30", url,
+                ["curl", "-s", "--ipv4", "--max-time", "60", url,
                  "-H", "Content-Type: application/json",
                  "-H", f"ApiKey: {api_key}",
                  "-H", f"User-Agent: {UA}",
                  "--data-binary", body],
-                capture_output=True, text=True, timeout=40,
+                capture_output=True, text=True, timeout=80,
             ).stdout
             if not raw.strip():
                 time.sleep(1.5 * (attempt + 1))
@@ -84,13 +98,15 @@ def fetch_images(url: str, api_key: str, pid: str, retries: int = 3) -> list[str
             if data.get("errors"):
                 time.sleep(1.5 * (attempt + 1))
                 continue
-            fp = (data.get("data") or {}).get("findPerformer")
-            if not fp:
-                return []          # 查无此人
-            return [img["url"] for img in (fp.get("images") or []) if img.get("url")]
+            payload = data.get("data") or {}
+            out: dict[str, list[str]] = {}
+            for i, pid in enumerate(pids):
+                node = payload.get(f"p{i}")
+                out[pid] = [img["url"] for img in ((node or {}).get("images") or []) if img.get("url")]
+            return out
         except Exception:
             time.sleep(1.5 * (attempt + 1))
-    return None                    # 失败（不写缓存，下轮再试）
+    return None                    # 整批失败（不写缓存，下轮再试）
 
 
 def load_ids(db_path: str, pid_field: str) -> list[str]:
@@ -150,19 +166,22 @@ def run_site(name: str, cfg: dict, limit: int, no_fetch: bool = False) -> None:
     print(f"[{name}] 库内 {len(ids)} 个 ID，缓存 {len(cache)}，本轮拉 {len(todo)}", file=sys.stderr)
 
     done = 0
-    if todo:
+    batches = [todo[i:i + BATCH] for i in range(0, len(todo), BATCH)]
+    if batches:
+        print(f"[{name}] 分 {len(batches)} 批（每批 {BATCH}）", file=sys.stderr)
         with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-            futures = {ex.submit(fetch_images, cfg["url"], api_key, pid): pid for pid in todo}
+            futures = {ex.submit(fetch_batch, cfg["url"], api_key, b): b for b in batches}
             for fut in as_completed(futures):
-                pid = futures[fut]
+                batch = futures[fut]
                 try:
-                    imgs = fut.result()
+                    got = fut.result()
                 except Exception:
-                    imgs = None
-                if imgs is not None:
-                    cache[pid] = imgs[:MAX_IMAGES]
-                done += 1
-                if done % 500 == 0:
+                    got = None
+                if got is not None:
+                    for pid, imgs in got.items():
+                        cache[pid] = imgs[:MAX_IMAGES]
+                done += len(batch)
+                if done % 1000 < BATCH:
                     print(f"[{name}] {done}/{len(todo)}", file=sys.stderr)
 
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
