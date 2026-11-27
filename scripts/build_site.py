@@ -221,8 +221,8 @@ def build_rows(rows: list[dict], src: str = "jp"):
             pid = (pids.get(site) or "").strip()
             if pid:
                 links.append([site, tmpl.format(pid)])
-        if bio or home or links:
-            details[idx % DETAIL_SHARDS][str(idx)] = [bio, home, links]
+        # 第 4 项存 key：选图提交时要回写数据库主键（放详情分片，不进主索引省体积）
+        details[idx % DETAIL_SHARDS][str(idx)] = [bio, home, links, a.get("key") or ""]
     return out, details
 
 
@@ -322,6 +322,22 @@ def main() -> int:
 
     with open(os.path.join(OUT_DIR, "data", "meta.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
+
+    # gfriends 候选图分片索引：详情页「换头像」时按名字哈希只拉一片（每片几十 KB）。
+    # 索引 6.3MB 不适合前端全量加载，所以构建时切好片。失败不影响主站。
+    try:
+        import subprocess
+        r = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "scripts", "build_gfriends_index.py")],
+            capture_output=True, text=True, timeout=300,
+        )
+        if r.returncode == 0:
+            for line in (r.stderr or "").strip().splitlines()[-1:]:
+                print(line)
+        else:
+            print(f"跳过 gfriends 索引：{r.stderr.strip()[:200]}", file=sys.stderr)
+    except Exception as e:
+        print(f"跳过 gfriends 索引：{e}", file=sys.stderr)
 
     size = os.path.getsize(data_path)
     print(f"演员 {len(data_rows)} 条（源 {len(rows)} 条）→ {data_path} ({size/1024/1024:.2f} MB)")

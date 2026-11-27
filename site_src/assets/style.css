@@ -443,3 +443,25 @@ main { padding: 12px 20px 40px; }
 }
 
 .linkish:hover { border-color: var(--accent); color: var(--accent); }
+
+/* 详情页「换头像」候选网格 */
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.avatar-cell {
+  padding: 0; border: 2px solid transparent; border-radius: 8px;
+  background: var(--chip); cursor: pointer; overflow: hidden;
+  aspect-ratio: 3 / 4; display: block;
+}
+.avatar-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar-cell.on { border-color: var(--accent); }
+.avatar-cell.broken { opacity: .25; }
+.pick-submit {
+  grid-column: 1 / -1; margin-top: 6px; padding: 9px 12px;
+  font-size: 13px; border-radius: 9px; cursor: pointer;
+  color: #fff; background: var(--accent); border: none;
+}
+.pick-submit:disabled { opacity: .45; cursor: not-allowed; }

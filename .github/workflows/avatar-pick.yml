@@ -1,0 +1,110 @@
+name: avatar-pick
+
+# 处理静态站「换头像」提交：读取 [avatar] 开头的 issue，把选中的图片写进
+# data/avatar_choices.json（人工裁决结果，优先级最高），然后同步应用到数据库。
+#
+# issue 正文格式（由页面自动生成）：
+#   key: stashdb:xxxx-...
+#   name: 某人
+#   image: https://...
+#
+# 只在 issue 打开且标题以 [avatar] 开头时触发；处理完关 issue 并留评论。
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: startsWith(github.event.issue.title, '[avatar]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ① 解析 issue
+        id: parse
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          python3 - <<'PY'
+          import os, re, json
+          body = os.environ.get("ISSUE_BODY", "")
+          def grab(label):
+              m = re.search(rf"^{label}\s*:\s*(\S+)\s*$", body, re.M)
+              return m.group(1).strip() if m else ""
+          key, name, image = grab("key"), grab("name"), grab("image")
+          ok = bool(key and image and image.startswith("http"))
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"ok={'true' if ok else 'false'}\n")
+              f.write(f"key={key}\n")
+              f.write(f"image={image}\n")
+              f.write(f"name={name}\n")
+          print(f"key={key} name={name} image={image[:80]} ok={ok}")
+          PY
+
+      - name: ② 写入 avatar_choices.json
+        if: steps.parse.outputs.ok == 'true'
+        env:
+          KEY: ${{ steps.parse.outputs.key }}
+          IMAGE: ${{ steps.parse.outputs.image }}
+        run: |
+          mkdir -p data
+          python3 - <<'PY'
+          import json, os, datetime
+          path = "data/avatar_choices.json"
+          try:
+              doc = json.load(open(path, encoding="utf-8"))
+          except Exception:
+              doc = {"version": 1, "choices": {}}
+          doc.setdefault("version", 1)
+          doc.setdefault("choices", {})[os.environ["KEY"]] = {
+              "url": os.environ["IMAGE"],
+              "at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "source": "pages",
+          }
+          with open(path, "w", encoding="utf-8") as f:
+              json.dump(doc, f, ensure_ascii=False, indent=2)
+              f.write("\n")
+          print(f"已记录 {os.environ['KEY']} → {os.environ['IMAGE'][:80]}")
+          PY
+
+      - name: ③ 提交
+        if: steps.parse.outputs.ok == 'true'
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/avatar_choices.json
+          if git diff --cached --quiet; then echo "无变化"; exit 0; fi
+          git commit -m "feat(avatar): pick from pages for ${{ steps.parse.outputs.key }}"
+          git pull --rebase --autostash origin main || true
+          git push || (sleep 5 && git pull --rebase --autostash origin main && git push)
+
+      - name: ④ 关闭 issue 并回复
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUM: ${{ github.event.issue.number }}
+          OK: ${{ steps.parse.outputs.ok }}
+          KEY: ${{ steps.parse.outputs.key }}
+        run: |
+          if [ "$OK" = "true" ]; then
+            MSG="已记录：\`$KEY\` 改用选中的头像。下次同步会写进数据库。"
+          else
+            MSG="解析失败：正文里需要有 \`key:\` 和 \`image:\` 两行。"
+          fi
+          gh issue comment "$NUM" --repo "${{ github.repository }}" --body "$MSG" || true
+          gh issue close "$NUM" --repo "${{ github.repository }}" || true

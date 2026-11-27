@@ -60,7 +60,10 @@
     mAliases: document.getElementById('m-aliases'),
     mBio: document.getElementById('m-bio'),
     mLinks: document.getElementById('m-links'),
-    mXref: document.getElementById('m-xref')
+    mXref: document.getElementById('m-xref'),
+    mPickAvatar: document.getElementById('m-pick-avatar'),
+    mAvatarGrid: document.getElementById('m-avatar-grid'),
+    mAvatarNote: document.getElementById('m-avatar-note')
   };
 
   var state = { q: '', source: '', cup: '', height: '', region: '', country: '', sort: 'name', tag: '', onlyAvatar: false };
@@ -90,6 +93,101 @@
   // 详情分片：简介和主页链接单独按需拉，首屏索引小一半
   var DETAIL_SHARDS = 16;
   var detailCache = {};
+
+  // gfriends 候选图：按演员名哈希取分片（每片几十 KB），只在前端点「换头像」时拉。
+  // 哈希算法必须与 scripts/build_gfriends_index.py 的 shard_of() 完全一致。
+  var GFRIENDS_SHARDS = 128;
+  var gfriendsCache = {};
+
+  function gfriendsShard(name) {
+    var s = 0;
+    for (var i = 0; i < name.length; i++) s += name.charCodeAt(i);
+    return s % GFRIENDS_SHARDS;
+  }
+
+  function loadGfriends(name, cb) {
+    var shard = gfriendsShard(name);
+    if (gfriendsCache[shard]) {
+      cb(gfriendsCache[shard][name] || []);
+      return;
+    }
+    fetch('data/gfriends/' + shard + '.json')
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .catch(function () { return {}; })
+      .then(function (data) {
+        gfriendsCache[shard] = data;
+        cb(data[name] || []);
+      });
+  }
+
+  // 选图：展示候选网格，点一张后生成 GitHub issue 链接（含 key + 图片 URL）。
+  // 仓库 owner 提交 issue 后，workflow 会写回 avatar_choices.json。
+  var REPO_URL = 'https://github.com/icezxf/actor-em';
+
+  function renderAvatarPicker(a, key) {
+    var grid = el.mAvatarGrid;
+    grid.textContent = '';
+    el.mAvatarNote.textContent = '加载候选图…';
+
+    // 多个候选名都试：主名、原名、别名（gfriends 按日文名存图）
+    var names = [a.name, a.orig].concat(a.aliases || []).filter(function (n, i, arr) {
+      return n && arr.indexOf(n) === i;
+    });
+    var found = [];
+    var pending = names.length;
+    if (!pending) { el.mAvatarNote.textContent = '没有可用的候选来源。'; return; }
+
+    names.forEach(function (n) {
+      loadGfriends(n, function (urls) {
+        urls.forEach(function (u) { if (found.indexOf(u) < 0) found.push(u); });
+        if (--pending === 0) drawGrid(found);
+      });
+    });
+
+    function drawGrid(urls) {
+      if (!urls.length) {
+        el.mAvatarNote.textContent = 'gfriends 里没有这个人的图。';
+        return;
+      }
+      el.mAvatarNote.textContent = '共 ' + urls.length + ' 张（gfriends）。点一张选中，再点下方按钮提交。';
+      var selectedUrl = '';
+      var pickBtn = document.createElement('button');
+      pickBtn.type = 'button';
+      pickBtn.className = 'pick-submit';
+      pickBtn.textContent = '用这张 → 提交';
+      pickBtn.disabled = true;
+      pickBtn.addEventListener('click', function () {
+        if (!selectedUrl) return;
+        var title = '[avatar] ' + a.name + ' (' + a.id + ')';
+        var body = 'key: ' + (key || '') + '\nname: ' + a.name + '\nimage: ' + selectedUrl;
+        window.open(REPO_URL + '/issues/new?title=' + encodeURIComponent(title) +
+          '&body=' + encodeURIComponent(body), '_blank');
+      });
+
+      urls.forEach(function (u, i) {
+        var cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'avatar-cell';
+        cell.title = '第 ' + (i + 1) + ' 张';
+        var img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = u;
+        img.alt = a.name + ' 候选 ' + (i + 1);
+        img.addEventListener('error', function () { cell.classList.add('broken'); });
+        cell.appendChild(img);
+        cell.addEventListener('click', function () {
+          Array.prototype.forEach.call(grid.querySelectorAll('.avatar-cell'), function (n) {
+            n.classList.remove('on');
+          });
+          cell.classList.add('on');
+          selectedUrl = u;
+          pickBtn.disabled = false;
+        });
+        grid.appendChild(cell);
+      });
+      grid.appendChild(pickBtn);
+    }
+  }
 
   function loadDetail(id, cb) {
     var shard = id % DETAIL_SHARDS;
@@ -298,6 +396,11 @@
   function openDetail(a) {
     detailToken++;
     var token = detailToken;
+    // 选图区域每次重开都清空，点「换头像」才加载
+    el.mAvatarGrid.textContent = '';
+    el.mAvatarNote.textContent = '点「换头像」查看候选图。';
+    var detailKey = '';
+    el.mPickAvatar.onclick = function () { renderAvatarPicker(a, detailKey); };
     el.mName.textContent = a.name;
     el.mOrig.textContent = a.orig && a.orig !== a.name ? a.orig : '';
     el.mInitial.textContent = (a.name || '?').slice(0, 1);
@@ -333,6 +436,7 @@
     el.mLinks.textContent = '';
     loadDetail(a.id, function (d) {
       if (token !== detailToken) return; // 弹层已经换成别人了，别覆盖
+      detailKey = (d && d[3]) || '';     // 选图写回要用的数据库主键
       var bio = (d && d[0]) ? d[0] : '';
       el.mBio.textContent = bio || '暂无简介。';
       // 英文简介标个来源，免得和中文口径混淆
