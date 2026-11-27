@@ -1,4 +1,10 @@
 {
   "version": 1,
-  "choices": {}
+  "choices": {
+    "javstash:c9eb9861-cf10-4c0a-a173-479ba5188b55": {
+      "url": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/7-Madonna/波多野結衣.jpg",
+      "at": "2026-11-27T08:33:49Z",
+      "source": "pages"
+    }
+  }
 }
