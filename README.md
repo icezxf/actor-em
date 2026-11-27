@@ -31,14 +31,10 @@
 |---|---|---|---|
 | `base-db.yml` | 合并 amane 映射表 + MDCx `actor-mapping` 成中文字典；并把 MDCx 两个库导成档案宽表 | 手动（可勾 `force` 忽略缓存） | `actor_dict.csv`、`mdcx_profiles.csv`、`data/base_sources.json` |
 | `actor-sync.yml` | 导出 MDCx 档案 → 多源刮削 → 落库 → 派生 JSON/Excel | 每天 04:00 UTC + 手动（`limit`/`concurrency`/`dry_run`/`refresh`/`refresh_all`/`fill_missing`/`fill_fields`/`fill_order`/`fill_min_age`/`backfill`） | 入库 `actors.jsonl`、`actors.json`、`actors.manifest.json`；Excel 走 artifact |
-| `tg-command.yml` | 处理一条 Telegram update：刮削 → 发候选图 → 换图 → 提交状态 | Cloudflare Worker 派发 | 同上（按需） |
 | `pages.yml` | 把 `actors.jsonl` 派生成静态站并发 GitHub Pages | 模板/脚本改动、`actor-sync` 跑完、手动 | Pages（`site/` 不入库） |
 
-`base-db` 是**前置条件**：它没跑过，`actor-sync` 和 `tg-command` 都会在「Check dictionary」那步直接失败。
+`base-db` 是**前置条件**：它没跑过，`actor-sync` 会在「Check dictionary」那步直接失败。
 
-三者共用 `concurrency: actor-data`，不会同时写数据。`tg-command` 的环境变量与
-`actor-sync` 保持一致（同样挂 `MDCX_CSV` / `GFRIENDS` / `THEACTORBASE`），
-否则从 Telegram 里发名字刮出来的人会缺一头一尾——没有出生地/罩杯/出道年/标签/头像。
 
 增量都靠指纹，不变就不提交：
 
@@ -216,17 +212,12 @@ actorsync [flags]
   --fill-fields 字段   配合 --fill-missing，逗号分隔；留空=全部可补字段
   --fill-order 顺序    挑人顺序：complete=最完整优先（默认，产出最高）/ missing=缺得最多优先 / name
   --fill-min-age N     补过的记退避 N 天，N 天内不再重抓，让队列往后走（0=不跳过）
-  --review-max 6       每轮最多发几个人到 Telegram 等选择（0 = 关闭）
   --xlsx actors.xlsx   导出 Excel 的路径
   --no-xlsx            不导出 Excel
   --verbose            打印每个源的命中情况
   --data / --manifest  自定义文件路径
 
-  # 常驻交互服务：在 Telegram 里发名字即时刮削（Ctrl+C 退出）
-  --tg-serve
 
-  # 处理一条 Telegram update JSON 后退出（CF Worker + Actions 用）
-  --tg-once '{"update_id":1,"message":{...}}'
 ```
 
 ### 清单从哪来
@@ -371,137 +362,12 @@ gfriends 覆盖 66.5%（14,188 / 21,322），目录之间有优先级：
 `AI-Fix-*` 是 AI 修图过的版本，同一个人同时有两版时优先原图；只有 AI-Fix 版时才用。
 
 > 注意：数据源原图是 CDN 链接，部分带防盗链/签名，过一段时间可能 403。
-> 若头像失效，用下面的 Telegram 人工选图换一张即可。
+> 若头像失效，可在静态站点开演员，用名字旁的相机按钮换一张。
 
-## 人工选图（Telegram）
 
-自动取图永远是第一张，经常不是最好看的那张。三种用法，按部署条件选：
+## 人工选图（静态站）
 
-| 方式 | 延迟 | 需要什么 |
-| --- | --- | --- |
-| A 批量同步顺带问 | 下一轮（约一天） | 无额外部署 |
-| **B Cloudflare Worker** | 约 10–60 秒 | 一个 Worker + PAT，**不需要 NAS / 软路由 / VPS** |
-| C 常驻 `--tg-serve` | 即时 | 一台常开机器 |
-
-三者共用同一套 Bot 逻辑：发名字 → 完整刮削 → 发候选相册 → 点数字按钮换图。
-差别只在「消息怎么送进来」。
-
-**通用 Secret**（GitHub 仓库里）：
-
-| Secret | 说明 |
-| --- | --- |
-| `TELEGRAM_BOT_TOKEN` | @BotFather 申请 |
-| `TELEGRAM_CHAT_ID` | 你与 bot 的会话 id（或群 id） |
-| `TELEGRAM_API_BASE` | 可选。境内直连 `api.telegram.org` 不通时填反代地址 |
-
-交互行为（三种方式都一样）：
-
-- **在库的人**：刷新元数据并更新网络头像，候选第 1 张固定是当前正在用的那张
-- **不在库的人**：完整刮削补齐元数据（生日、身高、三围、简介、别名、来源 ID）后入库
-- **点按钮**：把选中图的网络地址写进头像 → 写 `actors.jsonl` → 记进
-  `avatar_choices.json`，以后同步不会再被自动图覆盖
-- 抓取失败但库里已有记录时**保留旧数据**，不会把好好的 `ok` 改成 `no_source`
-
-命令（B、C 支持）：
-
-| 命令 | 作用 |
-| --- | --- |
-| 直接发名字 | 刮削 + 发候选图 |
-| `/repick 名字` | 重抓并重新发候选（换掉已选的） |
-| `/status 名字` | 只看库里现状，不联网 |
-| `/list [关键词]` | 列出库里的人 |
-| `/id` | 告诉你当前会话 id，首次配置用 |
-| `/help` | 用法说明 |
-
-### 方式 A：批量同步里顺带问（零部署）
-
-**新演员**和**抓完仍没有头像的人**在批量同步收尾时把候选图发到你会话里。
-
-1. 收尾时相册发出，下面一排 `1 2 3 4 5` 按钮
-2. 你点一个。此时进程已退出，按钮会转圈到超时——但**点击已经进了 Telegram 的
-   updates 队列（保留 24 小时）**
-3. 下一轮启动：`getUpdates` 把点击取回来，写进 `data/avatar_choices.json`
-4. 之后这个人一律用你选的图的网络地址
-
-约束：每轮最多发 `ACTORS_REVIEW_MAX` 个（默认 6）；候选少于 2 张不发；
-想改主意就删掉 `data/avatar_choices.json` 里对应的 key。
-两个状态文件都要提交进仓库（workflow 已包含）。
-
-### 方式 B：Cloudflare Worker（无本地设备）
-
-Worker **只做两件事**：接 Telegram webhook、把 update 派发成 GitHub
-`repository_dispatch`。刮削仍在 Actions 里跑一次性命令 `--tg-once`，Worker
-不存状态、不需要 KV / D1 / R2，也不跑 Go。
-
-```
-Telegram ──webhook──> CF Worker ──repository_dispatch──> Actions (--tg-once)
-                                                          │
-                                                actors.jsonl / choices
-```
-
-**一次性部署**
-
-```bash
-cd worker
-npm install
-
-# 生成两个随机串，记下来
-openssl rand -hex 24   # 给 TELEGRAM_WEBHOOK_SECRET
-openssl rand -hex 24   # 给 SETUP_KEY
-
-npx wrangler secret put TELEGRAM_BOT_TOKEN
-npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
-npx wrangler secret put SETUP_KEY
-npx wrangler secret put GH_TOKEN     # classic PAT，勾 repo；用来触发 workflow
-npx wrangler deploy
-```
-
-然后在 Worker 上注册 webhook（`SETUP_KEY` 是你刚生成的那个）：
-
-```bash
-curl -X POST https://actor-em-tg.<你的子域>.workers.dev/setup \
-  -H "Authorization: Bearer $SETUP_KEY"
-```
-
-webhook 模式下**不需要配置 `TELEGRAM_CHAT_ID`**：回复目标自动从消息里取，
-所以给 bot 发名字就能直接收到候选图。给 bot 发 `/id` 会回你当前会话 id，
-把它填进 `worker/wrangler.toml` 的 `ALLOWED_CHAT_ID` 并重新
-`npx wrangler deploy`——这样别人给 bot 发消息不会白耗 Actions 额度。
-
-**注意**
-
-- `GH_TOKEN` 必须是 **classic PAT 且勾 `repo`**。用 `GITHUB_TOKEN` 触发的
-  dispatch 不会再触发 workflow。
-- Worker 注册 webhook 时带了 `drop_pending_updates: true`，会清掉旧消息；
-  这是为了避免和 `getUpdates` 冲突（见下）。
-- Actions 冷启动要 10–60 秒，所以发名字后不会"秒回"，点按钮也要等同样时间。
-- 每次点击都跑一遍 Actions，按量计费；`ALLOWED_CHAT_ID` 一定要设。
-- `actor-sync.yml` 里 `ACTORS_REVIEW_MAX` 应设为 `0`（webhook 与 getUpdates 互斥，
-  两边同时收会拿到 `409 Conflict` 并互相吃掉点击）。想用方式 A 就手动改回 `6`，
-  但**不要和 Worker 同时开**。
-- 本地调试单条消息：`actorsync --tg-once '{"update_id":1,"message":{...}}'`。
-
-### 方式 C：常驻交互服务（本地设备）
-
-```bash
-actorsync --tg-serve
-```
-
-用 25 秒长轮询收消息，是**客户端主动出站 HTTPS**，不需要公网 IP、证书或域名。
-家里 NAS、软路由、树莓派、任意 VPS 都能跑。`Dockerfile` 和 systemd 配置可用：
-
-```bash
-docker build -t actor-em .
-docker run -d --name actor-em --restart unless-stopped \
-  --env-file secrets.env \
-  -v "$PWD/actors.jsonl:/app/actors.jsonl" \
-  -v "$PWD/actor_dict.csv:/app/actor_dict.csv:ro" \
-  -v "$PWD/data:/app/data" \
-  actor-em
-```
-
-`actors.jsonl` 和 `data/` 必须挂进去——bot 会写这两个地方。
-同样要把批量那边的 `ACTORS_REVIEW_MAX` 设为 `0`，否则两边抢 update。
+点开演员详情 → 名字旁相机按钮 → 选一张候选图 → 提交。后台自动写回数据库并重建页面。
 
 ## GitHub Actions
 

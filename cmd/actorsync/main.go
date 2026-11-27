@@ -7,10 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 	"unicode"
 
@@ -28,8 +26,6 @@ func main() {
 		fillOrder   string
 		fillMinAge  int
 		noXlsx      bool
-		serveBot    bool
-		tgOnce      string
 		backfill    bool
 		stashList     string
 		refreshStored bool
@@ -53,9 +49,6 @@ func main() {
 	flag.BoolVar(&backfill, "backfill", false, "只用 MDCx 离线档案补空字段（生日/三围/标签/身高/罩杯/出道年），不联网、不需要 API Key")
 	// 老名字保留，脚本里还在用
 	flag.BoolVar(&backfill, "backfill-birthday", false, "同 --backfill（旧名）")
-	flag.IntVar(&cfg.ReviewMax, "review-max", cfg.ReviewMax, "每轮最多发几个人的候选图到 Telegram 等选择（0 = 关闭）")
-	flag.BoolVar(&serveBot, "tg-serve", false, "常驻运行 Telegram 交互服务：发名字即时刮削并回候选图")
-	flag.StringVar(&tgOnce, "tg-once", "", "处理一条 Telegram update JSON 后退出（供 CF Worker + Actions 使用）")
 	flag.StringVar(&stashList, "stash-list", "", "StashDB 欧美模式：UUID 清单文件（一行一个 UUID）；只用这份清单，不掺日系字典。配合 --data 写独立库")
 	flag.BoolVar(&applyChoices, "apply-choices", false, "把 data/avatar_choices.json 里人工选好的头像直接写进数据库（不联网、秒级），配合 --data 指定要改的库")
 	flag.BoolVar(&refreshStored, "refresh-stored", false, "配合 --stash-list+--data：只重抓库里已存的记录（用它们的 StashDB UUID 作清单），不碰清单里还没入库的新人。适合小批量让新字段/简介对存量生效")
@@ -90,16 +83,7 @@ func main() {
 			strings.Join(fillFieldList, ", "), fillOrd, fillMinAge)
 	}
 
-	// 交互服务要一直挂着，5 小时超时只适合一次批量同步
-	var (
-		ctx    context.Context
-		cancel context.CancelFunc
-	)
-	if serveBot {
-		ctx, cancel = signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	} else {
-		ctx, cancel = context.WithTimeout(context.Background(), 5*time.Hour)
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Hour)
 	defer cancel()
 
 	// 人工选图立即生效：把 choices 里的头像写进数据库，不联网
@@ -120,22 +104,6 @@ func main() {
 
 	if cfg.TPDBAPIKey == "" && cfg.JavStashAPIKey == "" && cfg.StashDBAPIKey == "" {
 		logger.Fatal("至少要配一个数据源 Key（TPDB / JavStash / StashDB），否则所有演员都会被判成 no_source")
-	}
-
-	// 交互服务不读 actors.txt，名字由消息给
-	if serveBot {
-		if err := runTelegramServe(ctx, cfg, logger); err != nil {
-			logger.Fatalf("交互服务退出: %v", err)
-		}
-		return
-	}
-
-	// Worker webhook 转来的一条 update：处理完就退出，给 Actions 用
-	if tgOnce != "" {
-		if err := runTelegramOnce(ctx, cfg, logger, tgOnce); err != nil {
-			logger.Fatalf("处理 Telegram update 失败: %v", err)
-		}
-		return
 	}
 
 	// ---------- 0. 准备抓取器（清单要读字典，字典在这里加载） ----------
@@ -181,51 +149,14 @@ func main() {
 		logger.Printf("演员清单：%d 个（%s）", len(names), cfg.NamesFile)
 	}
 
-	// ---------- 2.5 Telegram 人工选图：先把上一轮攒下的点击收回来 ----------
-	// StashDB 欧美模式不参与人工选图（清单是 UUID、独立库，避免和日系 update 队列串台）。
-	reviewOn := cfg.TelegramToken != "" && cfg.TelegramChatID != "" && cfg.ReviewMax > 0 && stashList == ""
-	var (
-		tg          *actorsync.TelegramClient
-		reviewState *actorsync.ReviewState
-		choices     *actorsync.Choices
-	)
-	if reviewOn {
-		tg = newTelegram(cfg)
-		reviewState, err = actorsync.LoadReviewState(cfg.ReviewStateFile)
-		if err != nil {
-			logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
-			reviewState = actorsync.NewReviewState(cfg.ReviewStateFile)
-		}
-		choices, err = actorsync.LoadChoices(cfg.ChoicesFile)
-		if err != nil {
-			logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
-			choices = actorsync.NewChoices(cfg.ChoicesFile)
-		}
-		if dropped := reviewState.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
-			logger.Printf("清理了 %d 条过期的待选记录", dropped)
-		}
-
-		applied, picked, perr := actorsync.CollectPicks(ctx, tg, reviewState, choices)
-		switch {
-		case perr != nil:
-			logger.Printf("⚠️  收取 Telegram 点击失败: %v", perr)
-		case applied > 0:
-			logger.Printf("收到 %d 个选图结果：%s", applied, strings.Join(picked, "、"))
-		}
-		if applied > 0 {
-			logger.Printf("人工选图库：%d 条（%s）", len(choices.Choices), cfg.ChoicesFile)
-		}
-		// offset 即使没收到点击也可能前进，必须落盘，否则同一批 update 会被反复拉取
-		if !cfg.DryRun {
-			if err := reviewState.Save(""); err != nil {
-				logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
-			}
-			if applied > 0 {
-				if err := choices.Save(""); err != nil {
-					logger.Printf("⚠️  保存 %s 失败: %v", cfg.ChoicesFile, err)
-				}
-			}
-		}
+	// ---------- 2.5 人工选图结果：网页选的头像优先级最高，抓取时直接套用 ----------
+	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
+	if err != nil {
+		logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
+		choices = actorsync.NewChoices(cfg.ChoicesFile)
+	}
+	if len(choices.Choices) > 0 {
+		logger.Printf("人工选图库：%d 条（%s）", len(choices.Choices), cfg.ChoicesFile)
 	}
 
 	// ---------- 3. 算本轮待抓名单 ----------
@@ -303,13 +234,6 @@ func main() {
 	srcStats := map[string]map[string]int{}
 	added, updated, failed, kept := 0, 0, 0, 0
 
-	// 需要人工挑图的人：新演员、或抓完仍然没有头像的
-	type reviewCand struct {
-		Key    string
-		Name   string
-		Images []string
-	}
-	var reviewQueue []reviewCand
 
 	// 并发抓取、串行落库：
 	// 网络请求是瓶颈（每个演员要串 5~6 个源），所以抓取开 N 个 worker；
@@ -394,15 +318,6 @@ func main() {
 			extra += "（保留旧值）"
 		}
 
-		// 只对「新演员」和「还没有头像的」发候选图；至少 2 张才值得问
-		if reviewOn && !cfg.DryRun && !out.Manual &&
-			len(reviewQueue) < cfg.ReviewMax &&
-			len(out.Candidates) >= 2 &&
-			(f.item.Reason == "new" || actor.Avatar == nil) &&
-			!reviewState.HasKey(out.Key) {
-			reviewQueue = append(reviewQueue, reviewCand{Key: out.Key, Name: actor.Name, Images: out.Candidates})
-		}
-
 		countSources(srcStats, f.res.Sources)
 
 		if cfg.DryRun {
@@ -436,33 +351,6 @@ func main() {
 	stats.Updated = updated
 	stats.Failed = failed
 
-	// ---------- 5.5 把需要挑图的人发给 Telegram ----------
-	if reviewOn && !cfg.DryRun && len(reviewQueue) > 0 {
-		sent := 0
-		for _, cand := range reviewQueue {
-			id := reviewState.NextID()
-			msgs, err := tg.SendCandidates(ctx, id, cand.Name, cand.Images)
-			if err != nil {
-				logger.Printf("⚠️  候选图发送失败（%s）: %v", cand.Name, err)
-				continue
-			}
-			reviewState.Add(actorsync.ReviewPending{
-				ID:       id,
-				Key:      cand.Key,
-				Name:     cand.Name,
-				Messages: msgs,
-				Images:   cand.Images,
-			})
-			sent++
-			time.Sleep(3 * time.Second) // 同一会话约 20 条/分钟，留点余量
-		}
-		if err := reviewState.Save(""); err != nil {
-			logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
-		}
-		if sent > 0 {
-			logger.Printf("已发送 %d 个人的候选图，等你选择（下次运行时生效）", sent)
-		}
-	}
 
 	// ---------- 6. 收尾 ----------
 	if cfg.DryRun {
@@ -836,17 +724,6 @@ func runBackfill(cfg *Config, logger *log.Logger) error {
 	return nil
 }
 
-// newTelegram 组装客户端；配了 TELEGRAM_API_BASE 就走反代
-// （国内直连 api.telegram.org 基本不通，常驻服务尤其需要这一点）。
-func newTelegram(cfg *Config) *actorsync.TelegramClient {
-	tg := actorsync.NewTelegramClient(cfg.TelegramToken, cfg.TelegramChatID)
-	if base := strings.TrimSpace(cfg.TelegramAPIBase); base != "" {
-		tg.APIBase = base
-	}
-	return tg
-}
-
-// mergeNames 把 extra 里还没出现过的名字追加到 names 尾部（按归一化名字去重）。
 func mergeNames(names, extra []string) []string {
 	seen := make(map[string]bool, len(names)+len(extra))
 	for _, n := range names {
@@ -1001,124 +878,6 @@ func buildFetcher(cfg *Config, hc *http.Client, logger *log.Logger) *actorsync.F
 //
 // 注意：同一个 bot token 只能有一个 getUpdates 客户端。跑这个服务时，
 // 批量同步那边要把 ACTORS_REVIEW_MAX 设成 0，否则两边会抢 update（409 Conflict）。
-func runTelegramServe(ctx context.Context, cfg *Config, logger *log.Logger) error {
-	if cfg.TelegramToken == "" || cfg.TelegramChatID == "" {
-		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN 和 TELEGRAM_CHAT_ID")
-	}
-
-	db, err := actorsync.LoadDb(cfg.DataFile)
-	if err != nil {
-		return fmt.Errorf("读取本地库失败: %w", err)
-	}
-	logger.Printf("本地库：%d 条（%s）", len(db.Actors), cfg.DataFile)
-
-	hc := &http.Client{Timeout: 30 * time.Second}
-	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
-	if err != nil {
-		logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
-		choices = actorsync.NewChoices(cfg.ChoicesFile)
-	}
-	state, err := actorsync.LoadReviewState(cfg.ReviewStateFile)
-	if err != nil {
-		logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
-		state = actorsync.NewReviewState(cfg.ReviewStateFile)
-	}
-	if dropped := state.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
-		logger.Printf("清理了 %d 条过期的待选记录", dropped)
-	}
-
-	engine := &actorsync.Engine{
-		DB:       db,
-		Fetcher:  buildFetcher(cfg, hc, logger),
-		Choices:  choices,
-		HTTP:     hc,
-		DataFile: cfg.DataFile,
-		Log:      logger.Printf,
-	}
-
-	logger.Printf("提示：同一个 bot token 只能有一个 getUpdates 客户端，批量同步那边请把 ACTORS_REVIEW_MAX 设为 0")
-
-	bot := &actorsync.Bot{
-		TG:       newTelegram(cfg),
-		Engine:   engine,
-		State:    state,
-		Choices:  choices,
-		ChatID:   cfg.TelegramChatID,
-		MaxNames: 10, // 一条消息最多处理 10 个：再多 Telegram 侧就该限流了
-		Log:      logger.Printf,
-	}
-	return bot.Run(ctx)
-}
-
-// runTelegramOnce 处理 Cloudflare Worker 转发来的一条 update 后退出。
-// 没有长轮询、不碰 getUpdates，因此可以和 webhook 共存，适合 GitHub Actions。
-func runTelegramOnce(ctx context.Context, cfg *Config, logger *log.Logger, raw string) error {
-	// webhook 模式：回复目标从 update 里取，不必预置 TELEGRAM_CHAT_ID；
-	// 若显式配置了 chat id，则 Bot 会额外把它当作来源白名单。
-	if cfg.TelegramToken == "" {
-		return fmt.Errorf("需要 TELEGRAM_BOT_TOKEN")
-	}
-
-	db, err := actorsync.LoadDb(cfg.DataFile)
-	if err != nil {
-		return fmt.Errorf("读取本地库失败: %w", err)
-	}
-	hc := &http.Client{Timeout: 30 * time.Second}
-	choices, err := actorsync.LoadChoices(cfg.ChoicesFile)
-	if err != nil {
-		logger.Printf("⚠️  读取 %s 失败，按空结果继续: %v", cfg.ChoicesFile, err)
-		choices = actorsync.NewChoices(cfg.ChoicesFile)
-	}
-	state, err := actorsync.LoadReviewState(cfg.ReviewStateFile)
-	if err != nil {
-		logger.Printf("⚠️  读取 %s 失败，按空状态继续: %v", cfg.ReviewStateFile, err)
-		state = actorsync.NewReviewState(cfg.ReviewStateFile)
-	}
-	if dropped := state.PruneExpired(7*24*time.Hour, time.Now().UTC()); dropped > 0 {
-		logger.Printf("清理了 %d 条过期的待选记录", dropped)
-	}
-
-	engine := &actorsync.Engine{
-		DB:       db,
-		Fetcher:  buildFetcher(cfg, hc, logger),
-		Choices:  choices,
-		HTTP:     hc,
-		DataFile: cfg.DataFile,
-		Log:      logger.Printf,
-	}
-	bot := &actorsync.Bot{
-		TG:         newTelegram(cfg),
-		Engine:     engine,
-		State:      state,
-		Choices:    choices,
-		ChatID:     cfg.TelegramChatID,
-		DeriveChat: true,
-		MaxNames:   10,
-		Log:        logger.Printf,
-	}
-
-	if err := bot.HandleUpdate(ctx, []byte(raw)); err != nil {
-		return err
-	}
-	// Bot 内部已经存过，这里再兜一次底：回调分支和异常路径都要落盘
-	if err := engine.Save(); err != nil {
-		return fmt.Errorf("保存数据失败: %w", err)
-	}
-	if err := state.Save(""); err != nil {
-		logger.Printf("⚠️  保存 %s 失败: %v", cfg.ReviewStateFile, err)
-	}
-	if err := choices.Save(""); err != nil {
-		logger.Printf("⚠️  保存 %s 失败: %v", cfg.ChoicesFile, err)
-	}
-	if !cfg.DryRun {
-		if err := actorsync.ExportXLSX(cfg.XlsxFile, db); err != nil {
-			logger.Printf("⚠️  导出 Excel 失败: %v", err)
-		}
-	}
-	logger.Printf("本次 update 处理完毕：库内 %d 条", len(db.Actors))
-	return nil
-}
-
 func writeManifest(logger *log.Logger, cfg *Config, db *actorsync.Db, stats actorsync.RunStats, srcStats map[string]map[string]int, start time.Time) {
 	stats.DurationSec = int(time.Since(start).Seconds())
 	m := actorsync.BuildManifest(db, stats, srcStats)

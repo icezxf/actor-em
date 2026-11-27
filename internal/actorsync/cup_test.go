@@ -13,7 +13,8 @@ func TestCupTag(t *testing.T) {
 		"Eカップ":    "E罩杯",
 		"E cup":   "E罩杯",
 		"":        "",
-		"AA":      "",
+		"AA":      "AA罩杯",  // 欧美双字母杯（与日系单字母共存）
+		"DDD":     "DDD罩杯", // 欧美三字母杯
 		"1":       "",
 		"unknown": "",
 	}

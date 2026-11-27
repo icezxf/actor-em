@@ -33,13 +33,8 @@ type Config struct {
 	// 演员清单（唯一来源，一行一个名字）
 	NamesFile string
 
-	// Telegram 人工选图（两个都配了才启用）
-	TelegramToken   string // TELEGRAM_BOT_TOKEN
-	TelegramChatID  string // TELEGRAM_CHAT_ID
-	TelegramAPIBase string // TELEGRAM_API_BASE，国内直连不通时填反代地址
-	ReviewStateFile string // 发图状态 + getUpdates 游标
+	// 人工选图结果（网页选图写入，优先级高于自动抓的头像）
 	ChoicesFile     string // 人工选中的结果
-	ReviewMax       int    // 每轮最多发几个人等选（限流保护）
 
 	// 本地文件
 	DataFile      string
@@ -66,9 +61,7 @@ func DefaultConfig() *Config {
 		DictLocalFile:    "data/actor_dict.local.csv",
 		NamesFile:        "actors.txt",
 		XlsxFile:         "actors.xlsx",
-		ReviewStateFile:  "data/avatar_review.json",
 		ChoicesFile:      "data/avatar_choices.json",
-		ReviewMax:        6,
 		Limit:            0,
 		Concurrency:      1,
 	}
@@ -116,16 +109,7 @@ func applyEnv(c *Config) {
 	set(&c.DictLocalFile, "ACTOR_DICT_LOCAL")
 	set(&c.XlsxFile, "ACTORS_XLSX")
 	set(&c.NamesFile, "ACTORS_TXT")
-	set(&c.TelegramToken, "TELEGRAM_BOT_TOKEN")
-	set(&c.TelegramChatID, "TELEGRAM_CHAT_ID")
-	set(&c.TelegramAPIBase, "TELEGRAM_API_BASE")
-	set(&c.ReviewStateFile, "ACTORS_REVIEW_STATE")
 	set(&c.ChoicesFile, "ACTORS_CHOICES")
-	if v := os.Getenv("ACTORS_REVIEW_MAX"); v != "" {
-		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
-			c.ReviewMax = n
-		}
-	}
 	if v := os.Getenv("ACTORS_LIMIT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil {
 			c.Limit = n
