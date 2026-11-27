@@ -263,8 +263,23 @@ def main() -> int:
     os.makedirs(os.path.join(OUT_DIR, "data", "detail"), exist_ok=True)
     os.makedirs(os.path.join(OUT_DIR, "assets"), exist_ok=True)
 
-    for name in ("index.html",):
-        shutil.copyfile(os.path.join(SRC_DIR, name), os.path.join(OUT_DIR, name))
+    # index.html 里的 js/css 加内容哈希版本号：
+    # GitHub Pages 的缓存很顽固，改了代码用户还是拿到旧文件（«一直是提交中» 就是这么来的）。
+    # 内容一变 URL 就变，浏览器必须重新下载；内容没变则继续用缓存。
+    import hashlib
+    h = hashlib.sha1()
+    for asset in ("lock.js", "app.js", "tables.js", "style.css"):
+        ap = os.path.join(SRC_DIR, "assets", asset)
+        if os.path.exists(ap):
+            with open(ap, "rb") as af:
+                h.update(af.read())
+    ver = h.hexdigest()[:10]
+    with open(os.path.join(SRC_DIR, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    for asset in ("lock.js", "app.js", "tables.js", "style.css"):
+        html = html.replace(f"assets/{asset}", f"assets/{asset}?v={ver}")
+    with open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(html)
     for name in ("lock.js", "app.js", "tables.js", "style.css"):
         shutil.copyfile(os.path.join(SRC_DIR, "assets", name),
                         os.path.join(OUT_DIR, "assets", name))

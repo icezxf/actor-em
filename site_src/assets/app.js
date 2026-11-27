@@ -194,16 +194,29 @@
           el.mAvatarNote.textContent = '缺少主键，无法提交（详情数据可能未加载完）';
           return;
         }
-        pickBtn.disabled = true;
-        pickBtn.textContent = '提交中…';
-        SiteLock.pickAvatar(key, selectedUrl).then(function () {
-          pickBtn.textContent = '已提交 ✓';
-          el.mAvatarNote.textContent = '已提交，约 1~2 分钟后页面会更新（后台正在写库并重建）。';
-        }).catch(function (err) {
+        function restore() {
           pickBtn.disabled = false;
           pickBtn.textContent = '用这张 → 提交';
-          el.mAvatarNote.textContent = '提交失败：' + (err && err.message ? err.message : err);
-        });
+        }
+        // 旧版 lock.js 没有 pickAvatar，调用会同步抛错并把按钮卡在「提交中」
+        if (!window.SiteLock || typeof window.SiteLock.pickAvatar !== 'function') {
+          el.mAvatarNote.textContent = '页面版本过旧，请强制刷新（手机：关掉标签页重开；电脑：Ctrl+Shift+R）';
+          return;
+        }
+        pickBtn.disabled = true;
+        pickBtn.textContent = '提交中…';
+        try {
+          SiteLock.pickAvatar(key, selectedUrl).then(function () {
+            pickBtn.textContent = '已提交 ✓';
+            el.mAvatarNote.textContent = '已提交，约 1~2 分钟后页面会更新（后台正在写库并重建）。';
+          }).catch(function (err) {
+            restore();
+            el.mAvatarNote.textContent = '提交失败：' + (err && err.message ? err.message : err);
+          });
+        } catch (e) {
+          restore();
+          el.mAvatarNote.textContent = '提交失败：' + (e && e.message ? e.message : e);
+        }
       });
 
       urls.forEach(function (u, i) {

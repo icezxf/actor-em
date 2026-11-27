@@ -86,12 +86,24 @@
       'raw', new TextEncoder().encode(pw), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
     );
     var sig = bytesToB64(await crypto.subtle.sign('HMAC', hk, new TextEncoder().encode(msg)));
-    var resp = await fetch(PICK_ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ key: key, image: image, ts: ts, sig: sig }),
-    });
-    var data = await resp.json().catch(function () { return {}; });
+    // Worker 要转调 GitHub API，正常 3~8 秒；15 秒还没回就明确失败，
+    // 不能让按钮永远停在「提交中」
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 15000);
+    var resp, data;
+    try {
+      resp = await fetch(PICK_ENDPOINT, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ key: key, image: image, ts: ts, sig: sig }),
+        signal: ctrl.signal,
+      });
+      data = await resp.json().catch(function () { return {}; });
+    } catch (e) {
+      throw new Error(e && e.name === 'AbortError' ? '请求超时（15 秒），请重试' : '网络错误，请重试');
+    } finally {
+      clearTimeout(timer);
+    }
     if (!resp.ok || !data.ok) {
       throw new Error(data.error || ('HTTP ' + resp.status));
     }
