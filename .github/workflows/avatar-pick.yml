@@ -1,14 +1,15 @@
 name: avatar-pick
 
-# 处理静态站「换头像」提交：读取 [avatar] 开头的 issue，把选中的图片写进
-# data/avatar_choices.json（人工裁决结果，优先级最高），然后同步应用到数据库。
+# 处理静态站「换头像」提交：读取 [avatar] 开头的 issue，把选中的图片
+# 写进 data/avatar_choices.json，**并立即应用到数据库**，最后重建页面。
 #
-# issue 正文格式（由页面自动生成）：
+# 为什么要有「立即应用」这一步：choices 原本只在「该演员被重新抓取」时才生效，
+# 所以用户点了选图、issue 也处理了，页面上的头像却一直不变。
+#
+# issue 正文格式（页面自动生成）：
 #   key: stashdb:xxxx-...
 #   name: 某人
 #   image: https://...
-#
-# 只在 issue 打开且标题以 [avatar] 开头时触发；处理完关 issue 并留评论。
 
 on:
   issues:
@@ -17,16 +18,18 @@ on:
 permissions:
   contents: write
   issues: write
+  actions: write      # 触发 pages 重建
 
+# 独立并发组：不要和抓取任务抢 actor-data，否则选图会被长时间任务堵住
 concurrency:
-  group: actor-data
+  group: avatar-pick
   cancel-in-progress: false
 
 jobs:
   apply:
     if: startsWith(github.event.issue.title, '[avatar]')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -35,13 +38,18 @@ jobs:
         with:
           python-version: "3.12"
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
       - name: ① 解析 issue
         id: parse
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           python3 - <<'PY'
-          import os, re, json
+          import os, re
           body = os.environ.get("ISSUE_BODY", "")
           def grab(label):
               m = re.search(rf"^{label}\s*:\s*(\S+)\s*$", body, re.M)
@@ -82,18 +90,41 @@ jobs:
           print(f"已记录 {os.environ['KEY']} → {os.environ['IMAGE'][:80]}")
           PY
 
-      - name: ③ 提交
+      - name: ③ 应用到两套库（立即生效，不重抓）
+        if: steps.parse.outputs.ok == 'true'
+        run: |
+          go build -o /tmp/actorsync ./cmd/actorsync
+          for db in actors.jsonl actors_eu.jsonl; do
+            if [ -f "$db" ]; then
+              echo "── $db ──"
+              /tmp/actorsync --apply-choices --data "$db" || echo "::warning::$db 应用失败"
+            fi
+          done
+
+      - name: ④ 提交（choices + 两套库）
         if: steps.parse.outputs.ok == 'true'
         run: |
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/avatar_choices.json
+          for f in data/avatar_choices.json actors.jsonl actors.json actors_eu.jsonl actors_eu.json; do
+            [ -e "$f" ] && git add -- "$f" || true
+          done
           if git diff --cached --quiet; then echo "无变化"; exit 0; fi
           git commit -m "feat(avatar): pick from pages for ${{ steps.parse.outputs.key }}"
-          git pull --rebase --autostash origin main || true
-          git push || (sleep 5 && git pull --rebase --autostash origin main && git push)
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main >/dev/null 2>&1 || true
+            if git push; then echo "已推送"; exit 0; fi
+            sleep 5
+          done
+          echo "::error::推送失败"; exit 1
 
-      - name: ④ 关闭 issue 并回复
+      - name: ⑤ 重建静态站
+        if: steps.parse.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" || echo "::warning::pages 触发失败"
+
+      - name: ⑥ 关闭 issue 并回复
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +133,7 @@ jobs:
           KEY: ${{ steps.parse.outputs.key }}
         run: |
           if [ "$OK" = "true" ]; then
-            MSG="已记录：\`$KEY\` 改用选中的头像。下次同步会写进数据库。"
+            MSG="已应用：\`$KEY\` 的头像已写入数据库，页面稍后刷新即可看到。"
           else
             MSG="解析失败：正文里需要有 \`key:\` 和 \`image:\` 两行。"
           fi

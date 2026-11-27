@@ -22,8 +22,9 @@ on:
 permissions:
   contents: write
 
+# 独立并发组：这步要跑很久，占着 actor-data 会把选图、合并、页面重建全堵住
 concurrency:
-  group: actor-data
+  group: avatar-index
   cancel-in-progress: false
 
 jobs:
