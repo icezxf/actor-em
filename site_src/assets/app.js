@@ -359,10 +359,14 @@
     var info = document.createElement('div');
     info.className = 'info';
 
+    // 名字行：名字 + 换头像小按钮（不放图片上，图片保持干净）
+    var nameRow = document.createElement('div');
+    nameRow.className = 'name-row';
     var name = document.createElement('div');
     name.className = 'name';
     name.textContent = a.name;
-    info.appendChild(name);
+    nameRow.appendChild(name);
+    info.appendChild(nameRow);
     if (a.src === 'eu') {
       var euTag = document.createElement('span');
       euTag.className = 'srctag';
@@ -399,7 +403,7 @@
     // 缩略图右下角的相机：直接进详情并展开选图，省一次点击
     var cardPick = document.createElement('button');
     cardPick.type = 'button';
-    cardPick.className = 'card-pick';
+    cardPick.className = 'card-pick name-pick';
     cardPick.title = '换头像';
     cardPick.setAttribute('aria-label', '换头像');
     cardPick.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -410,7 +414,7 @@
       autoPickOnce = true;
       openDetail(a);
     });
-    thumb.appendChild(cardPick);
+    nameRow.appendChild(cardPick);   // 放名字右边，不压在图片上
 
     node.appendChild(thumb);
     node.appendChild(info);
