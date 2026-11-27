@@ -62,11 +62,14 @@
     mLinks: document.getElementById('m-links'),
     mXref: document.getElementById('m-xref'),
     mPickAvatar: document.getElementById('m-pick-avatar'),
+    mAvatarPanel: document.getElementById('m-avatar-panel'),
+    mAvatarClose: document.getElementById('m-avatar-close'),
     mAvatarGrid: document.getElementById('m-avatar-grid'),
     mAvatarNote: document.getElementById('m-avatar-note')
   };
 
   // 默认：只显示日系、按人气排序（用户希望打开就看到最热的日系演员）
+  var autoPickOnce = false;   // 从卡片上的相机按钮进来时，自动展开选图面板
   var state = { q: '', source: 'jp', cup: '', height: '', region: '', country: '', sort: 'popularity', tag: '', onlyAvatar: false };
   var all = [];
   var view = [];
@@ -152,6 +155,7 @@
   function renderAvatarPicker(a, key) {
     var grid = el.mAvatarGrid;
     grid.textContent = '';
+    el.mAvatarPanel.hidden = false;
     el.mAvatarNote.textContent = '加载候选图…';
 
     // 三个来源都拉：gfriends（按日文名）+ StashDB/JavStash（按 key 里的 uuid）
@@ -392,6 +396,22 @@
       info.appendChild(chips);
     }
 
+    // 缩略图右下角的相机：直接进详情并展开选图，省一次点击
+    var cardPick = document.createElement('button');
+    cardPick.type = 'button';
+    cardPick.className = 'card-pick';
+    cardPick.title = '换头像';
+    cardPick.setAttribute('aria-label', '换头像');
+    cardPick.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>' +
+      '<circle cx="12" cy="13" r="4"/></svg>';
+    cardPick.addEventListener('click', function (e) {
+      e.stopPropagation();          // 不要同时触发卡片的 openDetail
+      autoPickOnce = true;
+      openDetail(a);
+    });
+    thumb.appendChild(cardPick);
+
     node.appendChild(thumb);
     node.appendChild(info);
     node.addEventListener('click', function () { openDetail(a); });
@@ -433,11 +453,16 @@
   function openDetail(a) {
     detailToken++;
     var token = detailToken;
-    // 选图区域每次重开都清空，点「换头像」才加载
+    // 选图面板默认收起，点头像上的相机才展开
+    el.mAvatarPanel.hidden = true;
     el.mAvatarGrid.textContent = '';
-    el.mAvatarNote.textContent = '点「换头像」查看候选图。';
+    el.mAvatarNote.textContent = '加载候选图…';
     var detailKey = '';
-    el.mPickAvatar.onclick = function () { renderAvatarPicker(a, detailKey); };
+    var openPicker = function () { renderAvatarPicker(a, detailKey); el.mAvatarPanel.scrollIntoView({ block: 'nearest' }); };
+    el.mPickAvatar.onclick = openPicker;
+    el.mAvatarClose.onclick = function () { el.mAvatarPanel.hidden = true; };
+    var wantAutoPicker = autoPickOnce;   // 从卡片相机进来时自动展开
+    autoPickOnce = false;
     el.mName.textContent = a.name;
     el.mOrig.textContent = a.orig && a.orig !== a.name ? a.orig : '';
     el.mInitial.textContent = (a.name || '?').slice(0, 1);
@@ -495,6 +520,7 @@
         link.textContent = pair[0] + ' ↗';
         el.mLinks.appendChild(link);
       });
+      if (wantAutoPicker) openPicker();
     });
 
     // 对照入口：跳到字典 / MDCx 表，按日文原名搜

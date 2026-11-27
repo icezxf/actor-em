@@ -593,3 +593,44 @@ main { padding: 12px 20px 40px; }
 }
 .lock-card button:active { opacity: .85; }
 .lock-msg { min-height: 18px; margin: 12px 0 0; font-size: 13px; color: #c0392b; }
+
+/* ---------- 换头像入口（详情页头像角标 + 卡片角标） ---------- */
+.m-thumb { position: relative; }
+
+.thumb-pick {
+  /* .m-thumb 有 overflow:hidden（裁圆角图片），所以角标必须落在内部 */
+  position: absolute; right: 4px; bottom: 4px;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  color: #fff; background: var(--accent);
+  border: 2px solid var(--panel); border-radius: 50%;
+  cursor: pointer; padding: 0;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, .28);
+}
+.thumb-pick:hover { filter: brightness(1.08); }
+.thumb-pick svg { display: block; }
+
+.card-pick {
+  position: absolute; right: 4px; bottom: 4px;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  color: #fff; background: rgba(10, 12, 16, .62);
+  border: 0; border-radius: 7px;
+  cursor: pointer; padding: 0;
+  opacity: .9;
+}
+.card-pick:hover { background: var(--accent); opacity: 1; }
+.card-pick svg { display: block; }
+
+/* 候选面板：紧贴头像行下方，展开时明显一些 */
+.avatar-panel { margin-top: 14px; }
+.avatar-panel > h3 { display: flex; align-items: center; gap: 8px; }
+.avatar-panel .linkish { font-size: 12px; }
+
+@media (max-width: 768px) {
+  /* 手机上把点击区域做大一些 */
+  .thumb-pick { width: 36px; height: 36px; right: 5px; bottom: 5px; }
+  .thumb-pick svg { width: 17px; height: 17px; }
+  .card-pick { width: 32px; height: 32px; right: 5px; bottom: 5px; }
+  .card-pick svg { width: 15px; height: 15px; }
+}
