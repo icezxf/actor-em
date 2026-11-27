@@ -183,6 +183,13 @@ def run_site(name: str, cfg: dict, limit: int, no_fetch: bool = False) -> None:
                 done += len(batch)
                 if done % 1000 < BATCH:
                     print(f"[{name}] {done}/{len(todo)}", file=sys.stderr)
+                    # 中途落盘：跑到一半断网也不会全丢，下次从缓存继续
+                    try:
+                        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+                        with open(cache_path, "w", encoding="utf-8") as cf:
+                            json.dump(cache, cf, ensure_ascii=False, separators=(",", ":"))
+                    except Exception:
+                        pass
 
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
     with open(cache_path, "w", encoding="utf-8") as f:
