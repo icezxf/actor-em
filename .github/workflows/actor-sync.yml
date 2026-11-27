@@ -7,9 +7,6 @@ name: actor-sync
 # 前置：先跑过 base-db，仓库里要有 actor_dict.csv。
 
 on:
-  schedule:
-    # 每天 04:00 UTC = 北京时间 12:00
-    - cron: "0 4 * * *"
   workflow_dispatch:
     inputs:
       limit:

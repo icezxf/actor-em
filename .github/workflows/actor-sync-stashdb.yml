@@ -16,8 +16,6 @@ run-name: "${{ github.event_name == 'schedule' && '[欧美库·每日增量]' ||
 # 定时模式：自动刷新清单、抓 500 个新人、非 dry-run；不想定时就把下面 schedule 删掉。
 
 on:
-  schedule:
-    - cron: "0 5 * * *"   # 每天 05:00 UTC = 北京时间 13:00
   workflow_dispatch:
     inputs:
       limit:

@@ -15,7 +15,7 @@ on:
       - "actors_eu.jsonl"       # 欧美库更新后重建页面
       - "data/popularity_*.json"  # 人气排名更新后重建
   workflow_run:
-    workflows: [actor-sync, actor-sync-stashdb, update-popularity, merge-actors]
+    workflows: [actor-sync, actor-sync-stashdb, update-popularity, build-avatar-index, merge-actors]
     types: [completed]
   workflow_dispatch:
 

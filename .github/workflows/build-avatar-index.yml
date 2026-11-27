@@ -10,8 +10,6 @@ name: build-avatar-index
 run-name: "[候选头像] 更新索引"
 
 on:
-  schedule:
-    - cron: "30 4 * * 1"
   workflow_dispatch:
     inputs:
       only:

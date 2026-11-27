@@ -10,8 +10,6 @@ name: base-db
 # 上游变得很慢，脚本用 ETag/digest 指纹比对，没更新时十几秒就跳过，不产生空提交。
 
 on:
-  schedule:
-    - cron: "0 2 * * 1"   # 每周一 02:00 UTC = 北京时间周一 10:00
   workflow_dispatch:
     inputs:
       force:

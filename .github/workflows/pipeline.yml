@@ -1,0 +1,157 @@
+name: pipeline
+
+# 总调度：按依赖顺序把整条链路跑一遍，保证「基础数据一动，所有下游自动跟上」。
+#
+# 顺序（关键：排名/候选图/合并必须在两套 sync 之后）：
+#   base-db（周一）→ 日系 actor-sync → 欧美 actor-sync-stashdb
+#     → update-popularity（周一）→ build-avatar-index（周一）→ merge-actors
+#   → pages 由各工作流的 workflow_run 自动触发，不用这里管
+#
+# 各子工作流仍保留 workflow_dispatch，可以单独手动跑。
+# 它们原来的 cron 已移除，避免和这里重复触发（同一个 concurrency 组会互相排队）。
+#
+# 失败即停：任何一步失败，后面的步骤不再执行，并在摘要里标红。
+
+run-name: "全链路 ${{ github.event_name == 'schedule' && '每日' || '手动' }} $(date)"
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 每天 02:00 UTC（北京 10:00）
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "只跑到某一步（留空=全链路）：jp / eu / rank / avatars / merge"
+        default: ""
+
+permissions:
+  contents: read
+  actions: write          # 需要触发其他 workflow
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 准备
+        run: |
+          echo "UTC $(date -u '+%F %T') / 星期 $(date -u +%u)"
+          echo "IS_MONDAY=$([ "$(date -u +%u)" = "1" ] && echo 1 || echo 0)" >> "$GITHUB_ENV"
+
+      # 触发一个 workflow 并等它结束；失败返回非零
+      - name: 定义调度函数
+        run: |
+          cat > /tmp/dispatch.sh <<'SH'
+          #!/usr/bin/env bash
+          set -uo pipefail
+
+          # $1=workflow 文件；其余参数原样传给 gh workflow run
+          trigger_and_wait() {
+            local wf="$1"; shift
+            local before run=""
+            before=$(gh run list --repo "$GH_REPO" --workflow "$wf" --limit 1 \
+              --json databaseId --jq '.[0].databaseId // "0"' 2>/dev/null)
+            echo "── 触发 $wf $* ──"
+            if ! gh workflow run "$wf" --repo "$GH_REPO" "$@" >/dev/null 2>&1; then
+              echo "::error::触发 $wf 失败"
+              return 1
+            fi
+            for i in $(seq 1 12); do
+              sleep 8
+              run=$(gh run list --repo "$GH_REPO" --workflow "$wf" --limit 1 \
+                --json databaseId --jq '.[0].databaseId // ""' 2>/dev/null)
+              if [ -n "$run" ] && [ "$run" != "$before" ]; then break; fi
+            done
+            if [ -z "$run" ] || [ "$run" = "$before" ]; then
+              echo "::error::$wf 触发后没拿到新的 run id"
+              return 1
+            fi
+            echo "$wf run=$run，等待完成…"
+            if ! gh run watch "$run" --repo "$GH_REPO" --exit-status --interval 20 >/dev/null 2>&1; then
+              local concl
+              concl=$(gh run view "$run" --repo "$GH_REPO" --json conclusion --jq '.conclusion // "unknown"' 2>/dev/null)
+              echo "::error::$wf (run $run) 失败：$concl"
+              return 1
+            fi
+            echo "$wf 完成 ✅"
+            return 0
+          }
+          SH
+          chmod +x /tmp/dispatch.sh
+          echo "函数已就绪"
+
+      - name: ① 基础数据（仅周一）
+        if: "env.IS_MONDAY == '1' && (!github.event.inputs.only || github.event.inputs.only == 'base')"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: source /tmp/dispatch.sh && trigger_and_wait base-db.yml
+
+      - name: ② 日系库
+        if: "!github.event.inputs.only || github.event.inputs.only == 'jp'"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          source /tmp/dispatch.sh
+          trigger_and_wait actor-sync.yml \
+            -f limit=2000 -f concurrency=6 -f dry_run=false
+
+      - name: ③ 欧美库
+        if: "!github.event.inputs.only || github.event.inputs.only == 'eu'"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          source /tmp/dispatch.sh
+          trigger_and_wait actor-sync-stashdb.yml \
+            -f limit=500 -f concurrency=8 -f dry_run=false \
+            -f refresh_list=true -f refresh_stored=false
+
+      - name: ④ 人气排名（仅周一）
+        if: "env.IS_MONDAY == '1' && (!github.event.inputs.only || github.event.inputs.only == 'rank')"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: source /tmp/dispatch.sh && trigger_and_wait update-popularity.yml
+
+      - name: ⑤ 候选头像（仅周一）
+        if: "env.IS_MONDAY == '1' && (!github.event.inputs.only || github.event.inputs.only == 'avatars')"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          source /tmp/dispatch.sh
+          trigger_and_wait build-avatar-index.yml -f only=both -f limit=0
+
+      - name: ⑥ 合并库
+        if: "!github.event.inputs.only || github.event.inputs.only == 'merge'"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: source /tmp/dispatch.sh && trigger_and_wait merge-actors.yml
+
+      - name: ⑦ 重建静态站
+        # GITHUB_TOKEN 触发的子工作流不会再触发 pages 的 workflow_run（GitHub 防递归），
+        # 所以这里自己触发一次，保证页面跟上最新数据。
+        if: "always() && !cancelled()"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          source /tmp/dispatch.sh
+          trigger_and_wait pages.yml || echo "::warning::pages 触发失败，可稍后手动重跑"
+
+      - name: 摘要
+        if: "always()"
+        run: |
+          echo "### 全链路调度" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 结果：${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 星期：$(date -u +%u)（周一才跑基础数据/排名/候选图）" >> "$GITHUB_STEP_SUMMARY"
+          echo "- pages 由各数据工作流的 workflow_run 自动重建" >> "$GITHUB_STEP_SUMMARY"
