@@ -82,7 +82,7 @@
       id: r[0], name: r[1], orig: r[2], avatar: avatarUrl(r[3]),
       birth: r[4], height: r[5], cup: r[6], meas: r[7], career: r[8],
       tags: tags, aliases: aliases, place: r[11], country: (r[12] || '').toUpperCase(),
-      src: r[13] || 'jp',
+      src: r[13] || 'jp', rank: r[14] || 0,
       search: (r[1] + ' ' + r[2] + ' ' + aliases.join(' ') + ' ' + tags.join(' ')).toLowerCase()
     };
   }
@@ -178,7 +178,12 @@
       birth: function (x, y) { return year(y.birth) - year(x.birth); },
       height: function (x, y) { return (y.height || 0) - (x.height || 0); },
       cup: function (x, y) { return cupRank(y.cup) - cupRank(x.cup); },
-      debut: function (x, y) { return (y.career || 0) - (x.career || 0); }
+      debut: function (x, y) { return (y.career || 0) - (x.career || 0); },
+      // 人气：有排名的按 rank 升序（小=更火），没排名的（0）沉底
+      popularity: function (x, y) {
+        var rx = x.rank || 1e9, ry = y.rank || 1e9;
+        return rx - ry || x.name.localeCompare(y.name, 'ja');
+      }
     }[state.sort];
     out.sort(cmp);
     return out;

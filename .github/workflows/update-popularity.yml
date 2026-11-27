@@ -1,0 +1,91 @@
+name: update-popularity
+
+# 人气排名更新：从 StashDB / JavStash 按 POPULARITY 拉全量排名 →
+#   ① 生成排名文件 data/popularity_*.json（页面查表用）
+#   ② 把 rank 写进 actors.jsonl / actors_eu.jsonl 的 popularity_rank 字段（数据自带排名）
+# 每周一 03:00 UTC（在 base-db 02:00 之后、日系 04:00 之前）+ 手动。
+
+run-name: "[人气排名] 更新"
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # 每周一 03:00 UTC = 北京周一 11:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ① 拉两站人气排名
+        env:
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+        run: python3 scripts/export_popularity.py --per-page 500
+
+      - name: ② 写回数据库 + 派生
+        run: python3 scripts/apply_popularity.py
+
+      - name: ③ 校验排名文件
+        run: |
+          python3 - <<'PY'
+          import json
+          for f in ["data/popularity_stash.json", "data/popularity_jav.json"]:
+              try:
+                  d = json.load(open(f, encoding="utf-8"))
+                  print(f"{f}: {len(d)} 个排名")
+              except Exception as e:
+                  print(f"{f}: 读取失败 {e}")
+          for f in ["actors.jsonl", "actors_eu.jsonl"]:
+              n = 0
+              for line in open(f, encoding="utf-8"):
+                  if '"popularity_rank"' in line:
+                      n += 1
+              print(f"{f}: {n} 条带 popularity_rank")
+          PY
+
+      - name: ④ 提交
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          KEEP="$RUNNER_TEMP/pop-out"
+          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          for f in data/popularity_stash.json data/popularity_jav.json \
+                   actors.jsonl actors.json actors_eu.jsonl actors_eu.json; do
+            [ -e "$f" ] && cp -a "$f" "$KEEP"/ || true
+          done
+          MSG="chore(popularity): update rank files + DB snapshots ($(date -u +%F))"
+
+          commit_on_latest() {
+            git fetch --depth=1 origin main || return 1
+            git reset --hard FETCH_HEAD || return 1
+            for f in data/popularity_stash.json data/popularity_jav.json \
+                     actors.jsonl actors.json actors_eu.jsonl actors_eu.json; do
+              if [ -f "$KEEP/$f" ]; then cp -a "$KEEP/$f" .; git add -- "$f" || return 1; fi
+            done
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "$MSG" || return 1
+            return 0
+          }
+          for attempt in 1 2 3; do
+            if commit_on_latest; then rc=0; else rc=$?; fi
+            if [ "$rc" = 2 ]; then echo "本轮无变化，跳过提交"; exit 0; fi
+            if [ "$rc" != 0 ]; then echo "提交失败（$rc）"; exit "$rc"; fi
+            if git push; then echo "已推送（第 $attempt 次）"; exit 0; fi
+            echo "push 被拒，重新对齐后重试"; sleep 5
+          done
+          exit 1

@@ -47,6 +47,8 @@ FIELDS = [
     "cup_size", "measurements", "career_start", "tags", "aliases", "birth_place",
     # country 是 ISO 码（JP/US/TW…），前端翻成中文并做「日本 / 其他 → 具体国家」两级筛选
     "country", "src",
+    # popularity_rank：人气排名（1 开始）；0 = 无排名。排序下拉「按人气」用
+    "rank",
 ]
 
 # 别名给搜索用，个别人有上百条（含各种活动名），全带上会把索引撑大 0.5MB，取前 12 条足够。
@@ -204,6 +206,7 @@ def build_rows(rows: list[dict], src: str = "jp"):
             a.get("birth_place") or "",                 # 11
             a.get("country") or "",                     # 12
             src,                                        # 13 来源 jp/eu
+            int(a.get("popularity_rank") or 0),         # 14 人气排名，0=无
         ])
         bio = a.get("bio") or ""
         home = a.get("homepage_url") or ""
