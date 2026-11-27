@@ -84,7 +84,11 @@ jobs:
             git reset --hard FETCH_HEAD || return 1
             for d in data/avatars_stash data/avatars_jav; do
               if [ -d "$KEEP/$d" ]; then
-                rm -rf "$d"; cp -a "$KEEP/$d" . || return 1
+                # cp -a src . 会把目录放到当前目录下变成 ./avatars_jav；
+                # 必须指定确切目标路径，删掉旧目录后复制才能落到 data/ 下
+                rm -rf "$d"
+                mkdir -p "$(dirname "$d")"
+                cp -a "$KEEP/$d" "$d" || return 1
                 git add -- "$d" || return 1
               fi
             done
