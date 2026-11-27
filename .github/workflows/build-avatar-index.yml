@@ -70,9 +70,12 @@ jobs:
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           KEEP="$RUNNER_TEMP/av-out"
-          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          # 注意：cp -a data/x "$KEEP"/ 会变成 "$KEEP/x"（少了 data/），
+          # 后面按 "$KEEP/data/x" 取就永远找不到 → 误判「无变化」。
+          # 所以先建好 data/ 子目录再复制。
+          rm -rf "$KEEP"; mkdir -p "$KEEP/data"
           for d in data/avatars_stash data/avatars_jav; do
-            [ -d "$d" ] && cp -a "$d" "$KEEP"/ || true
+            [ -d "$d" ] && cp -a "$d" "$KEEP/data/" || true
           done
           MSG="chore(avatars): update candidate image index ($(date -u +%F))"
 

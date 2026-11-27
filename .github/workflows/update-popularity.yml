@@ -61,10 +61,16 @@ jobs:
           git config user.name  "actor-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           KEEP="$RUNNER_TEMP/pop-out"
-          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          # 同上：带 data/ 前缀的文件要先建好 $KEEP/data，否则复制后路径对不上，
+          # git add 拿不到、提交被判定为「无变化」——排名文件从来没进过仓库。
+          rm -rf "$KEEP"; mkdir -p "$KEEP/data"
           for f in data/popularity_stash.json data/popularity_jav.json \
                    actors.jsonl actors.json actors_eu.jsonl actors_eu.json; do
-            [ -e "$f" ] && cp -a "$f" "$KEEP"/ || true
+            [ -e "$f" ] || continue
+            case "$f" in
+              data/*) cp -a "$f" "$KEEP/data/" ;;
+              *)      cp -a "$f" "$KEEP/" ;;
+            esac
           done
           MSG="chore(popularity): update rank files + DB snapshots ($(date -u +%F))"
 
