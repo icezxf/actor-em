@@ -1,0 +1,17 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-11-27T05:58:14Z",
+  "count": 80112,
+  "by_status": {
+    "ok": 40216,
+    "partial": 37388,
+    "skipped": 194,
+    "no_source": 2299,
+    "failed": 15
+  },
+  "sources": {
+    "jp": 19113,
+    "eu": 61014,
+    "overlap": 15
+  }
+}
