@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-27T09:19:09Z",
+  "generated_at": "2026-11-27T09:22:46Z",
   "count": 16601,
   "actors": [
     {
@@ -157235,7 +157235,7 @@
       "bio_lang": "ja",
       "avatar": "https://raw.githubusercontent.com/gfriends/gfriends/master/Content/0-Hand-Storage/%E4%B8%89%E4%B8%8A%E6%82%A0%E4%BA%9C.jpg",
       "avatar_cn": "https://cdn.jsdelivr.net/gh/gfriends/gfriends@master/Content/0-Hand-Storage/%E4%B8%89%E4%B8%8A%E6%82%A0%E4%BA%9C.jpg",
-      "avatar_source_site": "gfriends",
+      "avatar_source_site": "manual",
       "homepage_url": "https://javstash.org/performers/33ba3368-2a68-45e6-b409-ac470a29053e",
       "provider_ids": {
         "JavStash": "33ba3368-2a68-45e6-b409-ac470a29053e",
