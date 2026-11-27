@@ -1,0 +1,98 @@
+name: merge-actors
+
+# 合并工作流：日系库 actors.jsonl + 欧美库 actors_eu.jsonl → actors_all.*
+#
+# 规则：按 key 并集去重；同 key 冲突以日系库为准，欧美只填空位。
+# 产物独立于两套源库：actors_all.jsonl / actors_all.json / actors_all.manifest.json
+# 手动触发；两套源库更新后跑一次即可。
+
+run-name: "[合并库] 日系+欧美 → actors_all"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ① 检查两套源库
+        run: |
+          for f in actors.jsonl actors_eu.jsonl; do
+            if [ ! -f "$f" ]; then
+              echo "::error::缺少 $f，无法合并"
+              exit 1
+            fi
+            echo "$f：$(wc -l < "$f") 行"
+          done
+
+      - name: ② 合并（冲突以日系为准）
+        run: python3 scripts/merge_actors.py
+
+      - name: ③ 质量体检（只读，不阻断）
+        continue-on-error: true
+        run: |
+          python3 scripts/check_quality.py actors_all.jsonl \
+            --json quality-all-report.json > quality-all-report.md 2> quality-all-report.err || true
+          cat quality-all-report.md >> "$GITHUB_STEP_SUMMARY" || true
+          if [ -s quality-all-report.err ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**体检发现硬性问题（多为源库遗留）：**" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat quality-all-report.err >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: ④ 提交合并库
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          KEEP="$RUNNER_TEMP/all-out"
+          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          for f in actors_all.jsonl actors_all.json actors_all.manifest.json; do
+            cp -a "$f" "$KEEP"/ || exit 1
+          done
+          rows=$(wc -l < actors_all.jsonl)
+          MSG="chore(actors-all): merge JP+EU ($(date -u +%F), ${rows} actors)"
+
+          commit_on_latest() {
+            git fetch --depth=1 origin main || return 1
+            git reset --hard FETCH_HEAD || return 1
+            for f in actors_all.jsonl actors_all.json actors_all.manifest.json; do
+              cp -a "$KEEP/$f" . || return 1
+              git add -- "$f" || return 1
+            done
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "$MSG" || return 1
+            return 0
+          }
+          for attempt in 1 2 3; do
+            if commit_on_latest; then rc=0; else rc=$?; fi
+            if [ "$rc" = 2 ]; then echo "本轮无变化，跳过提交"; exit 0; fi
+            if [ "$rc" != 0 ]; then echo "提交失败（$rc）"; exit "$rc"; fi
+            if git push; then echo "已推送（第 $attempt 次）"; exit 0; fi
+            echo "push 被拒，重新对齐后重试"; sleep 5
+          done
+          echo "连续 3 次推送失败"; exit 1
+
+      - name: ⑤ 摘要
+        if: always()
+        run: |
+          echo "### 合并库（日系 + 欧美）" >> "$GITHUB_STEP_SUMMARY"
+          for f in actors_all.jsonl actors_all.json actors_all.manifest.json; do
+            [ -f "$f" ] && echo "- $f：$(wc -l < "$f" 2>/dev/null || echo '-') / $(du -h "$f" | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          done
