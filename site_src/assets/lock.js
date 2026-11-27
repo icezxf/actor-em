@@ -65,10 +65,44 @@
     return unlock(password);
   }
 
+
+  // ---------- 换头像：直接调 Worker，不再开 issue ----------
+  // 用站点密码算 HMAC 签名（不发明文密码），Worker 校验后触发 GitHub Actions。
+  var PICK_ENDPOINT = 'https://actor-em-tg.2435817633.workers.dev/pick-avatar';
+
+  function bytesToB64(buf) {
+    var b = new Uint8Array(buf), s = '';
+    for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+    return btoa(s);
+  }
+
+  async function pickAvatar(key, image) {
+    if (!cryptoKey) throw new Error('未解锁');
+    var pw = sessionStorage.getItem('site_pw');
+    if (!pw) throw new Error('会话已过期，请刷新页面重新输入密码');
+    var ts = Math.floor(Date.now() / 1000);
+    var msg = key + '|' + image + '|' + ts;
+    var hk = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(pw), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    var sig = bytesToB64(await crypto.subtle.sign('HMAC', hk, new TextEncoder().encode(msg)));
+    var resp = await fetch(PICK_ENDPOINT, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key: key, image: image, ts: ts, sig: sig }),
+    });
+    var data = await resp.json().catch(function () { return {}; });
+    if (!resp.ok || !data.ok) {
+      throw new Error(data.error || ('HTTP ' + resp.status));
+    }
+    return data;
+  }
+
   window.SiteLock = {
     fetchData: fetchData,
     unlock: unlock,
     isUnlocked: isUnlocked,
     tryRestore: tryRestore,
+    pickAvatar: pickAvatar,
   };
 })();

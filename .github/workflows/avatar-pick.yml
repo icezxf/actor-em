@@ -14,6 +14,9 @@ name: avatar-pick
 on:
   issues:
     types: [opened]
+  # 静态站点「换头像」直接调 Worker → Worker 派发这个事件（免 issue）
+  repository_dispatch:
+    types: [avatar-pick]
 
 permissions:
   contents: write
@@ -27,7 +30,9 @@ concurrency:
 
 jobs:
   apply:
-    if: startsWith(github.event.issue.title, '[avatar]')
+    if: >-
+      (github.event_name == 'issues' && startsWith(github.event.issue.title, '[avatar]')) ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'avatar-pick')
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -43,18 +48,26 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: ① 解析 issue
+      - name: ① 解析来源（issue 或 Worker 派发）
         id: parse
         env:
+          EVENT: ${{ github.event_name }}
           ISSUE_BODY: ${{ github.event.issue.body }}
+          PAYLOAD_KEY: ${{ github.event.client_payload.key }}
+          PAYLOAD_IMAGE: ${{ github.event.client_payload.image }}
         run: |
           python3 - <<'PY'
           import os, re
-          body = os.environ.get("ISSUE_BODY", "")
-          def grab(label):
-              m = re.search(rf"^{label}\s*:\s*(\S+)\s*$", body, re.M)
-              return m.group(1).strip() if m else ""
-          key, name, image = grab("key"), grab("name"), grab("image")
+          if os.environ.get("EVENT") == "repository_dispatch":
+              key = (os.environ.get("PAYLOAD_KEY") or "").strip()
+              image = (os.environ.get("PAYLOAD_IMAGE") or "").strip()
+              name = ""
+          else:
+              body = os.environ.get("ISSUE_BODY", "")
+              def grab(label):
+                  m = re.search(rf"^{label}\s*:\s*(\S+)\s*$", body, re.M)
+                  return m.group(1).strip() if m else ""
+              key, name, image = grab("key"), grab("name"), grab("image")
           ok = bool(key and image and image.startswith("http"))
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
               f.write(f"ok={'true' if ok else 'false'}\n")
@@ -124,8 +137,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run pages.yml --repo "${{ github.repository }}" || echo "::warning::pages 触发失败"
 
-      - name: ⑥ 关闭 issue 并回复
-        if: always()
+      - name: ⑥ 关闭 issue 并回复（仅 issue 来源）
+        if: always() && github.event_name == 'issues'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUM: ${{ github.event.issue.number }}

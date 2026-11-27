@@ -177,7 +177,7 @@
         el.mAvatarNote.textContent = '没找到候选图（gfriends 与数据源都没有）。';
         return;
       }
-      el.mAvatarNote.textContent = '共 ' + urls.length + ' 张（含 gfriends 与数据源原图）。点一张选中，再点下方按钮提交。';
+      el.mAvatarNote.textContent = '共 ' + urls.length + ' 张（gfriends + 数据源原图）。点一张选中，再点下方按钮直接换上。';
       var selectedUrl = '';
       var pickBtn = document.createElement('button');
       pickBtn.type = 'button';
@@ -186,10 +186,20 @@
       pickBtn.disabled = true;
       pickBtn.addEventListener('click', function () {
         if (!selectedUrl) return;
-        var title = '[avatar] ' + a.name + ' (' + a.id + ')';
-        var body = 'key: ' + (key || '') + '\nname: ' + a.name + '\nimage: ' + selectedUrl;
-        window.open(REPO_URL + '/issues/new?title=' + encodeURIComponent(title) +
-          '&body=' + encodeURIComponent(body), '_blank');
+        if (!key) {
+          el.mAvatarNote.textContent = '缺少主键，无法提交（详情数据可能未加载完）';
+          return;
+        }
+        pickBtn.disabled = true;
+        pickBtn.textContent = '提交中…';
+        SiteLock.pickAvatar(key, selectedUrl).then(function () {
+          pickBtn.textContent = '已提交 ✓';
+          el.mAvatarNote.textContent = '已提交，约 1~2 分钟后页面会更新（后台正在写库并重建）。';
+        }).catch(function (err) {
+          pickBtn.disabled = false;
+          pickBtn.textContent = '用这张 → 提交';
+          el.mAvatarNote.textContent = '提交失败：' + (err && err.message ? err.message : err);
+        });
       });
 
       urls.forEach(function (u, i) {
