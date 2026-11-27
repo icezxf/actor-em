@@ -6,7 +6,12 @@ name: base-db
 # mdcx_profiles.csv（约 4MB）也放根目录，方便直接在 GitHub 上查演员档案。
 # 两个源都没变、且导出 CSV 也没变化时，不产生提交。
 
+# 触发：每周定时（周一 02:00 UTC，排在日系 04:00 / 欧美 05:00 之前）+ 手动。
+# 上游变得很慢，脚本用 ETag/digest 指纹比对，没更新时十几秒就跳过，不产生空提交。
+
 on:
+  schedule:
+    - cron: "0 2 * * 1"   # 每周一 02:00 UTC = 北京时间周一 10:00
   workflow_dispatch:
     inputs:
       force:
