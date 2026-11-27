@@ -1,0 +1,100 @@
+name: build-avatar-index
+
+# 候选头像索引：从 StashDB / JavStash 拉每个演员的全部图片 URL，
+# 按 id 分片存到 data/avatars_stash/ 与 data/avatars_jav/（提交仓库）。
+# 静态站在详情页「换头像」时按 id 哈希只拉一片，无需任何后端/密钥。
+#
+# 增量：脚本会从上次分片读回缓存，只拉新增演员；首次全量约 30~60 分钟。
+# 每周一 04:30 UTC（在 base-db 02:00、popularity 03:00 之后，避开日系 04:00 抢锁太久）。
+
+run-name: "[候选头像] 更新索引"
+
+on:
+  schedule:
+    - cron: "30 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "只拉一站：stash / jav / both"
+        default: "both"
+      limit:
+        description: "每站最多新拉多少个（0=不限，调试用）"
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actor-data
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ① 拉候选图并分片
+        env:
+          STASHDB_API_KEY: ${{ secrets.STASHDB_API_KEY }}
+          JAVSTASH_API_KEY: ${{ secrets.JAVSTASH_API_KEY }}
+          ONLY: ${{ github.event.inputs.only || 'both' }}
+          LIMIT: ${{ github.event.inputs.limit || '0' }}
+        run: |
+          python3 scripts/build_avatar_index.py --only "$ONLY" --limit "$LIMIT"
+
+      - name: ② 统计
+        run: |
+          echo "### 候选头像索引" >> "$GITHUB_STEP_SUMMARY"
+          for d in data/avatars_stash data/avatars_jav; do
+            if [ -d "$d" ]; then
+              n=$(du -sh "$d" | cut -f1)
+              cnt=$(python3 -c "
+          import json,glob
+          t=0
+          for p in glob.glob('$d/*.json'):
+              t+=len(json.load(open(p,encoding='utf-8')))
+          print(t)
+          ")
+              echo "- $d：$cnt 人有图，$n" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: ③ 提交分片
+        run: |
+          git config user.name  "actor-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          KEEP="$RUNNER_TEMP/av-out"
+          rm -rf "$KEEP"; mkdir -p "$KEEP"
+          for d in data/avatars_stash data/avatars_jav; do
+            [ -d "$d" ] && cp -a "$d" "$KEEP"/ || true
+          done
+          MSG="chore(avatars): update candidate image index ($(date -u +%F))"
+
+          commit_on_latest() {
+            git fetch --depth=1 origin main || return 1
+            git reset --hard FETCH_HEAD || return 1
+            for d in data/avatars_stash data/avatars_jav; do
+              if [ -d "$KEEP/$d" ]; then
+                rm -rf "$d"; cp -a "$KEEP/$d" . || return 1
+                git add -- "$d" || return 1
+              fi
+            done
+            if git diff --cached --quiet; then return 2; fi
+            git commit -m "$MSG" || return 1
+            return 0
+          }
+          for attempt in 1 2 3; do
+            if commit_on_latest; then rc=0; else rc=$?; fi
+            if [ "$rc" = 2 ]; then echo "本轮无变化，跳过提交"; exit 0; fi
+            if [ "$rc" != 0 ]; then echo "提交失败（$rc）"; exit "$rc"; fi
+            if git push; then echo "已推送（第 $attempt 次）"; exit 0; fi
+            echo "push 被拒，重试"; sleep 5
+          done
+          exit 1

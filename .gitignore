@@ -29,3 +29,6 @@ secrets.env
 # Worker 本地依赖与构建缓存
 worker/node_modules/
 worker/.wrangler/
+
+# 候选头像拉取缓存：体积大且可从 data/avatars_* 分片重建，不入库
+data/avatar_cache_*.json

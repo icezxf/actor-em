@@ -339,6 +339,26 @@ def main() -> int:
     except Exception as e:
         print(f"跳过 gfriends 索引：{e}", file=sys.stderr)
 
+    # 欧美/日系候选头像分片：只读 data/avatar_cache_*.json 的缓存生成（--no-fetch），
+    # 秒级完成。真正的 API 拉取由 .github/workflows/build-avatar-index.yml 定期跑。
+    try:
+        import subprocess
+        r = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "scripts", "build_avatar_index.py"), "--no-fetch"],
+            capture_output=True, text=True, timeout=120,
+        )
+        for line in (r.stderr or "").strip().splitlines()[-2:]:
+            print(line)
+        # 分片在 data/ 下（提交仓库），复制进站点产物
+        for site in ("stash", "jav"):
+            src = os.path.join(ROOT, "data", f"avatars_{site}")
+            if os.path.isdir(src):
+                dst = os.path.join(OUT_DIR, "data", f"avatars_{site}")
+                shutil.rmtree(dst, ignore_errors=True)
+                shutil.copytree(src, dst)
+    except Exception as e:
+        print(f"跳过候选头像分片：{e}", file=sys.stderr)
+
     size = os.path.getsize(data_path)
     print(f"演员 {len(data_rows)} 条（源 {len(rows)} 条）→ {data_path} ({size/1024/1024:.2f} MB)")
     print(f"详情分片 {DETAIL_SHARDS} 个，共 {detail_bytes/1024/1024:.2f} MB")

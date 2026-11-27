@@ -120,6 +120,32 @@
       });
   }
 
+  // StashDB / JavStash 候选图：分片文件 key 是 provider id（uuid），
+  // 按 id 字符码之和 % 128 分片（与 scripts/build_avatar_index.py 一致）。
+  var SITE_SHARDS = 128;
+  var siteImgCache = {};
+
+  function idShard(pid) {
+    var s = 0;
+    for (var i = 0; i < pid.length; i++) s += pid.charCodeAt(i);
+    return s % SITE_SHARDS;
+  }
+
+  function loadSiteImages(site, pid, cb) {
+    var dir = site === 'stashdb' ? 'avatars_stash' : site === 'javstash' ? 'avatars_jav' : '';
+    if (!dir || !pid) { cb([]); return; }
+    var shard = idShard(pid);
+    var ck = dir + '/' + shard;
+    if (siteImgCache[ck]) { cb(siteImgCache[ck][pid] || []); return; }
+    fetch('data/' + dir + '/' + shard + '.json')
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .catch(function () { return {}; })
+      .then(function (data) {
+        siteImgCache[ck] = data;
+        cb(data[pid] || []);
+      });
+  }
+
   // 选图：展示候选网格，点一张后生成 GitHub issue 链接（含 key + 图片 URL）。
   // 仓库 owner 提交 issue 后，workflow 会写回 avatar_choices.json。
   var REPO_URL = 'https://github.com/icezxf/actor-em';
@@ -129,27 +155,30 @@
     grid.textContent = '';
     el.mAvatarNote.textContent = '加载候选图…';
 
-    // 多个候选名都试：主名、原名、别名（gfriends 按日文名存图）
+    // 三个来源都拉：gfriends（按日文名）+ StashDB/JavStash（按 key 里的 uuid）
     var names = [a.name, a.orig].concat(a.aliases || []).filter(function (n, i, arr) {
       return n && arr.indexOf(n) === i;
     });
+    var parts = (key || '').split(':');
+    var site = parts[0] || '';
+    var pid = parts[1] || '';
     var found = [];
-    var pending = names.length;
-    if (!pending) { el.mAvatarNote.textContent = '没有可用的候选来源。'; return; }
+    var pending = names.length + 1;
 
-    names.forEach(function (n) {
-      loadGfriends(n, function (urls) {
-        urls.forEach(function (u) { if (found.indexOf(u) < 0) found.push(u); });
-        if (--pending === 0) drawGrid(found);
-      });
-    });
+    function add(urls) {
+      urls.forEach(function (u) { if (found.indexOf(u) < 0) found.push(u); });
+      if (--pending <= 0) drawGrid(found);
+    }
+
+    names.forEach(function (n) { loadGfriends(n, add); });
+    loadSiteImages(site, pid, add);
 
     function drawGrid(urls) {
       if (!urls.length) {
-        el.mAvatarNote.textContent = 'gfriends 里没有这个人的图。';
+        el.mAvatarNote.textContent = '没找到候选图（gfriends 与数据源都没有）。';
         return;
       }
-      el.mAvatarNote.textContent = '共 ' + urls.length + ' 张（gfriends）。点一张选中，再点下方按钮提交。';
+      el.mAvatarNote.textContent = '共 ' + urls.length + ' 张（含 gfriends 与数据源原图）。点一张选中，再点下方按钮提交。';
       var selectedUrl = '';
       var pickBtn = document.createElement('button');
       pickBtn.type = 'button';
