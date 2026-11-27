@@ -124,9 +124,10 @@ def main():
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     json_path = os.path.join(ROOT, args.out + ".json")
     with open(json_path, "w", encoding="utf-8") as f:
+        # 紧凑输出：indent=2 时 8 万条会到 101MB，超 GitHub 100MB 限制。
         json.dump({"schema_version": 3, "generated_at": now,
                    "count": len(exportable), "actors": exportable},
-                  f, ensure_ascii=False, indent=2)
+                  f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
 
     from collections import Counter
