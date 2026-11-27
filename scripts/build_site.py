@@ -280,9 +280,11 @@ def main() -> int:
         html = html.replace(f"assets/{asset}", f"assets/{asset}?v={ver}")
     with open(os.path.join(OUT_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
-    for name in ("lock.js", "app.js", "tables.js", "style.css"):
-        shutil.copyfile(os.path.join(SRC_DIR, "assets", name),
-                        os.path.join(OUT_DIR, "assets", name))
+    for name in ("lock.js", "app.js", "tables.js", "style.css",
+                 "favicon.ico", "apple-touch-icon.png", "icon-192.png", "icon-512.png"):
+        src_asset = os.path.join(SRC_DIR, "assets", name)
+        if os.path.exists(src_asset):
+            shutil.copyfile(src_asset, os.path.join(OUT_DIR, "assets", name))
 
     payload = {"fields": FIELDS, "rows": data_rows}
     data_path = os.path.join(OUT_DIR, "data", "actors.json")
