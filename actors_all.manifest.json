@@ -1,17 +1,17 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-11-27T05:58:14Z",
-  "count": 80112,
+  "generated_at": "2026-11-28T10:16:57Z",
+  "count": 80200,
   "by_status": {
-    "ok": 40216,
-    "partial": 37388,
+    "ok": 40238,
+    "partial": 37453,
     "skipped": 194,
-    "no_source": 2299,
-    "failed": 15
+    "no_source": 2301,
+    "failed": 14
   },
   "sources": {
-    "jp": 19113,
-    "eu": 61014,
+    "jp": 19098,
+    "eu": 61117,
     "overlap": 15
   }
 }
